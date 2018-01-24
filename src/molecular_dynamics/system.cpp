@@ -104,7 +104,7 @@ void System::removeEscapedAtoms() {
 */
 
 
-void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double latticeConstant, double temperature) {
+void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double variance, bool input_variance) {
 
 
     vec3 LatticeVector;  //vector which points to the origin of each unit cell
@@ -128,7 +128,7 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 z = LatticeVector[2];
                 atom1->setInitialPosition(x,y,z);
                 atom1->num_bndry_crossings.set(0.,0.,0.);   //make sure initial # of bndry crossings is 0
-                atom1->resetVelocityMaxwellian(temperature);
+                atom1->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom1);     //add element to vector m_atoms 1 element (atom object)
 
                 Atom *atom2 = new Atom(UnitConverter::massFromSI(6.63352088e-26));
@@ -137,7 +137,7 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 z = LatticeVector[2];
                 atom2->setInitialPosition(x,y,z);
                 atom2->num_bndry_crossings.set(0.,0.,0.);
-                atom2->resetVelocityMaxwellian(temperature);
+                atom2->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom2);
 
                 Atom *atom3 = new Atom(UnitConverter::massFromSI(6.63352088e-26));
@@ -146,7 +146,7 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 z = halfLatticeConstant + LatticeVector[2];
                 atom3->setInitialPosition(x,y,z);
                 atom3->num_bndry_crossings.set(0.,0.,0.);
-                atom3->resetVelocityMaxwellian(temperature);
+                atom3->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom3);
 
                 Atom *atom4 = new Atom(UnitConverter::massFromSI(6.63352088e-26));
@@ -155,7 +155,7 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 z = halfLatticeConstant + LatticeVector[2];
                 atom4->setInitialPosition(x,y,z);
                 atom4->num_bndry_crossings.set(0.,0.,0.);
-                atom4->resetVelocityMaxwellian(temperature);
+                atom4->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom4);
 
                 //std::cout << "atom mass = " <<atom1->mass() <<std::endl;
@@ -169,21 +169,21 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
 }
 
-void System::createRandomPositions(int num_particles, double temperature){
+void System::createRandomPositions(int num_particles, double side_length, double temperature, double variance, bool input_variance){
 
     //Places particles randomly into a cube of 10 angstroms
     for(int i=0; i<num_particles; i++) {      //for all atoms (100 right now)
         Atom *atom = new Atom(UnitConverter::massFromSI(6.63352088e-26)); //uses mass in kg
         //Choose random x,y,z positions
-        double x = Random::nextDouble(0, 10); // random number in the interval [0,10]
-        double y = Random::nextDouble(0, 10);
-        double z = Random::nextDouble(0, 10);
+        double x = Random::nextDouble(0, side_length); // random number in the interval [0,10]. nextDouble is defined in random.h
+        double y = Random::nextDouble(0, side_length);
+        double z = Random::nextDouble(0, side_length);
 
         atom->position.set(x,y,z);    //set atom to position x,y,z
         //TESTING
-    std::cout <<x <<std::endl;
+    //std::cout <<x <<std::endl;
     //  ///////////////////
-        atom->resetVelocityMaxwellian(temperature);
+        atom->resetVelocityMaxwellian(temperature, variance, input_variance);
         m_atoms.push_back(atom);     //add element to vector m_atoms 1 element (atom object)
     }
 }

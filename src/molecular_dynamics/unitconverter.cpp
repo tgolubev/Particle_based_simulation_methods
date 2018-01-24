@@ -24,17 +24,18 @@ double UnitConverter::diff0 = 0;
 std::string UnitConverter::currentUnits = "No units chosen.";
 bool UnitConverter::initialized = false;
 
-void UnitConverter::initializeMDUnits() {
+
+void UnitConverter::initializeMDUnits(double sigma, double epsilon) {
     UnitConverter::initialized = true;
     UnitConverter::currentUnits = "MD units";
     // Molecular Dynamics units
 
     // Fundamental units
-    double m0 = 1.66053892e-27;         // SI [kg]
-    double L0 = 3.405e-10;                  // SI [m]
+    double m0 = 1.66053892e-27;         // 1 amu in SI [kg]
+    double L0 = sigma*1.e-10;                // 1 particle diameter in SI [m]
     double kb = 1.3806488e-23;          // SI [J/K]
-    double E0eV = 1.0318e-2;            // eV
-    double E0 = 1.60217657e-19*E0eV;    // SI [J]
+    double E0eV = epsilon;            //epsilon (from LJ) in in eV
+    double E0 = 1.60217657e-19*E0eV;    // convert epsilon to SI [J]
 
     UnitConverter::m0 = m0;
     UnitConverter::kb = kb;
@@ -45,7 +46,7 @@ void UnitConverter::initializeMDUnits() {
     UnitConverter::t0 = L0*sqrt(m0/E0);
     UnitConverter::v0 = L0/t0;
     UnitConverter::F0 = E0/a0;
-    UnitConverter::T0 = E0/kb;
+    UnitConverter::T0 = E0/kb;  //epsilon/kb  --> epsilon is from LJ
     UnitConverter::P0 = E0/(a0*a0*a0);
     UnitConverter::visc0 = P0*t0;
     UnitConverter::diff0 = a0*a0/t0;
@@ -56,12 +57,13 @@ void UnitConverter::initializeMDUnits() {
 }
 
 void UnitConverter::makeSureInitialized() {
-    if(!UnitConverter::initialized) UnitConverter::initialize(MDUnits);
+    if(!UnitConverter::initialized) std::cout <<"ERROR: Unit converter not initialized" << std::endl;//UnitConverter::initialize(MDUnits);
 }
 
-void UnitConverter::initialize(Units type) {
-    if(type == MDUnits) UnitConverter::initializeMDUnits();
+/*void UnitConverter::initialize(Units type) {
+    //if(type == MDUnits) UnitConverter::initializeMDUnits(sigma);
 }
+*/
 
 double UnitConverter::pressureToSI(double P) {UnitConverter::makeSureInitialized(); return UnitConverter::P0*P; }
 double UnitConverter::pressureFromSI(double P) {UnitConverter::makeSureInitialized(); return P/UnitConverter::P0; }

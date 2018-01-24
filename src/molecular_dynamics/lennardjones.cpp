@@ -52,13 +52,27 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
         double radiusSqrd = displacement.lengthSquared();
         double radius = sqrt(radiusSqrd);
 
+
+
         //apply interaction range cutoff
         //std::cout<<radius<<std::endl;
         //if(radius > 5.0*m_sigma) continue;
         //THIS DOESN'T WORK FOR SOME REASON!
 
+        double sigma_over_radius = m_sigma/radius;
+
+
+       //double total_force_over_r = (m_twntyfour_epsilon/pow(m_sigma,2.))*(2.0*pow(sigma_over_radius,14.)-pow(sigma_over_radius,8.));
+
+        //below version is if make in unit converter L0 = sigma*1e-10;
         double total_force_over_r = m_twntyfour_epsilon*(2.0*pow(radius,-14.)-pow(radius,-8.));
         //ATTRACTIVE FORCE SHOULD POINT TOWARDS OTHER ATOM. REPULSIVE AWAY FROM OTHER ATOM!!!
+
+        //NOTE: scaling by sigma the lenght, makes code ~ 3x faster!
+
+        //std::cout <<m_sigma <<std::endl;
+
+        //std::cout<< total_force_over_r <<std::endl;
 
         //find and set force components
         //double total_force_over_r = total_force/radius; //precalculate to save 2 FLOPS
@@ -69,62 +83,13 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
         if(system.steps() % system.m_sample_freq ==0){
             //calculate potential energy every m_sample_freq steps
-            m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
+           //m_potentialEnergy += m_four_epsilon*(pow(sigma_over_radius,12.)-pow(sigma_over_radius,6));
+            //below version is if make in unit converter L0 = sigma*1e-10;
+           m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
         }
     }
  }
 
-
-
- //Implementing it in the above way, with only 1 calculation  per pair, made CPU time decrease from ~70sec to ~42sec for 108 atoms and 50k steps
- //1fs step size calculation
- //I'VE CHECKED TO MAKE SURE THAT THE ABOVE IMPLEMENTATION GIVES SAME RESULTS AS THE BELOW OLDER IMPLEMENTATION OF CALCULATING ALL FORCES EXPLICITELY.
- //Below is previous version which loops over all atoms: so uncessesarily counts each pairwise force twice
-
- /*
- for(Atom *current_atom : system.atoms()) {
-     //loop over the entire vector m_atoms (atoms() returns m_atoms: vector of pointers to the atoms objects
-
-     //Note: the forces for all atoms are already reset in system.cpp calculateForces() fnc.
-     //check if forces are already reset
-     //std::cout << "current_atom force = " <<  current_atom->force[0] << current_atom->force[1]<< current_atom->force[2]<<std::endl;
-     //std::cout << current_atom <<std::endl;    //shows that current_atom is a pointer to the location of the atom position
-
-    for(Atom *other_atom : system.atoms()){     //Calculate pairwise forces
-        if(other_atom == current_atom) continue; //skip case of same atom
-
-        //distance and vector btw objects dx should obey min. image convention: only closest distance to particle or its image is considered
-        vec3 displacement;
-        for(int j=0;j<3;j++){
-             displacement[j] = current_atom->position[j] - other_atom->position[j];  //WHEN USE POINTERS FOR ATOMS MUST USE -> TO ACCESS THEIR PROP.'S!
-             //for cases where the folded back particle will be closer than its image to a given particle
-             if (displacement[j] >  system.halfsystemSize(j)) displacement[j] -= system.systemSize(j);   //systemSize(j) returns m_systemSize[j] from system class
-             if (displacement[j] <= -system.halfsystemSize(j)) displacement[j] += system.systemSize(j);
-         }
-
-        //precalculate
-        //declare the variables inside loop since they are only needed within the loop
-        double radius = displacement.length();
-        double sigma_over_radius = m_sigma/radius;
-        //std::cout<<m_twntyfour_epsilon<<std::endl;
-        double sigma_over_radius_sqrd = sigma_over_radius/radius;
-        //double sigma_over_radius_sqrd = m_sigma/(radius*radius);
-        double total_force = m_twntyfour_epsilon*(2.0*pow(sigma_over_radius,11.)-pow(sigma_over_radius,5.))*(sigma_over_radius_sqrd); //for a single pair
-
-        //ATTRACTIVE FORCE SHOULD POINT TOWARDS OTHER ATOM. REPULSIVE AWAY FROM OTHER ATOM!!!
-
-        //find and set force components
-        double total_force_over_r = total_force/radius; //precalculate to save 2 FLOPS
-        for(int j=0;j<3;j++) current_atom->force[j] += total_force_over_r*displacement[j]; //i.e. Fx = (F/r)*x
-
-        if(system.steps() % 10 ==0){
-            //calculate potential energy every 10 steps
-            m_potentialEnergy += m_four_epsilon*pow(sigma_over_radius,12.)-pow(sigma_over_radius,6);
-        }
-    }
- }
-
-*/
 
 }
 

@@ -25,15 +25,22 @@
 using namespace std;
 using namespace chrono;
 
+
 int main()
 {
+
 
     int system_select;
     int num_particles;
     bool input_parameters;
-    vec3 numberOfUnitCellsEachDimension(5,5,5);
-    double initialTemperature = UnitConverter::temperatureFromSI(1.0); // measured in Kelvin
-    double latticeConstant = UnitConverter::lengthFromAngstroms(5.256); // measured in angstroms
+    vec3 numberOfUnitCellsEachDimension(3,3,3);
+    double initialTemperature = 600.0; //in K
+    double latticeConstant =5.256;  //in angstroms
+    double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
+    double epsilon = 1.0318e-2; // epsilon from LJ in eV
+    double side_length;
+    double variance;
+    bool input_variance;
 
     //use an interface
     cout<<"Do you want to input parameters, overiding default values?"<<endl;
@@ -45,13 +52,26 @@ int main()
     //seems have too many collisions and blows up!! the KE, etc...
     //I guess 100 particles in that volume results in too much  pressure!... since all moving around...
 
+    //---------------------------------------------------------------------------------------------------------------------------------
+    //System dependent parameters
     if(system_select ==1){
         cout<<"Number of particles" <<endl;
         cin >>num_particles;
+        cout<<"Side length of simulation cube" <<endl;
+        cin >>side_length;
         if(input_parameters ==1){
             cout <<"Initial temperature (in K)" <<endl;
             cin >> initialTemperature;
-            initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
+            cout<<"Sigma for LJ (atom diameter)" <<endl;
+            cin >> sigma;
+            cout<<"Epsilon for LJ (in eV)" <<endl;
+            cin >> epsilon;
+            cout<<"Would you like to input variance for Maxwellian velocity distr. (default = kT/m)? 1 Yes, 0 No" <<endl;
+            cin >> input_variance;
+            if(input_variance ==1){
+                cout<<"Variance"<<endl;
+                cin>> variance;
+            }
         }
     }
 
@@ -63,11 +83,17 @@ int main()
        // cin >> intialTemperature;
         //initialTemperature = UnitConverter::temperatureFromSI(intialTemperature);
         cout <<"lattice constant (in Angstroms)" <<endl;
-        cin >>latticeConstant;
-        latticeConstant = UnitConverter::lengthFromAngstroms(latticeConstant);
+        cin >>latticeConstant;  
+        cout<<"Sigma for LJ (atom diameter)" <<endl;
+        cin >> sigma;
+        cout<<"Epsilon for LJ (in eV)" <<endl;
+        cin >> epsilon;
+        cout<<"Would you like to input variance for Maxwellian velocity distr. (default = kT/m)? 1 Yes, 0 No" <<endl;
+        cin >> input_variance;
+        if(input_variance ==1)
+            cout<<"Variance. Note: k_b = 1, mass in amu, T "<<endl;
+            cin>> variance;
     }
-
-
 
     /*
     // If a first argument is provided, it is the number of unit cells and use same # of unit cells for all dimensions
@@ -78,24 +104,41 @@ int main()
     if(numberOfArguments > 3) latticeConstant = UnitConverter::lengthFromAngstroms(atof(argumentList[3]));
     */
 
-    double dt = UnitConverter::timeFromSI(1e-15); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
+    //-----------------------------------------------------------------------------------------------------------------------------------------------
+    //Initialize MD units
+     UnitConverter::initializeMDUnits(sigma, epsilon);
+     initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
+     latticeConstant = UnitConverter::lengthFromAngstroms(latticeConstant);
+     double dt = UnitConverter::timeFromSI(1e-15); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
 
     cout << "One unit of length is " << UnitConverter::lengthToSI(1.0) << " meters" << endl;
     cout << "One unit of velocity is " << UnitConverter::velocityToSI(1.0) << " meters/second" << endl;
     cout << "One unit of time is " << UnitConverter::timeToSI(1.0) << " seconds" << endl;
     cout << "One unit of mass is " << UnitConverter::massToSI(1.0) << " kg" << endl;
     cout << "One unit of temperature is " << UnitConverter::temperatureToSI(1.0) << " K" << endl;
+    cout <<"Epsilon is " << epsilon <<" eV and sigma is " <<sigma <<" in Angstrom" << endl;
 
     System system;
-    if(system_select ==2) system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature);
-    else system.createRandomPositions(num_particles, initialTemperature);
+    if(system_select ==2) system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance);
+    else system.createRandomPositions(num_particles, side_length, initialTemperature, variance, input_variance);
     system.potential().setEpsilon(1.0);
-    system.potential().setSigma(UnitConverter::lengthFromAngstroms(3.405));      //i.e. LJ atom diameter, Ar = 3.405 Angstroms
+    system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
     system.m_sample_freq=100; //statistics sampler freq.
     system.removeTotalMomentum();
 
     StatisticsSampler statisticsSampler;
-    IO movie("movie.xyz"); // To write the state to file, create IO object called "movie"
+    IO movie("movie.xyz"); // To write the positions to file, create IO object called "movie"
+    movie.saveState(system);  //save the initial particle positions to file
+
+    ofstream velocities;
+     velocities.open ("initial_velocities.txt");
+     for(Atom *atom : system.atoms()) {
+            velocities <<UnitConverter::velocityToSI(atom->velocity.x()) <<" "<<
+            UnitConverter::velocityToSI(atom->velocity.y()) <<" "<<
+            UnitConverter::velocityToSI(atom->velocity.z()) <<" "<< "\n";
+     }
+     velocities.close();
+
 
     cout << setw(20) << "Timestep" <<
             setw(20) << "Time" <<

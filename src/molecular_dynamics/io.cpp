@@ -44,9 +44,9 @@ void IO::saveState(System &system)
                     UnitConverter::lengthToAngstroms(atom->position.x()) << " " <<
                     UnitConverter::lengthToAngstroms(atom->position.y()) << " " <<
                     UnitConverter::lengthToAngstroms(atom->position.z()) << "\n";
-                    //UnitConverter::velocityToSI(atom->velocity.x())<<" "<<
-                    //UnitConverter::velocityToSI(atom->velocity.y())<<" "<<
-                    //UnitConverter::velocityToSI(atom->velocity.z())<<" "<< "\n";
+                    //UnitConverter::velocityToSI(atom->velocity.x()) <<" "<<
+                    //UnitConverter::velocityToSI(atom->velocity.y()) <<" "<<
+                    //UnitConverter::velocityToSI(atom->velocity.z()) <<" "<< "\n";
         }
     }
 }

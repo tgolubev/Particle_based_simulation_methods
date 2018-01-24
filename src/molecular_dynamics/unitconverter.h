@@ -78,6 +78,6 @@ public:
     static double degreesToRadians(double v);
     static double radiansToDegrees(double v);
 
-    static void initializeMDUnits();
+    static void initializeMDUnits(double sigma, double epsilon);
 };
 #endif
