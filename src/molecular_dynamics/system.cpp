@@ -104,7 +104,7 @@ void System::removeEscapedAtoms() {
 */
 
 
-void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double variance, bool input_variance) {
+void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double variance, bool input_variance, double mass) {
 
 
     vec3 LatticeVector;  //vector which points to the origin of each unit cell
@@ -122,7 +122,7 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 //Place the 4 atoms of each fcc cell into coordinates. Use setInitialPosition(): this will both set position and
                 //save the atom's initial position for use later.
                 //NOTE: The PBCs will prevent from adding atoms which are beyond the system dimensions when approach the boundaries.
-                Atom *atom1 = new Atom(UnitConverter::massFromSI(6.63352088e-26)); //uses mass in kg: mass is correct
+                Atom *atom1 = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct
                 x = LatticeVector[0];
                 y = LatticeVector[1];
                 z = LatticeVector[2];
@@ -131,7 +131,7 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 atom1->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom1);     //add element to vector m_atoms 1 element (atom object)
 
-                Atom *atom2 = new Atom(UnitConverter::massFromSI(6.63352088e-26));
+                Atom *atom2 = new Atom(UnitConverter::massFromSI(mass));
                 x = halfLatticeConstant + LatticeVector[0];
                 y = halfLatticeConstant + LatticeVector[1];
                 z = LatticeVector[2];
@@ -140,7 +140,7 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 atom2->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom2);
 
-                Atom *atom3 = new Atom(UnitConverter::massFromSI(6.63352088e-26));
+                Atom *atom3 = new Atom(UnitConverter::massFromSI(mass));
                 x = LatticeVector[0];
                 y = halfLatticeConstant + LatticeVector[1];
                 z = halfLatticeConstant + LatticeVector[2];
@@ -149,7 +149,7 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 atom3->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom3);
 
-                Atom *atom4 = new Atom(UnitConverter::massFromSI(6.63352088e-26));
+                Atom *atom4 = new Atom(UnitConverter::massFromSI(mass));
                 x = halfLatticeConstant + LatticeVector[0];
                 y = LatticeVector[1];
                 z = halfLatticeConstant + LatticeVector[2];
@@ -169,11 +169,11 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
 }
 
-void System::createRandomPositions(int num_particles, double side_length, double temperature, double variance, bool input_variance){
+void System::createRandomPositions(int num_particles, double side_length, double temperature, double variance, bool input_variance, double mass){
 
     //Places particles randomly into a cube of 10 angstroms
     for(int i=0; i<num_particles; i++) {      //for all atoms (100 right now)
-        Atom *atom = new Atom(UnitConverter::massFromSI(6.63352088e-26)); //uses mass in kg
+        Atom *atom = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg
         //Choose random x,y,z positions
         double x = Random::nextDouble(0, side_length); // random number in the interval [0,10]. nextDouble is defined in random.h
         double y = Random::nextDouble(0, side_length);

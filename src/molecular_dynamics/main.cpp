@@ -40,6 +40,7 @@ int main()
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;
     double variance;
+    double mass = 6.63352088e-26; // mass in kg
     bool input_variance;
 
     //use an interface
@@ -60,6 +61,8 @@ int main()
         cout<<"Side length of simulation cube" <<endl;
         cin >>side_length;
         if(input_parameters ==1){
+            cout <<"particle mass (in kg)" <<endl;
+            cin >> mass;
             cout <<"Initial temperature (in K)" <<endl;
             cin >> initialTemperature;
             cout<<"Sigma for LJ (atom diameter)" <<endl;
@@ -84,6 +87,8 @@ int main()
         //initialTemperature = UnitConverter::temperatureFromSI(intialTemperature);
         cout <<"lattice constant (in Angstroms)" <<endl;
         cin >>latticeConstant;  
+        cout <<"atom mass (in kg)" <<endl;
+        cin >> mass;
         cout<<"Sigma for LJ (atom diameter)" <<endl;
         cin >> sigma;
         cout<<"Epsilon for LJ (in eV)" <<endl;
@@ -119,8 +124,8 @@ int main()
     cout <<"Epsilon is " << epsilon <<" eV and sigma is " <<sigma <<" in Angstrom" << endl;
 
     System system;
-    if(system_select ==2) system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance);
-    else system.createRandomPositions(num_particles, side_length, initialTemperature, variance, input_variance);
+    if(system_select ==2) system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass);
+    else system.createRandomPositions(num_particles, side_length, initialTemperature, variance, input_variance, mass);
     system.potential().setEpsilon(1.0);
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
     system.m_sample_freq=100; //statistics sampler freq.

@@ -24,8 +24,8 @@ public:
     System();
     ~System();
     int m_sample_freq;
-    void createFCCLattice(vec3 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double variance, bool input_variance);
-    void System::createRandomPositions(int num_particles, double side_length, double temperature,  double variance, bool input_variance);
+    void createFCCLattice(vec3 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double variance, bool input_variance, double mass);
+    void System::createRandomPositions(int num_particles, double side_length, double temperature,  double variance, bool input_variance, double mass);
     void applyPeriodicBoundaryConditions();
     void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double desiredTemperature);
     void removeTotalMomentum();
