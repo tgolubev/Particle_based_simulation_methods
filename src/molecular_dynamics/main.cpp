@@ -28,8 +28,6 @@ using namespace chrono;
 
 int main()
 {
-
-
     int system_select;
     int num_particles;
     bool input_parameters;
@@ -99,22 +97,17 @@ int main()
             cout<<"Variance. Note: k_b = 1, mass in amu, T "<<endl;
             cin>> variance;
     }
+   //calculate volume
 
-    /*
-    // If a first argument is provided, it is the number of unit cells and use same # of unit cells for all dimensions
-    if(numberOfArguments > 1) numberOfUnitCellsEachDimension[0] = numberOfUnitCellsEachDimension[1] = numberOfUnitCellsEachDimension[2]= atoi(argumentList[1]);
-    // If a second argument is provided, it is the initial temperature (measured in kelvin)
-    if(numberOfArguments > 2) initialTemperature = UnitConverter::temperatureFromSI(atof(argumentList[2]));
-    // If a third argument is provided, it is the lattice constant determining the density (measured in angstroms)
-    if(numberOfArguments > 3) latticeConstant = UnitConverter::lengthFromAngstroms(atof(argumentList[3]));
-    */
+
+
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------
     //Initialize MD units
      UnitConverter::initializeMDUnits(sigma, epsilon);
      initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
      latticeConstant = UnitConverter::lengthFromAngstroms(latticeConstant);
-     double dt = UnitConverter::timeFromSI(1e-15); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
+     double dt = UnitConverter::timeFromSI(1e-14); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
 
     cout << "One unit of length is " << UnitConverter::lengthToSI(1.0) << " meters" << endl;
     cout << "One unit of velocity is " << UnitConverter::velocityToSI(1.0) << " meters/second" << endl;
@@ -126,7 +119,7 @@ int main()
     System system;
     if(system_select ==2) system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass);
     else system.createRandomPositions(num_particles, side_length, initialTemperature, variance, input_variance, mass);
-    system.potential().setEpsilon(1.0);
+    system.potential().setEpsilon(1.0); //we set epsilon =  1
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
     system.m_sample_freq=100; //statistics sampler freq.
     system.removeTotalMomentum();

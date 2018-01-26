@@ -65,14 +65,14 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
        //double total_force_over_r = (m_twntyfour_epsilon/pow(m_sigma,2.))*(2.0*pow(sigma_over_radius,14.)-pow(sigma_over_radius,8.));
 
         //below version is if make in unit converter L0 = sigma*1e-10;
-        double total_force_over_r = m_twntyfour_epsilon*(2.0*pow(radius,-14.)-pow(radius,-8.));
+        //note: epsilon was set to 1, so coeff. in front is just 24
+        double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
+        //double total_force_over_r = m_twntyfour_epsilon*(2.0*pow(radius,-14.)-pow(radius,-8.));
         //ATTRACTIVE FORCE SHOULD POINT TOWARDS OTHER ATOM. REPULSIVE AWAY FROM OTHER ATOM!!!
 
         //NOTE: scaling by sigma the lenght, makes code ~ 3x faster!
+        //NOTE: we set 4*epsilon = 1 here!...
 
-        //std::cout <<m_sigma <<std::endl;
-
-        //std::cout<< total_force_over_r <<std::endl;
 
         //find and set force components
         //double total_force_over_r = total_force/radius; //precalculate to save 2 FLOPS
@@ -85,7 +85,9 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
             //calculate potential energy every m_sample_freq steps
            //m_potentialEnergy += m_four_epsilon*(pow(sigma_over_radius,12.)-pow(sigma_over_radius,6));
             //below version is if make in unit converter L0 = sigma*1e-10;
-           m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
+            //since epsilon is set to 1
+            m_potentialEnergy += 4.*(pow(radius,-12.)-pow(radius,-6));
+           //m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
         }
     }
  }

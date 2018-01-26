@@ -185,6 +185,8 @@ void System::createRandomPositions(int num_particles, double side_length, double
     //  ///////////////////
         atom->resetVelocityMaxwellian(temperature, variance, input_variance);
         m_atoms.push_back(atom);     //add element to vector m_atoms 1 element (atom object)
+
+        setSystemSize(side_length); //system size defines size of system in EACH dimension
     }
 }
 

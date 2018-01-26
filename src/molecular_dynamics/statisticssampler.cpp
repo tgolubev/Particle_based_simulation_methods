@@ -54,7 +54,7 @@ void StatisticsSampler::sample(System &system)
     samplePotentialEnergy(system);
     sampleTemperature(system);
     sampleDiffusionCoeff(system);
-    //sampleDensity(system);
+    sampleDensity(system);
     saveToFile(system);
 }
 
@@ -88,6 +88,12 @@ void StatisticsSampler::sampleTemperature(System &system)
 
 void StatisticsSampler::sampleDensity(System &system)
 {
+  //total mass over volume
+    for(Atom *atom : m_atoms) {
+        m_totalMass += atom->mass();
+
+        m_density = m_totalMass/system.volume();  //already have this function
+    }
 
 }
 

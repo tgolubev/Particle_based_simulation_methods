@@ -34,7 +34,7 @@ void UnitConverter::initializeMDUnits(double sigma, double epsilon) {
     double m0 = 1.66053892e-27;         // 1 amu in SI [kg]
     double L0 = sigma*1.e-10;                // 1 particle diameter in SI [m]
     double kb = 1.3806488e-23;          // SI [J/K]
-    double E0eV = epsilon;            //epsilon (from LJ) in in eV
+    double E0eV = epsilon;            //4*epsilon (from coeff. in front of LJ) in in eV
     double E0 = 1.60217657e-19*E0eV;    // convert epsilon to SI [J]
 
     UnitConverter::m0 = m0;
@@ -114,7 +114,7 @@ vec3 UnitConverter::velocityFromSI(vec3 velocity)
 double UnitConverter::forceToSI(double F) {UnitConverter::makeSureInitialized(); return UnitConverter::F0*F; }
 double UnitConverter::forceFromSI(double F) {UnitConverter::makeSureInitialized(); return F/UnitConverter::F0; }
 
-double UnitConverter::energyToSI(double E) {UnitConverter::makeSureInitialized(); return UnitConverter::E0*E; }
+double UnitConverter::energyToSI(double E) {UnitConverter::makeSureInitialized(); return UnitConverter::E0*E; }  //this converts back correctly by multiplying by epsilon
 double UnitConverter::energyFromSI(double E) {UnitConverter::makeSureInitialized(); return E/UnitConverter::E0; }
 
 double UnitConverter::energyToEv(double E) {UnitConverter::makeSureInitialized(); return UnitConverter::E0ev*E; }
