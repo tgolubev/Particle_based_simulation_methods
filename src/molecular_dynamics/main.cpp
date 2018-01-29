@@ -126,7 +126,7 @@ int main()
 
     StatisticsSampler statisticsSampler;
     IO movie("movie.xyz"); // To write the positions to file, create IO object called "movie"
-    movie.saveState(system);  //save the initial particle positions to file
+    movie.saveState(system, statisticsSampler);  //save the initial particle positions to file. pass statisticsSampler object too, so can use density function...
 
     ofstream velocities;
      velocities.open ("initial_velocities.txt");
@@ -184,7 +184,7 @@ int main()
         }
         if(timestep % 1000 ==0){
           //save atom coordinates only periodically to save CPU and file size
-          movie.saveState(system);  //calls saveState fnc in io.cpp which saves the state to the movie.xyz file
+          movie.saveState(system, statisticsSampler);  //calls saveState fnc in io.cpp which saves the state to the movie.xyz file
         }
     }
 

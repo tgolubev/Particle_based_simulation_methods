@@ -2,6 +2,7 @@
 #include "system.h"
 #include "atom.h"
 #include "unitconverter.h"
+#include "statisticssampler.h"
 #include <cstdlib>
 using std::endl; using std::cout;
 
@@ -34,7 +35,7 @@ void IO::close() {
 // It can easily be opened in Ovito. Note that you can also output more properties than just the position. You can print the
 // velocities per particle (or kinetic energy etc), and color the atoms in Ovito based on these properties.
 
-void IO::saveState(System &system)
+void IO::saveState(System &system, StatisticsSampler &statisticsSampler) //statisticsSampler object of the class StatisticsSampler is passed by reference
 {
     if(file.is_open()) {
         file << system.atoms().size() << endl;
@@ -43,8 +44,8 @@ void IO::saveState(System &system)
             file << "H " <<         
                     UnitConverter::lengthToAngstroms(atom->position.x()) << " " <<
                     UnitConverter::lengthToAngstroms(atom->position.y()) << " " <<
-                    UnitConverter::lengthToAngstroms(atom->position.z()) <<
-                    StatisticsSampler::density(); "\n"; //density  is just a function that accesses the member of the class m_density and returns it
+                    UnitConverter::lengthToAngstroms(atom->position.z()) <<" " <<
+                    statisticsSampler.density() << "\n"; //density  is just a function that accesses the member of the class m_density and returns it
                     //UnitConverter::velocityToSI(atom->velocity.x()) <<" "<<
                     //UnitConverter::velocityToSI(atom->velocity.y()) <<" "<<
                     //UnitConverter::velocityToSI(atom->velocity.z()) <<" "<< "\n";
