@@ -32,7 +32,7 @@ int main()
     int num_particles;
     bool input_parameters;
     vec3 numberOfUnitCellsEachDimension(3,3,3);
-    double initialTemperature = 600.0; //in K
+    double initialTemperature = 610.0; //in K
     double latticeConstant =5.256;  //in angstroms
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
@@ -97,17 +97,13 @@ int main()
             cout<<"Variance. Note: k_b = 1, mass in amu, T "<<endl;
             cin>> variance;
     }
-   //calculate volume
-
-
-
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------
     //Initialize MD units
      UnitConverter::initializeMDUnits(sigma, epsilon);
      initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
      latticeConstant = UnitConverter::lengthFromAngstroms(latticeConstant);
-     double dt = UnitConverter::timeFromSI(1e-14); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
+     double dt = UnitConverter::timeFromSI(2e-14); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
 
     cout << "One unit of length is " << UnitConverter::lengthToSI(1.0) << " meters" << endl;
     cout << "One unit of velocity is " << UnitConverter::velocityToSI(1.0) << " meters/second" << endl;
@@ -145,11 +141,10 @@ int main()
             setw(20) << "PotentialEnergy" <<
             setw(20) << "TotalEnergy" << endl;
 
-    high_resolution_clock::time_point start2 = high_resolution_clock::now();  //start clock timer
+   high_resolution_clock::time_point start2 = high_resolution_clock::now();  //start clock timer
 
-    for(int timestep=0; timestep<50000; timestep++) {  //chose # of timesteps here
-        system.step(dt);   //advance system by 1 step. NOTE: PBCs ARE APPLIED IN THIS STEP: CALLS INTEGRATE WHICH IS IN velocityverlet.cpp
-
+    for(int timestep=0; timestep<10000; timestep++) {  //chose # of timesteps here    
+        system.step(dt);
         //Uncomment the below block to implement gradual heating of the system.
         /*
         //heat system gradually
@@ -173,7 +168,7 @@ int main()
         }
         */
 
-         if( timestep % 10000 == 0 ) {
+         if( timestep % 1000 == 0 ) {
             // Print the timestep and system properties every 1000 timesteps
             cout << setw(20) << system.steps() <<
                     setw(20) << system.time() <<
@@ -191,7 +186,7 @@ int main()
     //stop clock timer and output time duration
     high_resolution_clock::time_point finish2 = high_resolution_clock::now();
     duration<double> time2 = duration_cast<duration<double>>(finish2-start2);
-    cout << "CPU time = " << time2.count() << endl;
+    cout << "Total CPU time = " << time2.count() << endl;
 
     movie.close();
 

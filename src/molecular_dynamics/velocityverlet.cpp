@@ -2,8 +2,10 @@
 #include "system.h"
 #include "atom.h"
 
+
 void VelocityVerlet::integrate(System &system, double dt)
 {
+
 
     double half_dt = 0.5*dt;
     if(m_firstStep) {

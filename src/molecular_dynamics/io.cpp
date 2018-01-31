@@ -44,8 +44,8 @@ void IO::saveState(System &system, StatisticsSampler &statisticsSampler) //stati
             file << "H " <<         
                     UnitConverter::lengthToAngstroms(atom->position.x()) << " " <<
                     UnitConverter::lengthToAngstroms(atom->position.y()) << " " <<
-                    UnitConverter::lengthToAngstroms(atom->position.z()) <<" " <<
-                    statisticsSampler.density() << "\n"; //density  is just a function that accesses the member of the class m_density and returns it
+                    UnitConverter::lengthToAngstroms(atom->position.z()) <<" " << "\n";
+                    //statisticsSampler.density() << "\n"; //density  is just a function that accesses the member of the class m_density and returns it
                     //UnitConverter::velocityToSI(atom->velocity.x()) <<" "<<
                     //UnitConverter::velocityToSI(atom->velocity.y()) <<" "<<
                     //UnitConverter::velocityToSI(atom->velocity.z()) <<" "<< "\n";
