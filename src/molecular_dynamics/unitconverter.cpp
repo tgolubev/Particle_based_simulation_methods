@@ -32,6 +32,7 @@ void UnitConverter::initializeMDUnits(double sigma, double epsilon) {
 
     // Fundamental units
     double m0 = 1.66053892e-27;         // 1 amu in SI [kg]
+    //double L0 = 1e-10;
     double L0 = sigma*1.e-10;                // 1 particle diameter in SI [m]
     double kb = 1.3806488e-23;          // SI [J/K]
     double E0eV = epsilon;            //4*epsilon (from coeff. in front of LJ) in in eV

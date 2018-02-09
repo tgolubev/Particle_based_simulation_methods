@@ -27,7 +27,7 @@ public:
     void createFCCLattice(vec3 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double variance, bool input_variance, double mass);
     void System::createRandomPositions(int num_particles, double side_length, double temperature,  double variance, bool input_variance, double mass);
     void applyPeriodicBoundaryConditions();
-    void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double desiredTemperature);
+    void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double currentTemperature, double desiredTemperature, double N_steps);
     void removeTotalMomentum();
     //void System::removeEscapedAtoms();
     void increaseTemperature(StatisticsSampler &statisticsSampler, double increment);

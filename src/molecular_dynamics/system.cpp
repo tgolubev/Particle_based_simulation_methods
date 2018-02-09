@@ -59,9 +59,12 @@ void System::applyPeriodicBoundaryConditions() {
     }
 }
 
-void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double desiredTemperature){
+void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double currentTemperature, double desiredTemperature, double N_steps){
     //rescale velocities using equipartition theorem: v_desired = sqrt(T_desired/T_actual)*v_actual
-    double rescaling_factor = sqrt(desiredTemperature/statisticsSampler.temperature()); //sqrt(T_desired/T_actual)
+    //double rescaling_factor = sqrt(desiredTemperature/statisticsSampler.temperature()); //sqrt(T_desired/T_actual)
+
+    double rescaling_factor = sqrt(1+ (1/N_steps)*(desiredTemperature/currentTemperature-1)); //sqrt(1+(1/N_steps)(T_desired/T_current - 1))
+    //Note: if N_steps is set to 1, then just gives the old scaling: sqrt(T_desired/T_actual)
     for(Atom *atom : atoms()) {
         atom->velocity *= rescaling_factor;  //a*=b means a = a*b
     }

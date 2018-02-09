@@ -14,6 +14,7 @@ double LennardJones::sigma() const
 void LennardJones::setSigma(double sigma)
 {
     m_sigma = sigma;
+    m_sigma_sqrd = sigma*sigma;
 }
 
 double LennardJones::epsilon() const
@@ -50,15 +51,15 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
          }
         //declare the variables inside loop since they are only needed within the loop
         double radiusSqrd = displacement.lengthSquared();
-        double radius = sqrt(radiusSqrd);
-
 
 
         //apply interaction range cutoff
         //std::cout<<radius<<std::endl;
+       // double radius = sqrt(radiusSqrd);
         //if(radius > 5.0*m_sigma) continue;
-        //THIS DOESN'T WORK FOR SOME REASON!
+        //if(radiusSqrd > 16.0*m_sigma_sqrd) continue;
 
+        double radius = sqrt(radiusSqrd);
         double sigma_over_radius = m_sigma/radius;
 
 

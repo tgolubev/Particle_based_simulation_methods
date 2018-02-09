@@ -31,8 +31,9 @@ int main()
     int system_select;
     int num_particles;
     bool input_parameters;
-    vec3 numberOfUnitCellsEachDimension(3,3,3);
-    double initialTemperature = 610.0; //in K
+    vec3 numberOfUnitCellsEachDimension(5,5,5);
+    double initialTemperature = 610; //in K
+    double currentTemperature;
     double latticeConstant =5.256;  //in angstroms
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
@@ -40,6 +41,10 @@ int main()
     double variance;
     double mass = 6.63352088e-26; // mass in kg
     bool input_variance;
+    double total_dt_time= 0.0;
+
+    //for NVT ensemble
+    double N_steps = 100;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
 
     //use an interface
     cout<<"Do you want to input parameters, overiding default values?"<<endl;
@@ -117,7 +122,10 @@ int main()
     else system.createRandomPositions(num_particles, side_length, initialTemperature, variance, input_variance, mass);
     system.potential().setEpsilon(1.0); //we set epsilon =  1
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
-    system.m_sample_freq=100; //statistics sampler freq.
+
+    system.m_sample_freq=10; //statistics sampler freq.
+
+
     system.removeTotalMomentum();
 
     StatisticsSampler statisticsSampler;
@@ -143,8 +151,15 @@ int main()
 
    high_resolution_clock::time_point start2 = high_resolution_clock::now();  //start clock timer
 
-    for(int timestep=0; timestep<10000; timestep++) {  //chose # of timesteps here    
+    for(int timestep=0; timestep<15000; timestep++) {  //chose # of timesteps here
+        high_resolution_clock::time_point startdt = high_resolution_clock::now();
         system.step(dt);
+        high_resolution_clock::time_point finishdt = high_resolution_clock::now();
+        duration<double> time_dt = duration_cast<duration<double>>(finishdt-startdt);
+       // cout << "dt time" << time_dt.count() <<endl;
+        total_dt_time += time_dt.count();
+
+
         //Uncomment the below block to implement gradual heating of the system.
         /*
         //heat system gradually
@@ -153,19 +168,25 @@ int main()
         system.increaseTemperature(statisticsSampler, UnitConverter::temperatureFromSI(0.0001));  //Increase T by this increment (in K)
         */
 
-        //use sampler to calculate system parameters
+        //use sampler to calculate system parameters and save to statistics.txt file
         if(timestep % system.m_sample_freq ==0){
-            //to save CPU, don't sample every timestep
+            //to save CPU, can choose to sample only periodically
             statisticsSampler.sample(system);
         }
 
         //Uncoment the below block to use NVT ensemble.
+
         /*
+
         //periodically rescale Velocities to keep T constant (NVT ensemble)
-        if(timestep % 100 == 0){
-            //CAN'T RESCALE MORE FREQUENTLY THAN STAT SAMPLING RATE!
-           system.rescaleVelocities(statisticsSampler, initialTemperature);
-        }
+        //if(timestep % 100 == 0){
+            //rescale the velocities at every time step
+           //sample temperature, so can rescale as often as we want
+            statisticsSampler.sampleTemperature(system);
+            currentTemperature = statisticsSampler.temperature();  //this gets the value of temperature member variable
+           //Note: initial temperature is the desired temperature here
+           system.rescaleVelocities(statisticsSampler, currentTemperature, initialTemperature, N_steps);
+        //}
         */
 
          if( timestep % 1000 == 0 ) {
@@ -187,6 +208,8 @@ int main()
     high_resolution_clock::time_point finish2 = high_resolution_clock::now();
     duration<double> time2 = duration_cast<duration<double>>(finish2-start2);
     cout << "Total CPU time = " << time2.count() << endl;
+
+    cout<<"Total dt time = " <<total_dt_time <<endl;
 
     movie.close();
 
