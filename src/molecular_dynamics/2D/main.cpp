@@ -31,10 +31,10 @@ int main()
     int system_select;
     int num_particles;
     bool input_parameters;
-    vec3 numberOfUnitCellsEachDimension(5,5,5);
-    double initialTemperature = 610; //in K
+    vec2 numberOfUnitCellsEachDimension(6,6);
+    double initialTemperature = 10; //in K
     double currentTemperature;
-    double latticeConstant =5.256;  //in angstroms
+    double latticeConstant =10.256;  //in angstroms  //FOR 2D seems need larger latticeConstant to prevent blowup
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;
@@ -43,18 +43,16 @@ int main()
     bool input_variance;
     double total_dt_time= 0.0;
 
+    double N_time_steps = 15000; //number of time steps
+
     //for NVT ensemble
     double N_steps = 100;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
 
-    //use an interface
+    //input options interface
     cout<<"Do you want to input parameters, overiding default values?"<<endl;
     cin >> input_parameters;
     cout <<"Select System: 1 Random positions or 2 fcc lattice" <<endl;
     cin >> system_select;
-
-    //NOTE; right now it works for i.e. 2K temperature and 50 particles doesn't blow up--> if try to introduce too many  particles,
-    //seems have too many collisions and blows up!! the KE, etc...
-    //I guess 100 particles in that volume results in too much  pressure!... since all moving around...
 
     //---------------------------------------------------------------------------------------------------------------------------------
     //System dependent parameters
@@ -84,7 +82,7 @@ int main()
     if(system_select == 2 && input_parameters ==1){
         cout <<"Number of Unit cells in each dimension" <<endl;
         cin>> numberOfUnitCellsEachDimension[0];
-        numberOfUnitCellsEachDimension[1] = numberOfUnitCellsEachDimension[2] = numberOfUnitCellsEachDimension[0];
+        numberOfUnitCellsEachDimension[1]  = numberOfUnitCellsEachDimension[0];
         cout <<"Initial temperature (in K)" <<endl;
        // cin >> intialTemperature;
         //initialTemperature = UnitConverter::temperatureFromSI(intialTemperature);
@@ -108,7 +106,7 @@ int main()
      UnitConverter::initializeMDUnits(sigma, epsilon);
      initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
      latticeConstant = UnitConverter::lengthFromAngstroms(latticeConstant);
-     double dt = UnitConverter::timeFromSI(2e-14); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
+     double dt = UnitConverter::timeFromSI(2e-14); //
 
     cout << "One unit of length is " << UnitConverter::lengthToSI(1.0) << " meters" << endl;
     cout << "One unit of velocity is " << UnitConverter::velocityToSI(1.0) << " meters/second" << endl;
@@ -120,7 +118,7 @@ int main()
     System system;
     if(system_select ==2) system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass);
     else system.createRandomPositions(num_particles, side_length, initialTemperature, variance, input_variance, mass);
-    system.potential().setEpsilon(1.0); //we set epsilon =  1
+    system.potential().setEpsilon(1.0); //if don't set to 1.0, must modify LJ eqn.
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
 
     system.m_sample_freq=10; //statistics sampler freq.
@@ -136,8 +134,7 @@ int main()
      velocities.open ("initial_velocities.txt");
      for(Atom *atom : system.atoms()) {
             velocities <<UnitConverter::velocityToSI(atom->velocity.x()) <<" "<<
-            UnitConverter::velocityToSI(atom->velocity.y()) <<" "<<
-            UnitConverter::velocityToSI(atom->velocity.z()) <<" "<< "\n";
+            UnitConverter::velocityToSI(atom->velocity.y()) <<" "<< "\n";
      }
      velocities.close();
 
@@ -149,15 +146,16 @@ int main()
             setw(20) << "PotentialEnergy" <<
             setw(20) << "TotalEnergy" << endl;
 
-   high_resolution_clock::time_point start2 = high_resolution_clock::now();  //start clock timer
+   high_resolution_clock::time_point start2 = high_resolution_clock::now();
 
-    for(int timestep=0; timestep<15000; timestep++) {  //chose # of timesteps here
+    for(int timestep=0; timestep< N_time_steps; timestep++) {
         high_resolution_clock::time_point startdt = high_resolution_clock::now();
         system.step(dt);
         high_resolution_clock::time_point finishdt = high_resolution_clock::now();
         duration<double> time_dt = duration_cast<duration<double>>(finishdt-startdt);
        // cout << "dt time" << time_dt.count() <<endl;
         total_dt_time += time_dt.count();
+
 
 
         //Uncomment the below block to implement gradual heating of the system.
@@ -176,7 +174,7 @@ int main()
 
         //Uncoment the below block to use NVT ensemble.
 
-        /*
+  /*
 
         //periodically rescale Velocities to keep T constant (NVT ensemble)
         //if(timestep % 100 == 0){
@@ -188,6 +186,7 @@ int main()
            system.rescaleVelocities(statisticsSampler, currentTemperature, initialTemperature, N_steps);
         //}
         */
+
 
          if( timestep % 1000 == 0 ) {
             // Print the timestep and system properties every 1000 timesteps
@@ -204,7 +203,7 @@ int main()
         }
     }
 
-    //stop clock timer and output time duration
+    //timing
     high_resolution_clock::time_point finish2 = high_resolution_clock::now();
     duration<double> time2 = duration_cast<duration<double>>(finish2-start2);
     cout << "Total CPU time = " << time2.count() << endl;
