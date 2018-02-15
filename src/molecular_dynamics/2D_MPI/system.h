@@ -24,10 +24,10 @@ public:
     System();
     ~System();
     int m_sample_freq;
-    void createFCCLattice(vec2 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double variance, bool input_variance, double mass);
-    void System::createRandomPositions(int num_particles, double side_length, double temperature,  double variance, bool input_variance, double mass);
+    void createFCCLattice(vec2 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double mass);
+    void createRandomPositions(int num_particles, double side_length, double temperature,  double mass);
     void applyPeriodicBoundaryConditions();
-    void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double currentTemperature, double desiredTemperature, double N_steps);
+    void rescaleVelocities(StatisticsSampler &statisticsSampler, double currentTemperature, double desiredTemperature, int N_steps);
     void removeTotalMomentum();
     //void System::removeEscapedAtoms();
     void increaseTemperature(StatisticsSampler &statisticsSampler, double increment);

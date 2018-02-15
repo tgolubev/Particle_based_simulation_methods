@@ -9,7 +9,7 @@
 //Author: Timofey Golubev based on the code found at https://github.com/andeplane/molecular-dynamics-fys3150.
 
 
-#include "math/random.h"
+#include "random.h"
 #include "lennardjones.h"
 #include "velocityverlet.h"
 #include "system.h"

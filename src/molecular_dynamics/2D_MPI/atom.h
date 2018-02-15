@@ -16,7 +16,7 @@ public:
     Atom(double mass);
     void setInitialPosition(double x, double y);
     void resetForce();
-    void resetVelocityMaxwellian(double temperature, double variance,  bool input_variance);
+    void resetVelocityMaxwellian(double temperature);
     double mass() { return m_mass; }
     void setMass(double mass) { m_mass = mass; }
     double initial_position(int j){return m_initial_position[j];}

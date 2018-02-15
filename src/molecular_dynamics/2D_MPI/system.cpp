@@ -40,7 +40,7 @@ void System::applyPeriodicBoundaryConditions() {
     }
 }
 
-void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double currentTemperature, double desiredTemperature, double N_steps){
+void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double currentTemperature, double desiredTemperature, int N_steps){
     //rescale velocities using equipartition theorem: v_desired = sqrt(T_desired/T_actual)*v_actual
     //double rescaling_factor = sqrt(desiredTemperature/statisticsSampler.temperature()); //sqrt(T_desired/T_actual)
 
@@ -80,7 +80,7 @@ void System::removeTotalMomentum() {
 
 
 
-void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double latticeConstant, double temperature,  double variance, bool input_variance, double mass) {
+void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double latticeConstant, double temperature, double mass) {
 
 
     vec2 LatticeVector;  //vector which points to the origin of each unit cell
@@ -104,7 +104,7 @@ void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double lattic
 
                 atom1->setInitialPosition(x,y);
                 atom1->num_bndry_crossings.set(0.,0.);   //make sure initial # of bndry crossings is 0
-                atom1->resetVelocityMaxwellian(temperature, variance, input_variance);
+                atom1->resetVelocityMaxwellian(temperature);
                 m_atoms.push_back(atom1);     //add element to vector m_atoms 1 element (atom object)
 
                 Atom *atom2 = new Atom(UnitConverter::massFromSI(mass));
@@ -112,7 +112,7 @@ void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double lattic
                 y = halfLatticeConstant + LatticeVector[1];
                 atom2->setInitialPosition(x,y);
                 atom2->num_bndry_crossings.set(0.,0.);
-                atom2->resetVelocityMaxwellian(temperature, variance, input_variance);
+                atom2->resetVelocityMaxwellian(temperature);
                 m_atoms.push_back(atom2);
 
                 Atom *atom3 = new Atom(UnitConverter::massFromSI(mass));
@@ -120,7 +120,7 @@ void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double lattic
                 y = halfLatticeConstant + LatticeVector[1];
                 atom3->setInitialPosition(x,y);
                 atom3->num_bndry_crossings.set(0.,0.);
-                atom3->resetVelocityMaxwellian(temperature, variance, input_variance);
+                atom3->resetVelocityMaxwellian(temperature);
                 m_atoms.push_back(atom3);
 
                 Atom *atom4 = new Atom(UnitConverter::massFromSI(mass));
@@ -128,7 +128,7 @@ void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double lattic
                 y = LatticeVector[1];
                 atom4->setInitialPosition(x,y);
                 atom4->num_bndry_crossings.set(0.,0.);
-                atom4->resetVelocityMaxwellian(temperature, variance, input_variance);
+                atom4->resetVelocityMaxwellian(temperature);
                 m_atoms.push_back(atom4);
 
                 //std::cout << "atom mass = " <<atom1->mass() <<std::endl;
@@ -142,7 +142,7 @@ void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double lattic
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
 }
 
-void System::createRandomPositions(int num_particles, double side_length, double temperature, double variance, bool input_variance, double mass){
+void System::createRandomPositions(int num_particles, double side_length, double temperature, double mass){
 
     //Places particles randomly into a cube
     for(int i=0; i<num_particles; i++) {      //for all atoms (100 right now)
@@ -153,7 +153,7 @@ void System::createRandomPositions(int num_particles, double side_length, double
 
         atom->position.set(x,y);    //set atom to position x,y,z
 
-        atom->resetVelocityMaxwellian(temperature, variance, input_variance);
+        atom->resetVelocityMaxwellian(temperature);
         m_atoms.push_back(atom);     //add element to vector m_atoms 1 element (atom object)
 
         vec2 system_size;                                           //define a vector object containing system size
