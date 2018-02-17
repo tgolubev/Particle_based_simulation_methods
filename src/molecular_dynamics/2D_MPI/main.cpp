@@ -27,25 +27,33 @@
 using namespace std;
 using namespace chrono;
 
+//void decompose1D_system(int system_length, int my_id,int nproc, int*  subdomain_start,int* subdomain_size) { //int* means pointer to int
+//  *subsystem_length = system_length / nproc; //subsystem_length is a pointer, *subsystem_length changes the value of variable that pointer points to
+//}
+
+
 
 int main(int argc, char **argv)
 {
-   int rank, nproc;
+   int my_id, nproc;
     
     MPI_Init(&argc, &argv);  //initialize MPI environment: takes in arguments from the mpirun command
     //everything past this point is executed on EACH processor in parallel
 
-    //each processor finds out what it's ID (rank) is and how many processors there are
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
+    //each processor finds out what it's ID (AKA rank) is and how many processors there are
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_id);   //find ID
     MPI_Comm_size(MPI_COMM_WORLD, &nproc);  //find # of processors
-    printf( "Hello world from process %d of %d\n", rank, nproc );
 
+    // Find your part of the domain--> determines subdomain location and size for each processor
+    //int subsystem_length, subsystem_start;  //these will gain values after calling the decompose_system fnc.
+    //decompose1D_system(system_length, my_id, nproc, &subsystem_start, &subdomain_size);
+    //cout << "length of each subsystem" << subsystem_length <<endl;
     
-    //attempt to have each processor do entire simulation
 
     //all variables will be defined in EACH processor
-    int num_particles;
-    vec2 numberOfUnitCellsEachDimension(6,6);
+    vec2 Total_systemSize(20,10); //TOTAL system dimensions
+    vec2 subsystemSize; //this will be defined in each processor seperately
+    vec2 subsystemOrigin; //bottom left corner of each subsystem, this will be defined in each processor seperately
     double initialTemperature = 10; //in K
     double currentTemperature;
     double latticeConstant =10.256;  //in angstroms  //FOR 2D seems need larger latticeConstant to prevent blowup
@@ -57,7 +65,7 @@ int main(int argc, char **argv)
 
     int StatSample_freq = 10;
 
-    int N_time_steps = 1000; //number of time steps
+    int N_time_steps = 50000; //number of time steps
 
     //for NVT ensemble
     int N_steps = 100;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
@@ -77,63 +85,74 @@ int main(int argc, char **argv)
     cout <<"Epsilon is " << epsilon <<" eV and sigma is " <<sigma <<" in Angstrom" << endl;
 
 
-        System system;
-        system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, mass);
-        //system.createRandomPositions(num_particles, side_length, initialTemperature, mass);
-        system.potential().setEpsilon(1.0); //if don't set to 1.0, must modify LJ eqn.
-        system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
-        system.m_sample_freq=10; //statistics sampler freq.
-        system.removeTotalMomentum();
+    System system;
+    system.createSCLattice(Total_systemSize,subsystemSize, latticeConstant, initialTemperature, mass, subsystemOrigin);
+    //system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, mass);
+    //system.createRandomPositions(num_particles, side_length, initialTemperature, mass);
+    system.potential().setEpsilon(1.0); //if don't set to 1.0, must modify LJ eqn.
+    system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
+    system.m_sample_freq=10; //statistics sampler freq.
+    system.removeTotalMomentum();
 
-        StatisticsSampler statisticsSampler;
-        IO movie("movie.xyz"); // To write the positions to file, create IO object called "movie"
+    StatisticsSampler statisticsSampler;
+
+    //record left half of system
+    IO movie("movie.xyz"); // To write the positions to file, create IO object called "movie"
+    IO movie2("movie2.xyz");
+    if( my_id == 0 ) {
         movie.saveState(system, statisticsSampler);  //save the initial particle positions to file. pass statisticsSampler object too, so can use density function...
-
-//         ofstream velocities;
-//         velocities.open ("initial_velocities.txt");
-//         for(Atom *atom : system.atoms()) {
-//                 velocities <<UnitConverter::velocityToSI(atom->velocity.x()) <<" "<<
-//                 UnitConverter::velocityToSI(atom->velocity.y()) <<" "<< "\n";
-//         }
-//         velocities.close();
+    }
+    //record right half of system
+    if(my_id == 1) {
+        movie.saveState(system, statisticsSampler);  //save the initial particle positions to file. pass statisticsSampler object too, so can use density function...
+    }
 
 
-        cout << setw(20) << "Timestep" <<
-                setw(20) << "Time" <<
-                setw(20) << "Temperature(not K!)" <<
-                setw(20) << "KineticEnergy" <<
-                setw(20) << "PotentialEnergy" <<
-                setw(20) << "TotalEnergy" << endl;
+    //         ofstream velocities;
+    //         velocities.open ("initial_velocities.txt");
+    //         for(Atom *atom : system.atoms()) {
+    //                 velocities <<UnitConverter::velocityToSI(atom->velocity.x()) <<" "<<
+    //                 UnitConverter::velocityToSI(atom->velocity.y()) <<" "<< "\n";
+    //         }
+    //         velocities.close();
 
-        high_resolution_clock::time_point start2 = high_resolution_clock::now();
 
-        for(int timestep=0; timestep< N_time_steps; timestep++) {
-            high_resolution_clock::time_point startdt = high_resolution_clock::now();
-            system.step(dt);
-            high_resolution_clock::time_point finishdt = high_resolution_clock::now();
-            duration<double> time_dt = duration_cast<duration<double>>(finishdt-startdt);
+    cout << setw(20) << "Timestep" <<
+            setw(20) << "Time" <<
+            setw(20) << "Temperature(not K!)" <<
+            setw(20) << "KineticEnergy" <<
+            setw(20) << "PotentialEnergy" <<
+            setw(20) << "TotalEnergy" << endl;
+
+    high_resolution_clock::time_point start2 = high_resolution_clock::now();
+
+    for(int timestep=0; timestep< N_time_steps; timestep++) {
+        high_resolution_clock::time_point startdt = high_resolution_clock::now();
+        system.step(dt);
+        high_resolution_clock::time_point finishdt = high_resolution_clock::now();
+        duration<double> time_dt = duration_cast<duration<double>>(finishdt-startdt);
         // cout << "dt time" << time_dt.count() <<endl;
-            total_dt_time += time_dt.count();
+        total_dt_time += time_dt.count();
 
 
 
-            //Uncomment the below block to implement gradual heating of the system.
-            /*
+        //Uncomment the below block to implement gradual heating of the system.
+        /*
             //heat system gradually
             statisticsSampler.sampleKineticEnergy(system);      //can't sample temperature w/o sampling KE!
             statisticsSampler.sampleTemperature(system);  //sample temp at every timestep
             system.increaseTemperature(statisticsSampler, UnitConverter::temperatureFromSI(0.0001));  //Increase T by this increment (in K)
             */
 
-            //use sampler to calculate system parameters and save to statistics.txt file
-            if(timestep % system.m_sample_freq ==0){
-                //to save CPU, can choose to sample only periodically
-                statisticsSampler.sample(system);
-            }
+        //use sampler to calculate system parameters and save to statistics.txt file
+        if(timestep % system.m_sample_freq ==0){
+            //to save CPU, can choose to sample only periodically
+            statisticsSampler.sample(system);
+        }
 
-            //Uncoment the below block to use NVT ensemble.
+        //Uncoment the below block to use NVT ensemble.
 
-    /*
+        /*
 
             //periodically rescale Velocities to keep T constant (NVT ensemble)
             //if(timestep % 100 == 0){
@@ -147,32 +166,30 @@ int main(int argc, char **argv)
             */
 
 
-            if( timestep % 1000 == 0 ) {
-                // Print the timestep and system properties every 1000 timesteps
-                cout << setw(20) << system.steps() <<
-                        setw(20) << system.time() <<
-                        setw(20) << statisticsSampler.temperature() <<
-                        setw(20) << statisticsSampler.kineticEnergy() <<
-                        setw(20) << statisticsSampler.potentialEnergy() <<
-                        setw(20) << statisticsSampler.totalEnergy() << endl;
-            }
-    //         if(timestep % 1000 ==0){
-    //           //save atom coordinates only periodically to save CPU and file size
-    //           movie.saveState(system, statisticsSampler);  //calls saveState fnc in io.cpp which saves the state to the movie.xyz file
-    //         }
+        if( timestep % 1000 == 0 ) {
+            // Print the timestep and system properties every 1000 timesteps
+            cout << setw(20) << system.steps() <<
+                    setw(20) << system.time() <<
+                    setw(20) << statisticsSampler.temperature() <<
+                    setw(20) << statisticsSampler.kineticEnergy() <<
+                    setw(20) << statisticsSampler.potentialEnergy() <<
+                    setw(20) << statisticsSampler.totalEnergy() << endl;
         }
 
-        //timing
-        high_resolution_clock::time_point finish2 = high_resolution_clock::now();
-        duration<double> time2 = duration_cast<duration<double>>(finish2-start2);
-        cout << "Total CPU time = " << time2.count() << endl;
 
-        cout<<"Total dt time = " <<total_dt_time <<endl;
+    }
+
+    //timing
+    high_resolution_clock::time_point finish2 = high_resolution_clock::now();
+    duration<double> time2 = duration_cast<duration<double>>(finish2-start2);
+    cout << "Total CPU time = " << time2.count() << endl;
+
+    cout<<"Total dt time = " <<total_dt_time <<endl;
 
 
-MPI_Finalize();
+    MPI_Finalize();
 
-    //movie.close();
+
 
     return 0;
 }

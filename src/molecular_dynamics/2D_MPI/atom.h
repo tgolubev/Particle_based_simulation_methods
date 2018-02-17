@@ -12,6 +12,7 @@ public:
     vec2 velocity;
     vec2 force;
     vec2 num_bndry_crossings;  //this is to keep track of boundary crossings for calculating diffusion coeff.
+    int atom_index;
 
     Atom(double mass);
     void setInitialPosition(double x, double y);

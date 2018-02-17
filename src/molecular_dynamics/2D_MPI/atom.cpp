@@ -9,6 +9,7 @@ Atom::Atom(double mass) :
 
 }
 
+
 void Atom::setInitialPosition(double x, double y)
 {
     m_initial_position.set(x,y);

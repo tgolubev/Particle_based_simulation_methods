@@ -30,22 +30,21 @@ using namespace chrono;
 
 int main(int argc, char **argv)
 {
-   int rank, nproc;
+   int my_id, nproc;
     
     MPI_Init(&argc, &argv);  //initialize MPI environment: takes in arguments from the mpirun command
     //everything past this point is executed on EACH processor in parallel
 
-    //each processor finds out what it's ID (rank) is and how many processors there are
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
+    //each processor finds out what it's ID (AKA rank) is and how many processors there are
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_id);   //find ID
     MPI_Comm_size(MPI_COMM_WORLD, &nproc);  //find # of processors
-    printf( "Hello world from process %d of %d\n", rank, nproc );
-
+    
     
     //attempt to have each processor do entire simulation
 
     //all variables will be defined in EACH processor
     int num_particles;
-    vec2 numberOfUnitCellsEachDimension(6,6);
+    vec2 numberOfUnitCellsEachDimension; //declare here but will give values in if loop for each processor
     double initialTemperature = 10; //in K
     double currentTemperature;
     double latticeConstant =10.256;  //in angstroms  //FOR 2D seems need larger latticeConstant to prevent blowup
@@ -75,6 +74,28 @@ int main(int argc, char **argv)
     cout << "One unit of mass is " << UnitConverter::massToSI(1.0) << " kg" << endl;
     cout << "One unit of temperature is " << UnitConverter::temperatureToSI(1.0) << " K" << endl;
     cout <<"Epsilon is " << epsilon <<" eV and sigma is " <<sigma <<" in Angstrom" << endl;
+
+
+    //can give tasks to different processors by using their id
+     if( my_id == 0 ) {
+
+         /* do some work as process 0 */
+         printf( "Hello world from process %d of %d\n", my_id, nproc );
+         numberOfUnitCellsEachDimension.set(3,3); //set system size
+
+         cout << "I compute " <<numberOfUnitCellsEachDimension <<"unit cell system" << endl;
+      }
+      else if( my_id == 1 ) {
+
+         /* do some work as process 1 */
+ 	numberOfUnitCellsEachDimension.set(4,4);        
+        cout << "I compute " <<numberOfUnitCellsEachDimension <<"unit cell system" << endl;
+
+      }
+      else{
+        numberOfUnitCellsEachDimension.set(6,6);  //rest of procs compute 6x6 system
+        printf( "Hello world from process %d of %d\n", my_id, nproc );
+      }
 
 
         System system;

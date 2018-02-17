@@ -4,10 +4,13 @@
 #include "statisticssampler.h"
 #include "unitconverter.h"
 #include "random.h"
+#include <map>
+#include <mpi.h>
+#include <algorithm> //need for sort etc.
 
 System::System()   //constructor
 {
-
+  m_num_atoms = 0;  //make num_atoms = 0 upon initialization
 }
 
 System::~System()  //desctructor: remove all the atoms
@@ -39,6 +42,20 @@ void System::applyPeriodicBoundaryConditions() {
 
     }
 }
+
+
+// remove atoms that escape the SUB system (corresponding to current processor)
+/*
+void System::removeEscapedAtoms() {
+    for(Atom *atom : atoms()) {
+        if(atom->position[0]>m_subsystemSize[0])
+            //m_atoms.erase(atom);
+            delete atom;
+    }
+}
+*/
+
+
 
 void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double currentTemperature, double desiredTemperature, int N_steps){
     //rescale velocities using equipartition theorem: v_desired = sqrt(T_desired/T_actual)*v_actual
@@ -78,69 +95,40 @@ void System::removeTotalMomentum() {
     */
 }
 
+void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double latticeConstant, double temperature, double mass, vec2 subsystemOrigin) {
+
+    double x = subsystemOrigin[0];
 
 
-void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double latticeConstant, double temperature, double mass) {
-
-
-    vec2 LatticeVector;  //vector which points to the origin of each unit cell
-    //Note: 1st unit cell starts at 0,0
-
-    double x,y;
-    double halfLatticeConstant=0.5*latticeConstant;
-
-    for(int i=0;i<numberOfUnitCellsEachDimension[0];i++){
+    for(int i=0;i<subsystemSize[0];i++){
         //i.e. i = 0,1...N_x-1
-        for(int j=0;j<numberOfUnitCellsEachDimension[1];j++){
+        x +=latticeConstant;
+        double y = subsystemOrigin[1];
 
-                LatticeVector.set(latticeConstant*i,latticeConstant*j);
+        for(int j=0;j<subsystemSize[1];j++){
+                y += latticeConstant;
 
-                //Place the 4 atoms of each fcc cell into coordinates. Use setInitialPosition(): this will both set position and
-                //save the atom's initial position for use later.
-                //NOTE: The PBCs will prevent from adding atoms which are beyond the system dimensions when approach the boundaries.
-                Atom *atom1 = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct
-                x = LatticeVector[0];
-                y = LatticeVector[1];
+                Atom *atom = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct
 
-                atom1->setInitialPosition(x,y);
-                atom1->num_bndry_crossings.set(0.,0.);   //make sure initial # of bndry crossings is 0
-                atom1->resetVelocityMaxwellian(temperature);
-                m_atoms.push_back(atom1);     //add element to vector m_atoms 1 element (atom object)
-
-                Atom *atom2 = new Atom(UnitConverter::massFromSI(mass));
-                x = halfLatticeConstant + LatticeVector[0];
-                y = halfLatticeConstant + LatticeVector[1];
-                atom2->setInitialPosition(x,y);
-                atom2->num_bndry_crossings.set(0.,0.);
-                atom2->resetVelocityMaxwellian(temperature);
-                m_atoms.push_back(atom2);
-
-                Atom *atom3 = new Atom(UnitConverter::massFromSI(mass));
-                x = LatticeVector[0];
-                y = halfLatticeConstant + LatticeVector[1];
-                atom3->setInitialPosition(x,y);
-                atom3->num_bndry_crossings.set(0.,0.);
-                atom3->resetVelocityMaxwellian(temperature);
-                m_atoms.push_back(atom3);
-
-                Atom *atom4 = new Atom(UnitConverter::massFromSI(mass));
-                x = halfLatticeConstant + LatticeVector[0];
-                y = LatticeVector[1];
-                atom4->setInitialPosition(x,y);
-                atom4->num_bndry_crossings.set(0.,0.);
-                atom4->resetVelocityMaxwellian(temperature);
-                m_atoms.push_back(atom4);
-
-                //std::cout << "atom mass = " <<atom1->mass() <<std::endl;
-            }
+                atom->setInitialPosition(x,y);
+                atom->num_bndry_crossings.set(0.,0.);   //make sure initial # of bndry crossings is 0
+                atom->resetVelocityMaxwellian(temperature);
+                m_atoms.push_back(atom);     //add element to vector m_atoms 1 element (atom object)
         }
+    }
 
-
-
-    setSystemSize(latticeConstant*numberOfUnitCellsEachDimension); //system size set by multiply vec2 # of unit cells by latticeConstant
+    //this sets the TOTAL system size--> is used for PBCs which are at the outer boundaries
+    setSystemSize(latticeConstant*Total_systemSize); //system size set by multiply vec2 # of unit cells by latticeConstant
     std::cout<<"system size = " << m_systemSize <<std::endl;
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
+
+    m_num_atoms = num_atoms();
+
+    setSubSystemSize(latticeConstant*subsystemSize);
+
 }
+
+
 
 void System::createRandomPositions(int num_particles, double side_length, double temperature, double mass){
 
@@ -159,6 +147,7 @@ void System::createRandomPositions(int num_particles, double side_length, double
         vec2 system_size;                                           //define a vector object containing system size
         system_size.set(side_length,side_length);       //set the values of elements of the vector
         setSystemSize(system_size); //system size defines size of system in EACH dimension
+        m_num_atoms = num_atoms();
     }
 }
 
@@ -181,4 +170,112 @@ void System::step(double dt) {
     m_integrator.integrate(*this, dt);  //this calls velocityverlet.cpp
     m_steps++;
     m_time += dt;
+}
+
+//---------------------------------------------------------------------
+/*!
+ Remove atoms from the system.  Needs to sort indices because erase() operation reorders things; also, because of this it is fastest to pop from lowest to highest index.
+ Returns the number of atoms deleted.
+ \param [in] indices Vector of local indices of atoms to delete from the system
+*/
+int System::delete_atoms (std::vector <int> indices) {
+        std::vector <Atom*>::iterator it = m_atoms.begin();
+        std::map <int, int>::iterator map_it;
+
+        // Sort indices from lowest to highest
+        sort (indices.begin(), indices.end());
+
+        // Pop in this order
+        int shift = 0;
+        int upper;
+        for (unsigned int i = 0; i < indices.size(); ++i) {
+                // Update glob_to_loc for all atoms following the erased atoms
+                if (i < indices.size()-1) {
+                        upper = indices[i+1]-shift;
+                } else {
+                        upper = m_atoms.size();
+                }
+                for (int j = indices[i]+1-shift; j < upper; ++j) {
+                        glob_to_loc_id_[m_atoms[j]->atom_index] -= (shift+1);
+                }
+
+                map_it = glob_to_loc_id_.find(m_atoms[indices[i]-shift]->atom_index);
+                m_atoms.erase(it - shift + indices[i]); //must pass it a accept a const iterator: note: 'it' is an iterator
+                glob_to_loc_id_.erase(map_it);
+                ++shift;
+        }
+        m_num_atoms -= shift;
+        return shift;
+}
+/* I think this version is not needed --> is for 1 atom only it seems...
+/*
+ Attempt to push ONE atom into the system.  This assigns the map automatically to link the atoms global index to the local storage location.
+ This reallocates the internal vector that stores the atoms;
+ \param [in] natoms Length of the array of atoms to add to the system.
+ \param [in] \*new_atoms Pointer to an array of atoms the user has created elsewhere.
+
+std::vector <int> System::add_atoms (const int natoms, Atom &new_atoms) {
+        int index = m_atoms.size();
+        std::vector <int> update_proc(natoms);  //make vector of size natoms
+        for (int i = 0; i < natoms; ++i) {
+                m_atoms.push_back(new_atoms[i]);
+                glob_to_loc_id_[new_atoms[i].atom_index] = index;
+                update_proc[i] = new_atoms[i].atom_index; //filled with indices of the newly added atoms
+                index++;
+        }
+        m_num_atoms += natoms;
+        return update_proc;
+}
+*/
+
+/*!
+ Attempt to push an atom(s) into the system.  This assigns the map automatically to link the atoms global index to the local storage location.
+ This reallocates the internal vector that stores the atoms.
+ \param [in] natoms Length of the array of atoms to add to the system.
+ \param [in] \*new_atoms Pointer to an array of atoms the user has created elsewhere.
+*/
+std::vector <int> System::add_atoms (std::vector <Atom*> new_atoms) {
+        int index = m_atoms.size(), natoms = new_atoms.size();
+        std::vector <int> update_proc(natoms);
+        for (int i = 0; i < natoms; ++i) {
+               m_atoms.push_back(new_atoms.at(i)); //note: at() is member fnc of c++ vector class: Returns a reference to the element at position n in the vector. is almost same as [] operator but here checks whether i is within bounds of the vector.
+               glob_to_loc_id_[new_atoms.at(i)->atom_index] = index;
+               update_proc[i] = new_atoms.at(i)->atom_index;
+               index++;
+        }
+        m_num_atoms += natoms;
+        return update_proc;
+}
+
+/*!
+ Attempt to push ghost atom(s) into the system.  This assigns the map automatically to link the atoms global index to the local storage location.
+ This reallocates the internal vector that stores the atoms; if a memory error occurs during such reallocation, an error is given and the system exits.
+ Does not change m_num_atoms (the number of atoms a processor is responsible for)
+ \param [in] natoms Length of the array of atoms to add to the system.
+ \param [in] \*new_atoms Pointer to an array of atoms the user has created elsewhere.
+ */
+void System::add_ghost_atoms (const int natoms, std::vector <Atom*> new_atoms) {
+        for (int i = 0; i < natoms; ++i) {
+            /* Only add the atom to the system if it is not already contained in the system.
+                        Do this by going through the atoms and comparing atom_index of the atoms already in the system and the atoms to be added */
+            bool found_atom = false;
+            for (unsigned int j = 0; j < m_atoms.size(); ++j) {
+                if (m_atoms[j]->atom_index == new_atoms.at(i)->atom_index) {
+                    found_atom = true;
+                    break;
+                }
+            }
+            if (!found_atom) {
+                m_atoms.push_back(new_atoms.at(i));
+            }
+
+        }
+        return;
+}
+
+/*!
+ Clears the atoms communicated from neighbouring domains from the list of atoms stored in the system leaving only the atoms the system is responsible for.
+ */
+void System::clear_ghost_atoms () {
+        m_atoms.erase(m_atoms.begin()+m_num_atoms, m_atoms.end());
 }
