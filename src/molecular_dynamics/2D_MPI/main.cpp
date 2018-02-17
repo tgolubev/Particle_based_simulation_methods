@@ -2,7 +2,7 @@
 //program parameters and choose which simulation approach (NVT, NVE, or gradual heating) to use. Certain blocks need
 //to be commented/uncommented to use different approaches. This file can take input arguments, but they are not required.
 
-//Outputs are a movie.xyz file with atom positions which can allow to create animations in i.e Ovito and statistics.txt
+//Outputs are a movie.xyz file with atom positionitions which can allow to create animations in i.e Ovito and statistics.txt
 //which calculates system energetics, temperature, and diffusion coefficient. The frequency of output can be varied as
 //desired. Of course, less frequent output, makes the program run faster.
 
@@ -27,10 +27,10 @@
 using namespace std;
 using namespace chrono;
 
-//void decompose1D_system(int system_length, int my_id,int nproc, int*  subdomain_start,int* subdomain_size) { //int* means pointer to int
+
+//void decompositione1D_system(int system_length, int my_id,int nproc, int*  subdomain_start,int* subdomain_size) { //int* means pointer to int
 //  *subsystem_length = system_length / nproc; //subsystem_length is a pointer, *subsystem_length changes the value of variable that pointer points to
 //}
-
 
 
 int main(int argc, char **argv)
@@ -45,8 +45,8 @@ int main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD, &nproc);  //find # of processors
 
     // Find your part of the domain--> determines subdomain location and size for each processor
-    //int subsystem_length, subsystem_start;  //these will gain values after calling the decompose_system fnc.
-    //decompose1D_system(system_length, my_id, nproc, &subsystem_start, &subdomain_size);
+    //int subsystem_length, subsystem_start;  //these will gain values after calling the decompositione_system fnc.
+    //decompositione1D_system(system_length, my_id, nproc, &subsystem_start, &subdomain_size);
     //cout << "length of each subsystem" << subsystem_length <<endl;
     
 
@@ -88,23 +88,25 @@ int main(int argc, char **argv)
     System system;
     system.createSCLattice(Total_systemSize,subsystemSize, latticeConstant, initialTemperature, mass, subsystemOrigin);
     //system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, mass);
-    //system.createRandomPositions(num_particles, side_length, initialTemperature, mass);
+    //system.createRandompositionitions(num_particles, side_length, initialTemperature, mass);
     system.potential().setEpsilon(1.0); //if don't set to 1.0, must modify LJ eqn.
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
     system.m_sample_freq=10; //statistics sampler freq.
     system.removeTotalMomentum();
 
+    create_MPI_ATOM();
+
     StatisticsSampler statisticsSampler;
 
     //record left half of system
-    IO movie("movie.xyz"); // To write the positions to file, create IO object called "movie"
+    IO movie("movie.xyz"); // To write the positionitions to file, create IO object called "movie"
     IO movie2("movie2.xyz");
     if( my_id == 0 ) {
-        movie.saveState(system, statisticsSampler);  //save the initial particle positions to file. pass statisticsSampler object too, so can use density function...
+        movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
     }
     //record right half of system
     if(my_id == 1) {
-        movie.saveState(system, statisticsSampler);  //save the initial particle positions to file. pass statisticsSampler object too, so can use density function...
+        movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
     }
 
 

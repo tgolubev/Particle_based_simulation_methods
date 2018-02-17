@@ -1,6 +1,8 @@
 #include "send_atoms.h"
 #include <mpi.h>
-#include <math.h>
+#include <math.h>  //<> for include for files in other directories, i.e. STL
+#include "global.h" //tells it that MPI_ATOM is extern variable--> defined elsewhere
+
 
 using namespace std;
 
