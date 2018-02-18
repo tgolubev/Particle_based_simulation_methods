@@ -97,7 +97,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
             double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
             //ATTRACTIVE FORCE SHOULD POINT TOWARDS OTHER ATOM. REPULSIVE AWAY FROM OTHER ATOM!!!
-            std::cout << total_force_over_r <<"force" <<std::endl;
+            //std::cout << total_force_over_r <<"force" <<std::endl;
 
             //find and set force components
             //double total_force_over_r = total_force/radius; //precalculate to save 2 FLOPS
@@ -171,7 +171,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                     Atom *current_atom = system.atoms(current_index);
                     //forces with atoms which came from left
                     for (int other_index=0; other_index < num_from_left; ++other_index) {
-                        Atom *other_atom = system.atoms(other_index);
+                        Atom *other_atom = &from_left[other_index];  //other atom is taken form the vector of ghost atoms from left
                         vec2 displacement(0.,0.);
                         for(int j=0;j<2;j++){
                             displacement[j] = current_atom->position[j] - other_atom->position[j];
@@ -186,14 +186,14 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         //find and set force components
                         for(int j=0;j<2;j++) {
                             current_atom->force[j] += total_force_over_r*displacement[j]; //i.e. Fx = (F/r)*x
-                            other_atom->force[j] -= current_atom->force[j]; //using Newton's 3rd law
+                            //WE DO NOT want to update the force on other_atom here, b/c it is a ghost atom...--> outside of the system
                         }
 
 
                     }
                     //forces with atoms which came from right
                     for (int other_index=0; other_index < num_from_right; ++other_index) {
-                        Atom *other_atom = system.atoms(other_index);
+                        Atom *other_atom = &from_right[other_index]; //other atom is from vector of atoms from right
                         vec2 displacement(0.,0.);
                         for(int j=0;j<2;j++){
                             displacement[j] = current_atom->position[j] - other_atom->position[j];
@@ -208,10 +208,13 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         //find and set force components
                         for(int j=0;j<2;j++) {
                             current_atom->force[j] += total_force_over_r*displacement[j]; //i.e. Fx = (F/r)*x
-                            other_atom->force[j] -= current_atom->force[j]; //using Newton's 3rd law
+                            //WE DO NOT want to update the force on other_atom here, b/c it is a ghost atom...--> outside of the system
                         }
                     }
                 }
+
+
+
         }//end of if(nprocs>1)
 }
 

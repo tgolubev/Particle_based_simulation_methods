@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
     double initialTemperature = 10; //in K
     double currentTemperature;
-    double latticeConstant =10.256;  //in angstroms  //FOR 2D seems need larger latticeConstant to prevent blowup
+    double latticeConstant =30.0;  //in angstroms
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
 
     //all variables will be defined in EACH processor
-    vec2 Total_systemSize(20,10); //TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
+    vec2 Total_systemSize(20,20); //TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
     vec2 subsystemSize; //this will be defined in each processor seperately
     subsystemSize[0] = Total_systemSize[0]/nprocs;  //1D parallelization along x
     subsystemSize[1] = Total_systemSize[1]; //WILL CHANGE THIS TO /nprocs when do 2D parallelization
@@ -70,17 +70,17 @@ int main(int argc, char **argv)
 
     int StatSample_freq = 10;
 
-    int N_time_steps = 50000; //number of time steps
+    int N_time_steps = 150000; //number of time steps
 
     //for NVT ensemble
-    int N_steps = 100;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
+    int N_steps = 5;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------
     //Initialize MD units
      UnitConverter::initializeMDUnits(sigma, epsilon);
      initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
      latticeConstant = UnitConverter::lengthFromAngstroms(latticeConstant);
-     double dt = UnitConverter::timeFromSI(2e-14); //
+     double dt = UnitConverter::timeFromSI(2e-15); //
 
     cout << "One unit of length is " << UnitConverter::lengthToSI(1.0) << " meters" << endl;
     cout << "One unit of velocity is " << UnitConverter::velocityToSI(1.0) << " meters/second" << endl;
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
 
         //Uncoment the below block to use NVT ensemble.
 
-        /*
+
 
             //periodically rescale Velocities to keep T constant (NVT ensemble)
             //if(timestep % 100 == 0){
@@ -175,10 +175,10 @@ int main(int argc, char **argv)
             //Note: initial temperature is the desired temperature here
             system.rescaleVelocities(statisticsSampler, currentTemperature, initialTemperature, N_steps);
             //}
-            */
 
 
-        if( timestep % 1 == 0 ) {
+
+        if( timestep % 100 == 0 ) {
             // Print the timestep and system properties every 1000 timesteps
             cout << setw(20) << system.steps() <<
                     setw(20) << system.time() <<
@@ -186,6 +186,13 @@ int main(int argc, char **argv)
                     setw(20) << statisticsSampler.kineticEnergy() <<
                     setw(20) << statisticsSampler.potentialEnergy() <<
                     setw(20) << statisticsSampler.totalEnergy() << endl;
+        }
+
+
+        if(timestep%10 == 0){
+            if( my_id == 0 ) {
+                movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
+            }
         }
 
 

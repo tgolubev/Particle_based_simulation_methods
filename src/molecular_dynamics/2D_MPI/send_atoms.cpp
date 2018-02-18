@@ -43,9 +43,9 @@ void send_atoms(System *system) {
         for (int i=0; i!=system->num_atoms(); ++i) {   //-> are used b/c
 		// calculate the processor for each atom
                 proc_to = floor(system->atoms(i)->position[decomp_dim]/ sim_size[decomp_dim] * nprocs);
-                std::cout <<"position" <<system->atoms(i)->position[decomp_dim] <<std::endl;
-                  std::cout <<"sim_size" <<sim_size[decomp_dim] <<std::endl;
-                  std::cout <<"nprocs" << nprocs <<std::endl;
+                //std::cout <<"position" <<system->atoms(i)->position[decomp_dim] <<std::endl;
+                 // std::cout <<"sim_size" <<sim_size[decomp_dim] <<std::endl;
+                  //std::cout <<"proc_to" << proc_to <<std::endl;
 
 		if (proc_to == (rank - 1 + nprocs) % nprocs) {
                         to_left.push_back((system->atoms(i)));  // my atoms are pointers...--> don't need & when passing them...

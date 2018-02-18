@@ -110,12 +110,12 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
     //std::cout <<"x" <<x <<std::endl;  //works correctly
 
 
-    for(int i=0;i<subsystemSize[0];i++){  //< b/c i starts w/ 0
+    for(int i=1;i<subsystemSize[0];i++){  // i = 1 and < b/c can't have atoms on both boundaries--> will blow up!
         //i.e. i = 0,1...N_x-1
 
         double y = 0;
 
-        for(int j=0;j<subsystemSize[1];j++){
+        for(int j=1;j<subsystemSize[1];j++){
 
                 Atom *atom = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct
 
@@ -130,8 +130,8 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
 
     //this sets the TOTAL system size--> is used for PBCs which are at the outer boundaries
     setSystemSize(latticeConstant*Total_systemSize); //system size set by multiply vec2 # of unit cells by latticeConstant
-    vec2 include_bndry(0.00001,0.00001);  //will add onto SystemSize so include bndry for domain distributions among processors in SimSize
-    setSimSize(Total_systemSize*latticeConstant + include_bndry);
+    //vec2 include_bndry(0.001,0.001);  //will add onto SystemSize so include bndry for domain distributions among processors in SimSize
+    setSimSize(Total_systemSize*latticeConstant);
     std::cout<<"system size = " << m_systemSize <<std::endl;
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
 
@@ -254,17 +254,17 @@ std::vector <int> System::add_atoms (std::vector <Atom*> new_atoms) {
         std::vector <int> update_proc(natoms);
         //gets through here
 
-        std::cout <<"index at line 248"<< index <<std::endl;
-        std::cout <<"natoms at line 248"<< natoms <<std::endl;  //finds that there are 100 new atoms --> ok.. make sense for 2 processors...
+        //std::cout <<"index at line 248"<< index <<std::endl;
+        //std::cout <<"natoms at line 248"<< natoms <<std::endl;  //finds that there are 100 new atoms --> ok.. make sense for 2 processors...
         //issue is that it might try to add atoms that already are in the processor AGAIN... b/c intially didn't split up the domain...
         for (int i = 0; i < natoms; ++i) {
                m_atoms.push_back(new_atoms.at(i)); //note: at() is member fnc of c++ vector class: Returns a reference to the element at position n in the vector. is almost same as [] operator but here checks whether i is within bounds of the vector.
                //gets through here fine
-               std::cout << "line 252 system" <<std::endl;
-               std::cout <<"new_atoms[0]" << new_atoms[0] <<std::endl;  //new atoms[0] is a pointer --> good
-               std::cout <<"new_atoms[0]->atom_index" <<new_atoms[0]->m_mass << std::endl; //it can't find the new_atoms.at(i).atom_index!  //IT SEEMS THE POINTER, BUT CAN'T FIND atom_index!!
+               //std::cout << "line 252 system" <<std::endl;
+               //std::cout <<"new_atoms[0]" << new_atoms[0] <<std::endl;  //new atoms[0] is a pointer --> good
+              // std::cout <<"new_atoms[0]->atom_index" <<new_atoms[0]->m_mass << std::endl; //it can't find the new_atoms.at(i).atom_index!  //IT SEEMS THE POINTER, BUT CAN'T FIND atom_index!!
                glob_to_loc_id_[new_atoms.at(i)->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
-               std::cout <<"line 252 in addatoms" <<std::endl;
+               //std::cout <<"line 252 in addatoms" <<std::endl;
                update_proc[i] = new_atoms.at(i)->atom_index; //note: if accessing member property through a pointer, must use -> instead of .
                index++;
 
