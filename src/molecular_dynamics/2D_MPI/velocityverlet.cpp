@@ -18,6 +18,9 @@ void VelocityVerlet::integrate(System &system, double dt) //passing by reference
         //this operates on the vectors directly using vec3 class
         atom->velocity += atom->force*half_dt/atom->mass();
         atom->position += atom->velocity*dt;  //NOTE: since v is computed 1st, this is actually x(t+dt) = x(t) + vt+0.5at^2 since v = v+0.5at
+        //std::cout<< atom->m_initial_position[0] << "atom INITIAL position" <<std::endl;  //initial positions seem fine...
+        //std::cout << atom->position[0] <<"atomposition in VV" <<std::endl;  //these positions are blown up...
+         //std::cout << atom->force[0] << "atom force" <<std::endl; //force is blown up
 
     }
 

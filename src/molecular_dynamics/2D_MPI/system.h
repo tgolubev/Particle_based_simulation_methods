@@ -13,6 +13,7 @@ class System
 private:
     //m_ stands for member
     vec2 m_systemSize;
+    vec2 m_sim_size;  //will be just slightly larger than systemSize for purpose to make sure to include outer boundary atoms in the last processor
     vec2 m_subsystemSize;
     vec2 m_halfsystemSize;
     VelocityVerlet m_integrator;
@@ -52,6 +53,7 @@ public:
     double volume() { return m_systemSize[0]*m_systemSize[1]*m_systemSize[2]; }
     vec2 systemSize() { return m_systemSize; }
     vec2 subsystemSize() { return m_subsystemSize; }
+    vec2 simSize() { return m_sim_size; }
     double systemSize(int j) { return m_systemSize[j]; }
     double subsystemSize(int j) { return m_subsystemSize[j]; }
     double halfsystemSize(int j){return m_halfsystemSize[j];}
@@ -62,6 +64,8 @@ public:
     void setSubSystemSize(vec2 subsystemSize) {
           m_subsystemSize = subsystemSize;
         }
+    void setSimSize(vec2 simSize){m_sim_size = simSize;}
+
 
     LennardJones &potential() { return m_potential; }
     double time() { return m_time; }

@@ -35,25 +35,20 @@ using namespace chrono;
 
 int main(int argc, char **argv)
 {
-   int my_id, nproc;
+   int my_id, nprocs;
     
     MPI_Init(&argc, &argv);  //initialize MPI environment: takes in arguments from the mpirun command
     //everything past this point is executed on EACH processor in parallel
 
     //each processor finds out what it's ID (AKA rank) is and how many processors there are
     MPI_Comm_rank(MPI_COMM_WORLD, &my_id);   //find ID
-    MPI_Comm_size(MPI_COMM_WORLD, &nproc);  //find # of processors
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);  //find # of processors
 
     // Find your part of the domain--> determines subdomain location and size for each processor
     //int subsystem_length, subsystem_start;  //these will gain values after calling the decompositione_system fnc.
-    //decompositione1D_system(system_length, my_id, nproc, &subsystem_start, &subdomain_size);
+    //decompositione1D_system(system_length, my_id, nprocs, &subsystem_start, &subdomain_size);
     //cout << "length of each subsystem" << subsystem_length <<endl;
-    
 
-    //all variables will be defined in EACH processor
-    vec2 Total_systemSize(20,10); //TOTAL system dimensions
-    vec2 subsystemSize; //this will be defined in each processor seperately
-    vec2 subsystemOrigin; //bottom left corner of each subsystem, this will be defined in each processor seperately
     double initialTemperature = 10; //in K
     double currentTemperature;
     double latticeConstant =10.256;  //in angstroms  //FOR 2D seems need larger latticeConstant to prevent blowup
@@ -62,6 +57,16 @@ int main(int argc, char **argv)
     double side_length;
     double mass = 6.63352088e-26; // mass in kg
     double total_dt_time= 0.0;
+
+
+    //all variables will be defined in EACH processor
+    vec2 Total_systemSize(20,10); //TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
+    vec2 subsystemSize; //this will be defined in each processor seperately
+    subsystemSize[0] = Total_systemSize[0]/nprocs;  //1D parallelization along x
+    subsystemSize[1] = Total_systemSize[1]; //WILL CHANGE THIS TO /nprocs when do 2D parallelization
+
+
+    vec2 subsystemOrigin; //bottom left corner of each subsystem, this will be defined in each processor seperately
 
     int StatSample_freq = 10;
 
@@ -99,15 +104,18 @@ int main(int argc, char **argv)
     StatisticsSampler statisticsSampler;
 
     //record left half of system
+
     IO movie("movie.xyz"); // To write the positionitions to file, create IO object called "movie"
     IO movie2("movie2.xyz");
     if( my_id == 0 ) {
         movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
     }
     //record right half of system
+
     if(my_id == 1) {
-        movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
+        movie2.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
     }
+    //all initial positions are correct...
 
 
     //         ofstream velocities;
@@ -128,14 +136,16 @@ int main(int argc, char **argv)
 
     high_resolution_clock::time_point start2 = high_resolution_clock::now();
 
-    for(int timestep=0; timestep< N_time_steps; timestep++) {
+
+
+    for(int timestep=0; timestep< N_time_steps; timestep++) { 
         high_resolution_clock::time_point startdt = high_resolution_clock::now();
+        //gets through here fine
         system.step(dt);
         high_resolution_clock::time_point finishdt = high_resolution_clock::now();
         duration<double> time_dt = duration_cast<duration<double>>(finishdt-startdt);
         // cout << "dt time" << time_dt.count() <<endl;
         total_dt_time += time_dt.count();
-
 
 
         //Uncomment the below block to implement gradual heating of the system.
@@ -168,7 +178,7 @@ int main(int argc, char **argv)
             */
 
 
-        if( timestep % 1000 == 0 ) {
+        if( timestep % 1 == 0 ) {
             // Print the timestep and system properties every 1000 timesteps
             cout << setw(20) << system.steps() <<
                     setw(20) << system.time() <<

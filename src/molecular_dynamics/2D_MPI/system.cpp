@@ -95,18 +95,27 @@ void System::removeTotalMomentum() {
     */
 }
 
+//note: currently upon initialization, each processor will create the ENTIRE global system. Then will send atoms and delete uneecesary atoms when send_atoms
+//is called in velocityverlet.cpp. Could optimize to have only the subdomains created here, but not sure how much CPU this saves since just corresponds to 1 dt send commands.
 void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double latticeConstant, double temperature, double mass, vec2 subsystemOrigin) {
 
-    double x = subsystemOrigin[0];
+    double x = 0;
+    //each processor finds out what it's ID (AKA rank) is and how many processors there are
+    int nprocs, rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);  //find # of processors
+
+    x =rank*subsystemSize[0]*latticeConstant;  //initializes x at the right position for the processor's domain
+
+    //std::cout <<"x" <<x <<std::endl;  //works correctly
 
 
-    for(int i=0;i<subsystemSize[0];i++){
+    for(int i=0;i<subsystemSize[0];i++){  //< b/c i starts w/ 0
         //i.e. i = 0,1...N_x-1
-        x +=latticeConstant;
-        double y = subsystemOrigin[1];
+
+        double y = 0;
 
         for(int j=0;j<subsystemSize[1];j++){
-                y += latticeConstant;
 
                 Atom *atom = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct
 
@@ -114,11 +123,15 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
                 atom->num_bndry_crossings.set(0.,0.);   //make sure initial # of bndry crossings is 0
                 atom->resetVelocityMaxwellian(temperature);
                 m_atoms.push_back(atom);     //add element to vector m_atoms 1 element (atom object)
+                y += latticeConstant;
         }
+        x +=latticeConstant;
     }
 
     //this sets the TOTAL system size--> is used for PBCs which are at the outer boundaries
     setSystemSize(latticeConstant*Total_systemSize); //system size set by multiply vec2 # of unit cells by latticeConstant
+    vec2 include_bndry(0.00001,0.00001);  //will add onto SystemSize so include bndry for domain distributions among processors in SimSize
+    setSimSize(Total_systemSize*latticeConstant + include_bndry);
     std::cout<<"system size = " << m_systemSize <<std::endl;
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
 
@@ -127,6 +140,7 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
     setSubSystemSize(latticeConstant*subsystemSize);
 
 }
+
 
 
 
@@ -170,6 +184,7 @@ void System::step(double dt) {
     m_integrator.integrate(*this, dt);  //this calls velocityverlet.cpp
     m_steps++;
     m_time += dt;
+
 }
 
 //---------------------------------------------------------------------
@@ -235,13 +250,25 @@ std::vector <int> System::add_atoms (const int natoms, Atom &new_atoms) {
  \param [in] \*new_atoms Pointer to an array of atoms the user has created elsewhere.
 */
 std::vector <int> System::add_atoms (std::vector <Atom*> new_atoms) {
-        int index = m_atoms.size(), natoms = new_atoms.size();
+        int index = m_atoms.size(), natoms = new_atoms.size();  //index is correct --> gives 200 = total number of atoms
         std::vector <int> update_proc(natoms);
+        //gets through here
+
+        std::cout <<"index at line 248"<< index <<std::endl;
+        std::cout <<"natoms at line 248"<< natoms <<std::endl;  //finds that there are 100 new atoms --> ok.. make sense for 2 processors...
+        //issue is that it might try to add atoms that already are in the processor AGAIN... b/c intially didn't split up the domain...
         for (int i = 0; i < natoms; ++i) {
                m_atoms.push_back(new_atoms.at(i)); //note: at() is member fnc of c++ vector class: Returns a reference to the element at position n in the vector. is almost same as [] operator but here checks whether i is within bounds of the vector.
-               glob_to_loc_id_[new_atoms.at(i)->atom_index] = index;
-               update_proc[i] = new_atoms.at(i)->atom_index;
+               //gets through here fine
+               std::cout << "line 252 system" <<std::endl;
+               std::cout <<"new_atoms[0]" << new_atoms[0] <<std::endl;  //new atoms[0] is a pointer --> good
+               std::cout <<"new_atoms[0]->atom_index" <<new_atoms[0]->m_mass << std::endl; //it can't find the new_atoms.at(i).atom_index!  //IT SEEMS THE POINTER, BUT CAN'T FIND atom_index!!
+               glob_to_loc_id_[new_atoms.at(i)->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
+               std::cout <<"line 252 in addatoms" <<std::endl;
+               update_proc[i] = new_atoms.at(i)->atom_index; //note: if accessing member property through a pointer, must use -> instead of .
                index++;
+
+
         }
         m_num_atoms += natoms;
         return update_proc;

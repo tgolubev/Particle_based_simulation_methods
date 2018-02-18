@@ -62,6 +62,8 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     
    //First calculate interactions btw. all atoms in the system
 
+
+
     for(int current_index=0; current_index<system.num_atoms()-1; current_index++){  //-1 b/c don't need to calculate pairs when get to last atom
         Atom *current_atom = system.atoms(current_index);  //system.atoms(index) returns the pointer to the atom corresponding to index
 
@@ -74,28 +76,28 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
              for(int j=0;j<2;j++){
                  displacement[j] = current_atom->position[j] - other_atom->position[j];
-                   //no min. image convention here for parallel version
-                //for cases where the folded back particle will be closer than its image to a given particle
-                // if (displacement[j] >  system.halfsystemSize(j)) displacement[j] -= system.systemSize(j);   //systemSize(j) returns m_systemSize[j] from system class
-                //if (displacement[j] <= -system.halfsystemSize(j)) displacement[j] += system.systemSize(j);
-           }
+             }
 
+            // std::cout << displacement[0] <<"displacement x" <<displacement[1] <<"displacement y" <<std::endl;
+             //std::cout<<"numatoms" <<system.num_atoms() <<std::endl;
+
+             //displacements are fine
 
             double radiusSqrd = displacement.lengthSquared();
-            //apply interaction range cutoff
-            //std::cout<<radius<<std::endl;
-            // double radius = sqrt(radiusSqrd);
-            //if(radius > 5.0*m_sigma) continue;
-
 
             if(radiusSqrd > skin_cutoff_sqrd) continue;
 
             double radius = sqrt(radiusSqrd);
             double sigma_over_radius = m_sigma/radius;
 
+            //std::cout <<sigma_over_radius <<"sigmaoverradius" << std::endl;
+
+            //SEEMS BLOWS UP AFTER 1ST dt,
+
 
             double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
             //ATTRACTIVE FORCE SHOULD POINT TOWARDS OTHER ATOM. REPULSIVE AWAY FROM OTHER ATOM!!!
+            std::cout << total_force_over_r <<"force" <<std::endl;
 
             //find and set force components
             //double total_force_over_r = total_force/radius; //precalculate to save 2 FLOPS
@@ -104,6 +106,8 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                 other_atom->force[j] -= current_atom->force[j]; //using Newton's 3rd law
             }
             
+              //force is blown up here
+            //std::cout << current_atom->force[0] <<"force in lj LINE 99" <<std::endl;
 
             
              /*
@@ -143,39 +147,72 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
             
     }//end of outer loop
     
-    //first just test w/o worrying about ghost atoms
-    
-    
+
     //send ghost atoms
-//     if (nprocs > 1) {
-// 		// Send ghost atoms to neighboring processor
-// 		MPI_Isend(&num_to_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req);
-// 		MPI_Irecv(&num_from_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req+1);
-// 		MPI_Isend(&num_to_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+2);
-// 		MPI_Irecv(&num_from_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+3);
-// 		MPI_Waitall (4, req, stat);
-// 
-// 		from_left.resize(num_from_left);
-// 		from_right.resize(num_from_right);
-// 		
-// 		MPI_Isend(&to_left[0], num_to_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2);
-// 		MPI_Irecv(&from_left[0], num_from_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2+1);
-// 		MPI_Isend(&to_right[0], num_to_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+2);
-// 		MPI_Irecv(&from_right[0], num_from_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+3);
-// 		MPI_Waitall (4, req2, stat2);
-        
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
+     if (nprocs > 1) {
+                // Send ghost atoms to neighboring processor
+                MPI_Isend(&num_to_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req);
+                MPI_Irecv(&num_from_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req+1);
+                MPI_Isend(&num_to_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+2);
+                MPI_Irecv(&num_from_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+3);
+                MPI_Waitall (4, req, stat);
+
+                from_left.resize(num_from_left);
+                from_right.resize(num_from_right);
+
+                MPI_Isend(&to_left[0], num_to_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2);
+                MPI_Irecv(&from_left[0], num_from_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2+1);
+                MPI_Isend(&to_right[0], num_to_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+2);
+                MPI_Irecv(&from_right[0], num_from_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+3);
+                MPI_Waitall (4, req2, stat2);
+
+                // Calculate interactions between new (ghost) atoms and atoms on processor
+                for (int current_index=0; current_index!=system.num_atoms(); ++current_index) {
+                    Atom *current_atom = system.atoms(current_index);
+                    //forces with atoms which came from left
+                    for (int other_index=0; other_index < num_from_left; ++other_index) {
+                        Atom *other_atom = system.atoms(other_index);
+                        vec2 displacement(0.,0.);
+                        for(int j=0;j<2;j++){
+                            displacement[j] = current_atom->position[j] - other_atom->position[j];
+                      }
+
+                        double radiusSqrd = displacement.lengthSquared();
+                        if(radiusSqrd > skin_cutoff_sqrd) continue;
+                        double radius = sqrt(radiusSqrd);
+                        double sigma_over_radius = m_sigma/radius;
+                        double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
+
+                        //find and set force components
+                        for(int j=0;j<2;j++) {
+                            current_atom->force[j] += total_force_over_r*displacement[j]; //i.e. Fx = (F/r)*x
+                            other_atom->force[j] -= current_atom->force[j]; //using Newton's 3rd law
+                        }
 
 
+                    }
+                    //forces with atoms which came from right
+                    for (int other_index=0; other_index < num_from_right; ++other_index) {
+                        Atom *other_atom = system.atoms(other_index);
+                        vec2 displacement(0.,0.);
+                        for(int j=0;j<2;j++){
+                            displacement[j] = current_atom->position[j] - other_atom->position[j];
+                        }
+
+                        double radiusSqrd = displacement.lengthSquared();
+                        if(radiusSqrd > skin_cutoff_sqrd) continue;
+                        double radius = sqrt(radiusSqrd);
+                        double sigma_over_radius = m_sigma/radius;
+                        double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
+
+                        //find and set force components
+                        for(int j=0;j<2;j++) {
+                            current_atom->force[j] += total_force_over_r*displacement[j]; //i.e. Fx = (F/r)*x
+                            other_atom->force[j] -= current_atom->force[j]; //using Newton's 3rd law
+                        }
+                    }
+                }
+        }//end of if(nprocs>1)
 }
 
 
