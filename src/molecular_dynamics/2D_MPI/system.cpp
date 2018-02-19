@@ -117,12 +117,13 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
 
         for(int j=1;j<subsystemSize[1];j++){
 
-                Atom *atom = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct
+                Atom *atom = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct //* atom means create a pointer --> atom is a pointer
+                //equivalent to: Atom *atom;  atom = new Atom(..);  //declare a pointer and have it point to new Atom object
 
                 atom->setInitialPosition(x,y);
                 atom->num_bndry_crossings.set(0.,0.);   //make sure initial # of bndry crossings is 0
                 atom->resetVelocityMaxwellian(temperature);
-                m_atoms.push_back(atom);     //add element to vector m_atoms 1 element (atom object)
+                m_atoms.push_back(atom);     //add element to vector m_atoms 1 element (pointer to atom)
                 y += latticeConstant;
         }
         x +=latticeConstant;
@@ -195,7 +196,7 @@ void System::step(double dt) {
 */
 int System::delete_atoms (std::vector <int> indices) {
         std::vector <Atom*>::iterator it = m_atoms.begin();
-        std::map <int, int>::iterator map_it;
+        //std::map <int, int>::iterator map_it;
 
         // Sort indices from lowest to highest
         sort (indices.begin(), indices.end());
@@ -203,20 +204,15 @@ int System::delete_atoms (std::vector <int> indices) {
         // Pop in this order
         int shift = 0;
         int upper;
-        for (unsigned int i = 0; i < indices.size(); ++i) {
-                // Update glob_to_loc for all atoms following the erased atoms
+        for (unsigned int i = 0; i < indices.size(); ++i) {           //finds size = 6
                 if (i < indices.size()-1) {
                         upper = indices[i+1]-shift;
                 } else {
                         upper = m_atoms.size();
                 }
-                for (int j = indices[i]+1-shift; j < upper; ++j) {
-                        glob_to_loc_id_[m_atoms[j]->atom_index] -= (shift+1);
-                }
 
-                map_it = glob_to_loc_id_.find(m_atoms[indices[i]-shift]->atom_index);
                 m_atoms.erase(it - shift + indices[i]); //must pass it a accept a const iterator: note: 'it' is an iterator
-                glob_to_loc_id_.erase(map_it);
+          //      glob_to_loc_id_.erase(map_it);  //GETS STUCK AT THIS ERASE!
                 ++shift;
         }
         m_num_atoms -= shift;
@@ -249,26 +245,24 @@ std::vector <int> System::add_atoms (const int natoms, Atom &new_atoms) {
  \param [in] natoms Length of the array of atoms to add to the system.
  \param [in] \*new_atoms Pointer to an array of atoms the user has created elsewhere.
 */
-std::vector <int> System::add_atoms (std::vector <Atom*> new_atoms) {
-        int index = m_atoms.size(), natoms = new_atoms.size();  //index is correct --> gives 200 = total number of atoms
+std::vector <int> System::add_atoms (std::vector <Atom> new_atoms) { //accepts POINTER to vector of new_atoms
+        int index = m_atoms.size(), natoms = new_atoms.size();  //use . for objects -> for pointers
         std::vector <int> update_proc(natoms);
         //gets through here
 
         //std::cout <<"index at line 248"<< index <<std::endl;
         //std::cout <<"natoms at line 248"<< natoms <<std::endl;  //finds that there are 100 new atoms --> ok.. make sense for 2 processors...
-        //issue is that it might try to add atoms that already are in the processor AGAIN... b/c intially didn't split up the domain...
+        //issue is that it might try to add atoms that already are in the processor AGAIN
         for (int i = 0; i < natoms; ++i) {
-               m_atoms.push_back(new_atoms.at(i)); //note: at() is member fnc of c++ vector class: Returns a reference to the element at position n in the vector. is almost same as [] operator but here checks whether i is within bounds of the vector.
-               //gets through here fine
-               //std::cout << "line 252 system" <<std::endl;
-               //std::cout <<"new_atoms[0]" << new_atoms[0] <<std::endl;  //new atoms[0] is a pointer --> good
-              // std::cout <<"new_atoms[0]->atom_index" <<new_atoms[0]->m_mass << std::endl; //it can't find the new_atoms.at(i).atom_index!  //IT SEEMS THE POINTER, BUT CAN'T FIND atom_index!!
-               glob_to_loc_id_[new_atoms.at(i)->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
-               //std::cout <<"line 252 in addatoms" <<std::endl;
-               update_proc[i] = new_atoms.at(i)->atom_index; //note: if accessing member property through a pointer, must use -> instead of .
+               Atom *adding_atom = &new_atoms[i];  //makes a pointer to the individual atom
+               m_atoms.push_back(adding_atom); //note: at() is member fnc of c++ vector class: Returns a reference to the element at position n in the vector. is almost same as [] operator but here checks whether i is within bounds of the vector.
+
+               glob_to_loc_id_[adding_atom->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
+               //std::cout <<"line 270 in addatoms" <<std::endl;
+               //works through here
+               update_proc[i] = adding_atom->atom_index; //note: if accessing member property through a pointer, must use -> instead of .
                index++;
-
-
+\
         }
         m_num_atoms += natoms;
         return update_proc;
@@ -281,19 +275,20 @@ std::vector <int> System::add_atoms (std::vector <Atom*> new_atoms) {
  \param [in] natoms Length of the array of atoms to add to the system.
  \param [in] \*new_atoms Pointer to an array of atoms the user has created elsewhere.
  */
-void System::add_ghost_atoms (const int natoms, std::vector <Atom*> new_atoms) {
+void System::add_ghost_atoms (const int natoms, std::vector <Atom> new_atoms) {
         for (int i = 0; i < natoms; ++i) {
             /* Only add the atom to the system if it is not already contained in the system.
                         Do this by going through the atoms and comparing atom_index of the atoms already in the system and the atoms to be added */
             bool found_atom = false;
             for (unsigned int j = 0; j < m_atoms.size(); ++j) {
-                if (m_atoms[j]->atom_index == new_atoms.at(i)->atom_index) {
+                if (m_atoms[j]->atom_index == new_atoms.at(i).atom_index) {
                     found_atom = true;
                     break;
                 }
             }
             if (!found_atom) {
-                m_atoms.push_back(new_atoms.at(i));
+                Atom *adding_atom = &new_atoms[i];
+                m_atoms.push_back(adding_atom);
             }
 
         }

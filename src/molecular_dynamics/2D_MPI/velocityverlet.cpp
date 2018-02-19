@@ -31,14 +31,17 @@ void VelocityVerlet::integrate(System &system, double dt) //passing by reference
 
     system.applyPeriodicBoundaryConditions();
 
+
     //send_atoms accepts a pointer, so declare a pointer(variable whose value = the memory address)
     //System  * pt_system = &system; //assign it the address of system
 
+     //std::cout <<"vv line 38"<<std::endl;
 
-
-    if(nprocs >1){
+    if(nprocs >1){ //SEGMENTATION FAULT IS HERE
        send_atoms(&system);  //send and recieve atoms which have left their processor's domain
     }
+
+
 
     system.calculateForces(); // New positions, recompute forces
 

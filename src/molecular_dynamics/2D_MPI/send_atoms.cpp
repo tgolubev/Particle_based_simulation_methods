@@ -24,11 +24,11 @@ void send_atoms(System *system) {
 	int num_to_right = 0;
 	int num_from_left, num_from_right;
 	
-	// store atoms to send and receive
-        vector<Atom*> to_left;
-        vector<Atom*> to_right;
-        vector<Atom*> from_left;
-        vector<Atom*> from_right;
+        // store atoms to send and receive: vectors of atom objects (not pointers)
+        vector<Atom> to_left;
+        vector<Atom> to_right;
+        vector<Atom> from_left;
+        vector<Atom> from_right;
 	
 	// store indices of atoms that have been sent (so we can delete them)
 	vector<int> to_delete;
@@ -46,14 +46,15 @@ void send_atoms(System *system) {
                 //std::cout <<"position" <<system->atoms(i)->position[decomp_dim] <<std::endl;
                  // std::cout <<"sim_size" <<sim_size[decomp_dim] <<std::endl;
                   //std::cout <<"proc_to" << proc_to <<std::endl;
+                //proc_to works fine
 
 		if (proc_to == (rank - 1 + nprocs) % nprocs) {
-                        to_left.push_back((system->atoms(i)));  // my atoms are pointers...--> don't need & when passing them...
+                        to_left.push_back(*(system->atoms(i)));  //* means pass the value that atoms (which is a pointer) points to
 			num_to_left++;
 			to_delete.push_back(i);
 		}
 		else if (proc_to == (rank + 1) % nprocs) {
-                        to_right.push_back((system->atoms(i)));
+                        to_right.push_back(*(system->atoms(i)));
 			num_to_right++;
 			to_delete.push_back(i);
 		}
@@ -69,8 +70,8 @@ void send_atoms(System *system) {
         //(starting address of data that sending (called buffer), # of elements in buffer, MPI data type, destination processor, message tag, communicator, pointer to the request)
         MPI_Isend(&num_to_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req); // req will input pointer to beggining of req array --> req[0].
         MPI_Irecv(&num_from_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req+1);  //req+1 b/c req is pointer --> pts to req[1]
-	MPI_Isend(&num_to_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+2);
-	MPI_Irecv(&num_from_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+3);
+        MPI_Isend(&num_to_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+2);
+        MPI_Irecv(&num_from_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+3);
 	MPI_Waitall (4, req, stat);  //wait for all send and receive requests to be completed
 
 
@@ -80,23 +81,30 @@ void send_atoms(System *system) {
 
 
 	
-	// send atoms
-	MPI_Isend(&to_left[0], num_to_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2);
-	MPI_Irecv(&from_left[0], num_from_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2+1);
-	MPI_Isend(&to_right[0], num_to_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+2);
-	MPI_Irecv(&from_right[0], num_from_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+3);
-	MPI_Waitall (4, req2, stat2);  
+        // send atoms --> & here is b/c sendsing the vectors by address to MPI_Isend etc..
+        MPI_Isend(&to_left[0], num_to_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2);
+        MPI_Irecv(&from_left[0], num_from_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2+1);
+        MPI_Isend(&to_right[0], num_to_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+2);
+        MPI_Irecv(&from_right[0], num_from_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+3);
+        MPI_Waitall (4, req2, stat2);
+
 
         //gets through here
+        //std::cout <<"to_left[0]" <<to_left[0] <<std::endl; //is a pointer
 
 
-        // add atoms to system   BREAKS HERE...
-        system->add_atoms(from_left);  //pass the vectors of atom pointers --> since already pointers, don't need a & in passing...
+        // add atoms to system
+        system->add_atoms(from_left);  //from left is vector of atom objects,
         system->add_atoms(from_right);
 
+        //gets here
+
+std::cout << "line 99 in sendatoms" <<std::endl;
 
 	// delete atoms that we sent to another system
-	system->delete_atoms(to_delete);
+        system->delete_atoms(to_delete);  //THIS DOESN'T WORK PROPERLY  ---> IFITINTE LOOP
+         //doesn't get to here
+
 	
 	MPI_Barrier(MPI_COMM_WORLD);
 }

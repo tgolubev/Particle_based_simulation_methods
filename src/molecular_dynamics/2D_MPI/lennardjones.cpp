@@ -76,6 +76,12 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
              for(int j=0;j<2;j++){
                  displacement[j] = current_atom->position[j] - other_atom->position[j];
+                 //for case of 1 processor, need to implement mirror image convention here
+                 if(nprocs ==1){
+                    //for cases where the folded back particle will be closer than its image to a given particle
+                    if (displacement[j] >  system.halfsystemSize(j)) displacement[j] -= system.systemSize(j);   //systemSize(j) returns m_systemSize[j] from system class
+                    if (displacement[j] <= -system.halfsystemSize(j)) displacement[j] += system.systemSize(j);
+                 }
              }
 
             // std::cout << displacement[0] <<"displacement x" <<displacement[1] <<"displacement y" <<std::endl;
@@ -92,7 +98,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
             //std::cout <<sigma_over_radius <<"sigmaoverradius" << std::endl;
 
-            //SEEMS BLOWS UP AFTER 1ST dt,
+
 
 
             double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
@@ -148,6 +154,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     }//end of outer loop
     
 
+
     //send ghost atoms
      if (nprocs > 1) {
                 // Send ghost atoms to neighboring processor
@@ -168,10 +175,10 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
                 // Calculate interactions between new (ghost) atoms and atoms on processor
                 for (int current_index=0; current_index!=system.num_atoms(); ++current_index) {
-                    Atom *current_atom = system.atoms(current_index);
+                    Atom *current_atom = system.atoms(current_index); //*curr... means pointer to current_atom = ... RHS is a pointer
                     //forces with atoms which came from left
                     for (int other_index=0; other_index < num_from_left; ++other_index) {
-                        Atom *other_atom = &from_left[other_index];  //other atom is taken form the vector of ghost atoms from left
+                        Atom *other_atom = &from_left[other_index];  //*other_atom = &.. means pointer to other_atom = address of from_left[]. other_atom itself is an object.
                         vec2 displacement(0.,0.);
                         for(int j=0;j<2;j++){
                             displacement[j] = current_atom->position[j] - other_atom->position[j];
@@ -216,6 +223,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
 
         }//end of if(nprocs>1)
+
 }
 
 

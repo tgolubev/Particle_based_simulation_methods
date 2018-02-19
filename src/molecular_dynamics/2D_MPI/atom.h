@@ -4,6 +4,7 @@
 #include "global.h"
 #include <mpi.h>
 
+
 class Atom
 {
     //make no private vars for ease of use with MPI
@@ -16,8 +17,21 @@ public:
     vec2 num_bndry_crossings;  //this is to keep track of boundary crossings for calculating diffusion coeff.
     int atom_index;
 
+
     Atom();// for dummy array in create_MPI_ATOM
-    Atom(double mass);
+   Atom(double mass);
+    //copy constructor
+
+    Atom(const Atom& atom){
+        m_mass = atom.m_mass;
+        m_initial_position = atom.m_initial_position;
+        position = atom.position;
+        velocity = atom.velocity;
+        force = atom.force;
+        num_bndry_crossings = atom.num_bndry_crossings;
+        atom_index = atom.atom_index;
+    }
+
     void setInitialPosition(double x, double y);
     void resetForce();
     void resetVelocityMaxwellian(double temperature);
