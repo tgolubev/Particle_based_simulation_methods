@@ -43,13 +43,17 @@ void send_atoms(System *system) {
         for (int i=0; i!=system->num_atoms(); ++i) {   //-> are used b/c
 		// calculate the processor for each atom
                 proc_to = floor(system->atoms(i)->position[decomp_dim]/ sim_size[decomp_dim] * nprocs);
+                //
+
                 //std::cout <<"position" <<system->atoms(i)->position[decomp_dim] <<std::endl;
-                 // std::cout <<"sim_size" <<sim_size[decomp_dim] <<std::endl;
-                  //std::cout <<"proc_to" << proc_to <<std::endl;
+                  //std::cout <<"sim_size" <<sim_size[decomp_dim] <<std::endl;
+                 // std::cout <<"proc_to" << proc_to <<std::endl;
                 //proc_to works fine
 
 		if (proc_to == (rank - 1 + nprocs) % nprocs) {
+
                         to_left.push_back(*(system->atoms(i)));  //* means pass the value that atoms (which is a pointer) points to
+                        //std::cout<<"position to_left send line 53" << system->atoms(i)->position[0] <<endl;
 			num_to_left++;
 			to_delete.push_back(i);
 		}
@@ -59,7 +63,7 @@ void send_atoms(System *system) {
 			to_delete.push_back(i);
 		}
 		else if (proc_to != rank) {
-                        std::cout <<"Atom moved too many boxes" << proc_to << std::endl;
+                       // std::cout <<"Atom moved too many boxes" << proc_to << std::endl;
 		}			
 	}
          //gets through here fine
@@ -89,21 +93,24 @@ void send_atoms(System *system) {
         MPI_Waitall (4, req2, stat2);
 
 
-        //gets through here
-        //std::cout <<"to_left[0]" <<to_left[0] <<std::endl; //is a pointer
-
-
         // add atoms to system
+
         system->add_atoms(from_left);  //from left is vector of atom objects,
         system->add_atoms(from_right);
 
-        //gets here
 
-std::cout << "line 99 in sendatoms" <<std::endl;
 
 	// delete atoms that we sent to another system
-        system->delete_atoms(to_delete);  //THIS DOESN'T WORK PROPERLY  ---> IFITINTE LOOP
-         //doesn't get to here
+        system->delete_atoms(to_delete);
+
+
+        //clear the vectors so can be used fresh again
+        to_left.clear();
+        to_right.clear();
+        from_right.clear();
+        from_left.clear();
+        to_delete.clear();
+
 
 	
 	MPI_Barrier(MPI_COMM_WORLD);

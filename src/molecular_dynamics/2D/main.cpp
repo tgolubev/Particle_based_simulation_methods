@@ -43,7 +43,7 @@ int main()
     bool input_variance;
     double total_dt_time= 0.0;
 
-    double N_time_steps = 15000; //number of time steps
+    double N_time_steps = 50000; //number of time steps
 
     //for NVT ensemble
     double N_steps = 100;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
@@ -197,7 +197,7 @@ int main()
                     setw(20) << statisticsSampler.potentialEnergy() <<
                     setw(20) << statisticsSampler.totalEnergy() << endl;
         }
-        if(timestep % 1000 ==0){
+        if(timestep % 10 ==0){
           //save atom coordinates only periodically to save CPU and file size
           movie.saveState(system, statisticsSampler);  //calls saveState fnc in io.cpp which saves the state to the movie.xyz file
         }

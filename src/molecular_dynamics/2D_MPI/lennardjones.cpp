@@ -37,6 +37,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
     const double skin_cutoff = 3.5*m_sigma;
     const double skin_cutoff_sqrd = skin_cutoff*skin_cutoff;
+    const double too_close_sqrd = (m_sigma)*(m_sigma);
 
     vec2 sys_size = system.subsystemSize(); //returns size of LOCAL processors system box
     int decomp_dim = 0;  // 0 or 1, x or y direction of decomposition
@@ -76,13 +77,18 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
              for(int j=0;j<2;j++){
                  displacement[j] = current_atom->position[j] - other_atom->position[j];
-                 //for case of 1 processor, need to implement mirror image convention here
-                 if(nprocs ==1){
-                    //for cases where the folded back particle will be closer than its image to a given particle
-                    if (displacement[j] >  system.halfsystemSize(j)) displacement[j] -= system.systemSize(j);   //systemSize(j) returns m_systemSize[j] from system class
-                    if (displacement[j] <= -system.halfsystemSize(j)) displacement[j] += system.systemSize(j);
-                 }
              }
+             //NOTE: I need minimum image convention along y-direction!--> b/c no passing of atoms/ghosts etc there!
+             if (displacement[1] >  system.halfsystemSize(1)) displacement[1] -= system.systemSize(1);   //systemSize(j) returns m_systemSize[j] from system class
+             if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
+
+             //for case of 1 processor, need to implement x mirror image convention also
+             if(nprocs ==1){
+                 //for cases where the folded back particle will be closer than its image to a given particle
+                 if (displacement[0] >  system.halfsystemSize(0)) displacement[0] -= system.systemSize(0);   //systemSize(j) returns m_systemSize[j] from system class
+                 if (displacement[0] <= -system.halfsystemSize(0)) displacement[0] += system.systemSize(0);
+             }
+
 
             // std::cout << displacement[0] <<"displacement x" <<displacement[1] <<"displacement y" <<std::endl;
              //std::cout<<"numatoms" <<system.num_atoms() <<std::endl;
@@ -91,14 +97,12 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
             double radiusSqrd = displacement.lengthSquared();
 
-            if(radiusSqrd > skin_cutoff_sqrd) continue;
+            if(radiusSqrd > skin_cutoff_sqrd || radiusSqrd < too_close_sqrd) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
 
             double radius = sqrt(radiusSqrd);
             double sigma_over_radius = m_sigma/radius;
 
             //std::cout <<sigma_over_radius <<"sigmaoverradius" << std::endl;
-
-
 
 
             double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
@@ -129,9 +133,9 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
         }//end of inner loop
         
-        //remember if atom need to be sent to neighboring processor
+        //remember if atom needs to be considered as ghost atom for neighboring processors
         // special case for nprocs==2; don't want to send same atom twise
-        if (nprocs == 2) {                                //SHOULD BE USING SUBSYSTEM SIZE HERE!
+        if (nprocs == 2) {
             if (system.atoms(current_index)->position[decomp_dim] < rank * sys_size[decomp_dim] / nprocs + skin_cutoff) {
                 to_left.push_back(*(system.atoms(current_index)));
                 num_to_left++;
@@ -158,7 +162,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     //send ghost atoms
      if (nprocs > 1) {
                 // Send ghost atoms to neighboring processor
-                MPI_Isend(&num_to_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req);
+                MPI_Isend(&num_to_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req); //note: these formulas will pass i.e. from proc 0 to proc (max at right)...--> satisfy PBCs...
                 MPI_Irecv(&num_from_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req+1);
                 MPI_Isend(&num_to_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+2);
                 MPI_Irecv(&num_from_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+3);
@@ -166,6 +170,9 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
                 from_left.resize(num_from_left);
                 from_right.resize(num_from_right);
+                //verified that these arrays do get filled
+
+                //std::cout <<"num_from_left for ghosts" << num_from_left <<std::endl;
 
                 MPI_Isend(&to_left[0], num_to_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2);
                 MPI_Irecv(&from_left[0], num_from_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2+1);
@@ -182,10 +189,13 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         vec2 displacement(0.,0.);
                         for(int j=0;j<2;j++){
                             displacement[j] = current_atom->position[j] - other_atom->position[j];
-                      }
+                        }
+                        //NOTE: I need minimum image convention along y-direction!--> b/c no passing of atoms/ghosts etc there!--> .i.e. think at the corners along skin
+                        if (displacement[1] >  system.halfsystemSize(1)) displacement[1] -= system.systemSize(1);   //systemSize(j) returns m_systemSize[j] from system class
+                        if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
 
                         double radiusSqrd = displacement.lengthSquared();
-                        if(radiusSqrd > skin_cutoff_sqrd) continue;
+                        if(radiusSqrd > skin_cutoff_sqrd || radiusSqrd < too_close_sqrd) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
                         double radius = sqrt(radiusSqrd);
                         double sigma_over_radius = m_sigma/radius;
                         double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
@@ -205,9 +215,12 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         for(int j=0;j<2;j++){
                             displacement[j] = current_atom->position[j] - other_atom->position[j];
                         }
+                        //NOTE: I need minimum image convention along y-direction!--> b/c no passing of atoms/ghosts etc there!
+                        if (displacement[1] >  system.halfsystemSize(1)) displacement[1] -= system.systemSize(1);   //systemSize(j) returns m_systemSize[j] from system class
+                        if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
 
                         double radiusSqrd = displacement.lengthSquared();
-                        if(radiusSqrd > skin_cutoff_sqrd) continue;
+                         if(radiusSqrd > skin_cutoff_sqrd || radiusSqrd < too_close_sqrd) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
                         double radius = sqrt(radiusSqrd);
                         double sigma_over_radius = m_sigma/radius;
                         double total_force_over_r = 24.*(2.0*pow(radius,-14.)-pow(radius,-8.));
@@ -219,6 +232,10 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         }
                     }
                 }
+
+                //clear the vectors
+                from_left.clear();
+                from_right.clear();
 
 
 

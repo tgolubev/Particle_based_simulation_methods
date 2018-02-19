@@ -10,7 +10,7 @@
 
 System::System()   //constructor
 {
-  m_num_atoms = 0;  //make num_atoms = 0 upon initialization
+ m_num_atoms = 0;
 }
 
 System::~System()  //desctructor: remove all the atoms
@@ -99,13 +99,13 @@ void System::removeTotalMomentum() {
 //is called in velocityverlet.cpp. Could optimize to have only the subdomains created here, but not sure how much CPU this saves since just corresponds to 1 dt send commands.
 void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double latticeConstant, double temperature, double mass, vec2 subsystemOrigin) {
 
-    double x = 0;
+    double x;
     //each processor finds out what it's ID (AKA rank) is and how many processors there are
     int nprocs, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);  //find # of processors
 
-    x =rank*subsystemSize[0]*latticeConstant;  //initializes x at the right position for the processor's domain
+    x =rank*subsystemSize[0]*latticeConstant + 0.5*latticeConstant;  //initializes x at the right position for the processor's domain
 
     //std::cout <<"x" <<x <<std::endl;  //works correctly
 
@@ -113,7 +113,7 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
     for(int i=1;i<subsystemSize[0];i++){  // i = 1 and < b/c can't have atoms on both boundaries--> will blow up!
         //i.e. i = 0,1...N_x-1
 
-        double y = 0;
+        double y = 0.5*latticeConstant;
 
         for(int j=1;j<subsystemSize[1];j++){
 
@@ -130,9 +130,9 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
     }
 
     //this sets the TOTAL system size--> is used for PBCs which are at the outer boundaries
-    setSystemSize(latticeConstant*Total_systemSize); //system size set by multiply vec2 # of unit cells by latticeConstant
-    //vec2 include_bndry(0.001,0.001);  //will add onto SystemSize so include bndry for domain distributions among processors in SimSize
-    setSimSize(Total_systemSize*latticeConstant);
+    setSystemSize(latticeConstant*Total_systemSize ); //system size set by multiply vec2 # of unit cells by latticeConstant
+    vec2 include_bndry(0.001,0.001);  //will add to SystemSize so include bndry for domain distributions among processors in SimSize
+    setSimSize(Total_systemSize*latticeConstant + include_bndry);
     std::cout<<"system size = " << m_systemSize <<std::endl;
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
 
@@ -256,7 +256,7 @@ std::vector <int> System::add_atoms (std::vector <Atom> new_atoms) { //accepts P
         for (int i = 0; i < natoms; ++i) {
                Atom *adding_atom = &new_atoms[i];  //makes a pointer to the individual atom
                m_atoms.push_back(adding_atom); //note: at() is member fnc of c++ vector class: Returns a reference to the element at position n in the vector. is almost same as [] operator but here checks whether i is within bounds of the vector.
-
+               //std::cout <<"added atom position" << adding_atom->position[0];
                glob_to_loc_id_[adding_atom->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
                //std::cout <<"line 270 in addatoms" <<std::endl;
                //works through here

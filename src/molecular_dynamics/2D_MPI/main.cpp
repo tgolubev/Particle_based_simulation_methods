@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     //decompositione1D_system(system_length, my_id, nprocs, &subsystem_start, &subdomain_size);
     //cout << "length of each subsystem" << subsystem_length <<endl;
 
-    double initialTemperature = 10; //in K
+    double initialTemperature = 100; //in K
     double currentTemperature;
     double latticeConstant =30.0;  //in angstroms
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
 
     //all variables will be defined in EACH processor
-    vec2 Total_systemSize(20,20); //TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
+    vec2 Total_systemSize(50,50); //TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
     vec2 subsystemSize; //this will be defined in each processor seperately
     subsystemSize[0] = Total_systemSize[0]/nprocs;  //1D parallelization along x
     subsystemSize[1] = Total_systemSize[1]; //WILL CHANGE THIS TO /nprocs when do 2D parallelization
@@ -184,6 +184,7 @@ int main(int argc, char **argv)
                     setw(20) << system.time() <<
                     setw(20) << statisticsSampler.temperature() <<
                     setw(20) << statisticsSampler.kineticEnergy() <<
+                    //setw(20) << "proc" << my_id <<  //this results in std::bad cast error
                     setw(20) << statisticsSampler.potentialEnergy() <<
                     setw(20) << statisticsSampler.totalEnergy() << endl;
         }
