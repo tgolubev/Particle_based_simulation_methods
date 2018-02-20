@@ -30,6 +30,7 @@ void VelocityVerlet::integrate(System &system, double dt) //passing by reference
     }
 
     system.applyPeriodicBoundaryConditions();
+   // system.applyMirrorBCs_inX(dt);
 
 
     //send_atoms accepts a pointer, so declare a pointer(variable whose value = the memory address)

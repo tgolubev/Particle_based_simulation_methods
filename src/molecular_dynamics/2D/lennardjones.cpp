@@ -1,5 +1,6 @@
 #include "lennardjones.h"
 #include "system.h"
+#include "math.h"
 
 double LennardJones::potentialEnergy() const
 {
@@ -34,8 +35,17 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 {
  m_potentialEnergy = 0;  //reset potential energy
 
+
+ const double skin_cutoff = 8.*m_sigma;
+ const double skin_cutoff_sqrd = skin_cutoff*skin_cutoff;
+ //std::cout <<"skincutoffsqrd" << skin_cutoff_sqrd <<std::endl;
+
  for(int current_index=0; current_index<system.num_atoms()-1; current_index++){  //-1 b/c don't need to calculate pairs when get to last atom
     Atom *current_atom = system.atoms(current_index);  //system.atoms(index) returns the pointer to the atom corresponding to index
+
+    //if(system.steps() > 2200){
+       // std::cout << "current atom force" << current_atom->force[0] <<" "<<  current_atom->force[1] << "atom index" << current_index << std::endl;
+    //}
 
     for(int other_index=current_index+1;other_index<system.num_atoms();other_index++){   //to avoid double counting
         Atom *other_atom = system.atoms(other_index);
@@ -56,7 +66,10 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
         //std::cout<<radius<<std::endl;
        // double radius = sqrt(radiusSqrd);
         //if(radius > 5.0*m_sigma) continue;
-        //if(radiusSqrd > 16.0*m_sigma_sqrd) continue;
+        if(radiusSqrd > skin_cutoff_sqrd) {
+            //std::cout <<"a force calculation is being ignored b/c of cutoff" <<std::endl;
+            continue;
+        }
 
         double radius = sqrt(radiusSqrd);
         double sigma_over_radius = m_sigma/radius;

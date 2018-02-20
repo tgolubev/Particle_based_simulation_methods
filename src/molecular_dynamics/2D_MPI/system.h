@@ -38,6 +38,7 @@ public:
     void increaseTemperature(StatisticsSampler &statisticsSampler, double increment);
     void calculateForces();
     void step(double dt);
+    void applyMirrorBCs_inX(double dt);
 
     //std::vector <int> add_atoms (const int natoms, Atom &new_atoms);		//!< Add atom(s) to the system with an array of atoms
     void add_ghost_atoms (const int natoms,  std::vector <Atom> new_atoms);		//!< Add ghost atom(s) to the system (does not update the number of atoms the processor is responsible for

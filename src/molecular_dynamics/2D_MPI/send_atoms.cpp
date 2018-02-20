@@ -45,7 +45,7 @@ void send_atoms(System *system) {
                 proc_to = floor(system->atoms(i)->position[decomp_dim]/ sim_size[decomp_dim] * nprocs);
                 //
 
-                //std::cout <<"position" <<system->atoms(i)->position[decomp_dim] <<std::endl;
+                //std::cout <<"velocityline 48" <<system->atoms(i)->velocity[0] <<std::endl;
                   //std::cout <<"sim_size" <<sim_size[decomp_dim] <<std::endl;
                  // std::cout <<"proc_to" << proc_to <<std::endl;
                 //proc_to works fine
@@ -69,6 +69,7 @@ void send_atoms(System *system) {
          //gets through here fine
 
 
+
 	// send number of atoms
         //synthax: MPI_Isend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag,  MPI_Comm comm, MPI_Request *request)
         //(starting address of data that sending (called buffer), # of elements in buffer, MPI data type, destination processor, message tag, communicator, pointer to the request)
@@ -84,6 +85,8 @@ void send_atoms(System *system) {
 	from_right.resize(num_from_right);
 
 
+
+
 	
         // send atoms --> & here is b/c sendsing the vectors by address to MPI_Isend etc..
         MPI_Isend(&to_left[0], num_to_left, MPI_ATOM, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req2);
@@ -92,8 +95,38 @@ void send_atoms(System *system) {
         MPI_Irecv(&from_right[0], num_from_right, MPI_ATOM, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req2+3);
         MPI_Waitall (4, req2, stat2);
 
+        // add atoms to system
+
+
 
         // add atoms to system
+
+        if(num_to_right !=0){
+           std::cout <<"before sent to right" << to_right[0].position[0] <<" " << to_right[0].position[1] <<"mass" <<to_right[0].mass() << "velocity" << to_right[0].velocity[0]
+                   <<" " << to_right[0].velocity[1] <<" proc" << rank << std::endl;
+        }
+
+        if(num_to_left !=0){
+            std::cout <<"before sent to left" << to_left[0].position[0] <<" " << to_left[0].position[1] <<"mass" << to_left[0].mass() << "velocity" << to_left[0].velocity[0]
+                    <<" " << to_left[0].velocity[1] <<" proc" << rank<< std::endl;
+        }
+
+        if(num_from_left !=0){
+            //std::cout <<"Send atoms: num_from left " <<num_from_left << "proc" << rank << std::endl;
+
+            std::cout <<"received from left" << from_left[0].position[0] <<" " <<from_left[0].position[1] << "mass" << from_left[0].mass() << "velocity" << from_left[0].velocity[0]
+                    <<" " << from_left[0].velocity[1] <<" proc" << rank << std::endl;
+        }
+
+         if(num_from_right != 0){
+            //std::cout <<"num_from_right" <<num_from_right << "proc" << rank << std::endl;
+
+            std::cout <<"received from right" << from_right[0].position[0] <<" " << from_right[0].position[1] << "mass" <<from_right[0].mass() << "velocity" << from_right[0].velocity[0]
+                    <<" " << from_right[0].velocity[1] << " proc" <<rank << std::endl;
+         }
+
+
+
 
         system->add_atoms(from_left);  //from left is vector of atom objects,
         system->add_atoms(from_right);

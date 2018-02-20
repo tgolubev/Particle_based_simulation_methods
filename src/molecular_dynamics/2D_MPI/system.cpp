@@ -43,6 +43,30 @@ void System::applyPeriodicBoundaryConditions() {
     }
 }
 
+//
+void System::applyMirrorBCs_inX(double dt){
+    for(Atom *atom : atoms()) {
+
+             if (atom->position[0] <  0. ) {
+                 //we go back to the previous x position, and keep the y position
+                 //also we reverse sign on X component of velocity
+                 // std::cout << "test mirror bc's BEFORE mirroring" << atom->position[0] <<"time step" << steps() << std::endl;
+                 //atom->position[0] -=dt*atom->velocity[0];
+                 atom->position[0] = 0.01;  //POOR MAN'S mirror BCs
+                // std::cout << "test mirror bc's" << atom->position[0] <<std::endl; // not working properly it seems--> after mirroring, stll have negative positoin...
+                 atom->velocity[0] = - atom->velocity[0];
+
+             }
+
+             if(atom->position[0] >  m_systemSize[0]){
+                 atom->position[0] = m_systemSize[0] -0.01;  //POOR MAN'S mirror BCs
+                // std::cout << "test mirror bc's" << atom->position[0] <<std::endl; // not working properly it seems--> after mirroring, stll have negative positoin...
+                 atom->velocity[0] = - atom->velocity[0];
+             }
+        }
+
+}
+
 
 // remove atoms that escape the SUB system (corresponding to current processor)
 /*
@@ -131,14 +155,14 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
 
     //this sets the TOTAL system size--> is used for PBCs which are at the outer boundaries
     setSystemSize(latticeConstant*Total_systemSize ); //system size set by multiply vec2 # of unit cells by latticeConstant
-    vec2 include_bndry(0.001,0.001);  //will add to SystemSize so include bndry for domain distributions among processors in SimSize
-    setSimSize(Total_systemSize*latticeConstant + include_bndry);
+    //vec2 include_bndry(0.001,0.001);  //will add to SystemSize so include bndry for domain distributions among processors in SimSize
+    setSimSize(Total_systemSize*latticeConstant);
+    //setSimSize(Total_systemSize*latticeConstant + include_bndry);
     std::cout<<"system size = " << m_systemSize <<std::endl;
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
 
-    m_num_atoms = num_atoms();
 
-    setSubSystemSize(latticeConstant*subsystemSize);
+    //setSubSystemSize(latticeConstant*subsystemSize);
 
 }
 
@@ -256,7 +280,12 @@ std::vector <int> System::add_atoms (std::vector <Atom> new_atoms) { //accepts P
         for (int i = 0; i < natoms; ++i) {
                Atom *adding_atom = &new_atoms[i];  //makes a pointer to the individual atom
                m_atoms.push_back(adding_atom); //note: at() is member fnc of c++ vector class: Returns a reference to the element at position n in the vector. is almost same as [] operator but here checks whether i is within bounds of the vector.
-               //std::cout <<"added atom position" << adding_atom->position[0];
+
+
+               //hard code resseting the mass to correct value
+              //adding_atom->setMass(UnitConverter::massFromSI(6.63352088e-26));
+
+               std::cout <<"added atom mass" << adding_atom->mass() << std::endl;
                glob_to_loc_id_[adding_atom->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
                //std::cout <<"line 270 in addatoms" <<std::endl;
                //works through here
@@ -275,10 +304,12 @@ std::vector <int> System::add_atoms (std::vector <Atom> new_atoms) { //accepts P
  \param [in] natoms Length of the array of atoms to add to the system.
  \param [in] \*new_atoms Pointer to an array of atoms the user has created elsewhere.
  */
+
+/*
 void System::add_ghost_atoms (const int natoms, std::vector <Atom> new_atoms) {
         for (int i = 0; i < natoms; ++i) {
             /* Only add the atom to the system if it is not already contained in the system.
-                        Do this by going through the atoms and comparing atom_index of the atoms already in the system and the atoms to be added */
+                        Do this by going through the atoms and comparing atom_index of the atoms already in the system and the atoms to be added
             bool found_atom = false;
             for (unsigned int j = 0; j < m_atoms.size(); ++j) {
                 if (m_atoms[j]->atom_index == new_atoms.at(i).atom_index) {
@@ -294,6 +325,7 @@ void System::add_ghost_atoms (const int natoms, std::vector <Atom> new_atoms) {
         }
         return;
 }
+*/
 
 /*!
  Clears the atoms communicated from neighbouring domains from the list of atoms stored in the system leaving only the atoms the system is responsible for.

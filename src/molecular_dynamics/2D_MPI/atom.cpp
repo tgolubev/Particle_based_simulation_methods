@@ -39,11 +39,13 @@ void Atom::resetVelocityMaxwellian(double temperature)
 
 
 void create_MPI_ATOM () {
-        const int num_fields = 6;
+        const int num_fields = 5;
 
-        MPI_Datatype type[num_fields] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_UB}; //Type of elements in each block (array of handles to data-type objects).
+        MPI_Datatype type[num_fields] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_UB}; //Type of elements in each block (array of handles to data-type objects).
         //MPI_UB is an upper-bound indicator, tells where the datatype needs to end
-        int blocklen[num_fields] = {2, 2, 2, 1, 1, 1};
+        int blocklen[num_fields] = {2, 2, 1, 1, 1};
+
+        //no need to send the forces b/c need to be recalculated
 
         /* To ensure memory padding (done by compiler) in an array (or vector) is
          measured correctly, define a dummy array here to check addresses
@@ -64,17 +66,14 @@ void create_MPI_ATOM () {
         MPI_Get_address(&(atom[0].velocity[0]), &address);
         disp[1] = address - start_address;
 
-        MPI_Get_address(&(atom[0].force[0]), &address);
+        MPI_Get_address(&(atom[0].m_mass), &address);
         disp[2] = address - start_address;
 
-        MPI_Get_address(&(atom[0].m_mass), &address);
+        MPI_Get_address(&(atom[0].atom_index), &address);
         disp[3] = address - start_address;
 
-        MPI_Get_address(&(atom[0].atom_index), &address);
-        disp[4] = address - start_address;
-
         MPI_Get_address(&(atom[1]), &address);  //the next atom--> used for the MPI_UB upper bound indicator
-        disp[5] = address - start_address;
+        disp[4] = address - start_address;
 
         MPI_Type_create_struct(num_fields, blocklen, disp, type, &MPI_ATOM);  //make a structure MPI datatype
         MPI_Type_commit(&MPI_ATOM);

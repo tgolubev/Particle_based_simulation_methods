@@ -49,9 +49,9 @@ int main(int argc, char **argv)
     //decompositione1D_system(system_length, my_id, nprocs, &subsystem_start, &subdomain_size);
     //cout << "length of each subsystem" << subsystem_length <<endl;
 
-    double initialTemperature = 100; //in K
+    double initialTemperature = 100.;//100; //in K
     double currentTemperature;
-    double latticeConstant =30.0;  //in angstroms
+    double latticeConstant =3.82;  //in angstroms
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
 
     //all variables will be defined in EACH processor
-    vec2 Total_systemSize(50,50); //TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
+    vec2 Total_systemSize(20,10); //rectangle for symmetry for 2 procs, TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
     vec2 subsystemSize; //this will be defined in each processor seperately
     subsystemSize[0] = Total_systemSize[0]/nprocs;  //1D parallelization along x
     subsystemSize[1] = Total_systemSize[1]; //WILL CHANGE THIS TO /nprocs when do 2D parallelization
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 
     int StatSample_freq = 10;
 
-    int N_time_steps = 150000; //number of time steps
+    int N_time_steps = 1100000; //number of time steps
 
     //for NVT ensemble
     int N_steps = 5;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
@@ -105,10 +105,10 @@ int main(int argc, char **argv)
 
     //record left half of system
 
-    IO movie("movie.xyz"); // To write the positionitions to file, create IO object called "movie"
-    IO movie2("movie2.xyz");
+    //IO movie("movie.xyz"); // To write the positionitions to file, create IO object called "movie"
+    IO movie2("movie_proc1.xyz");
     if( my_id == 0 ) {
-        movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
+       // movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
     }
     //record right half of system
 
@@ -131,6 +131,7 @@ int main(int argc, char **argv)
             setw(20) << "Time" <<
             setw(20) << "Temperature(not K!)" <<
             setw(20) << "KineticEnergy" <<
+
             setw(20) << "PotentialEnergy" <<
             setw(20) << "TotalEnergy" << endl;
 
@@ -164,7 +165,7 @@ int main(int argc, char **argv)
 
         //Uncoment the below block to use NVT ensemble.
 
-
+       /*
 
             //periodically rescale Velocities to keep T constant (NVT ensemble)
             //if(timestep % 100 == 0){
@@ -175,6 +176,7 @@ int main(int argc, char **argv)
             //Note: initial temperature is the desired temperature here
             system.rescaleVelocities(statisticsSampler, currentTemperature, initialTemperature, N_steps);
             //}
+            */
 
 
 
@@ -184,15 +186,15 @@ int main(int argc, char **argv)
                     setw(20) << system.time() <<
                     setw(20) << statisticsSampler.temperature() <<
                     setw(20) << statisticsSampler.kineticEnergy() <<
-                    //setw(20) << "proc" << my_id <<  //this results in std::bad cast error
+                    setw(20) << "proc" << my_id <<  //this results in std::bad cast error
                     setw(20) << statisticsSampler.potentialEnergy() <<
                     setw(20) << statisticsSampler.totalEnergy() << endl;
         }
 
 
         if(timestep%10 == 0){
-            if( my_id == 0 ) {
-                movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
+            if( my_id == 1 ) {  //use proc1 to record
+                movie2.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
             }
         }
 

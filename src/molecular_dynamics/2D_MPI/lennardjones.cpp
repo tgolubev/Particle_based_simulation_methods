@@ -34,14 +34,15 @@ void LennardJones::setEpsilon(double epsilon)
 
 void LennardJones::calculateForces(System &system)  //object system is passed by reference (allows changing)
 {
+    m_potentialEnergy = 0;  //reset potential energy
 
-    const double skin_cutoff = 3.5*m_sigma;
+    const double skin_cutoff = 8.*m_sigma;
     const double skin_cutoff_sqrd = skin_cutoff*skin_cutoff;
-    const double too_close_sqrd = (m_sigma)*(m_sigma);
+    const double too_close_sqrd = 0;//(0.5*m_sigma)*(0.5*m_sigma);  //%BE CAREFUL HERE -> if make too large, it will ignore important forces
 
     vec2 sys_size = system.subsystemSize(); //returns size of LOCAL processors system box
     int decomp_dim = 0;  // 0 or 1, x or y direction of decomposition
-    m_potentialEnergy = 0;  //reset potential energy
+
     int nprocs, rank;
     MPI_Comm_size (MPI_COMM_WORLD, &nprocs);
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);
@@ -68,13 +69,16 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     for(int current_index=0; current_index<system.num_atoms()-1; current_index++){  //-1 b/c don't need to calculate pairs when get to last atom
         Atom *current_atom = system.atoms(current_index);  //system.atoms(index) returns the pointer to the atom corresponding to index
 
+        //if(system.steps() > 2200){
+        //    std::cout << "current atom force" << current_atom->force[0] <<" "<<  current_atom->force[1] << "atom index" << current_index <<"num_atoms" << system.num_atoms() << "proc" <<rank << std::endl;
+       // }
+
         for(int other_index=current_index+1;other_index<system.num_atoms();other_index++){   //to avoid double counting
             Atom *other_atom = system.atoms(other_index);
 
 
             //distance and vector btw objects dx
               vec2 displacement(0.,0.);
-
              for(int j=0;j<2;j++){
                  displacement[j] = current_atom->position[j] - other_atom->position[j];
              }
@@ -96,6 +100,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
              //displacements are fine
 
             double radiusSqrd = displacement.lengthSquared();
+            //if(radiusSqrd > skin_cutoff_sqrd ) continue;
 
             if(radiusSqrd > skin_cutoff_sqrd || radiusSqrd < too_close_sqrd) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
 
@@ -120,7 +125,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
             //std::cout << current_atom->force[0] <<"force in lj LINE 99" <<std::endl;
 
             
-             /*
+
              if(system.steps() % system.m_sample_freq ==0){
                  //calculate potential energy every m_sample_freq steps
              //m_potentialEnergy += m_four_epsilon*(pow(sigma_over_radius,12.)-pow(sigma_over_radius,6));
@@ -129,7 +134,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                  m_potentialEnergy += 4.*(pow(radius,-12.)-pow(radius,-6));
              //m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
              }
-              */
+
 
         }//end of inner loop
         
@@ -195,6 +200,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
 
                         double radiusSqrd = displacement.lengthSquared();
+                        // if(radiusSqrd > skin_cutoff_sqrd ) continue;
                         if(radiusSqrd > skin_cutoff_sqrd || radiusSqrd < too_close_sqrd) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
                         double radius = sqrt(radiusSqrd);
                         double sigma_over_radius = m_sigma/radius;
@@ -220,6 +226,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
 
                         double radiusSqrd = displacement.lengthSquared();
+                       //  if(radiusSqrd > skin_cutoff_sqrd ) continue;
                          if(radiusSqrd > skin_cutoff_sqrd || radiusSqrd < too_close_sqrd) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
                         double radius = sqrt(radiusSqrd);
                         double sigma_over_radius = m_sigma/radius;

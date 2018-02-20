@@ -31,10 +31,10 @@ int main()
     int system_select;
     int num_particles;
     bool input_parameters;
-    vec2 numberOfUnitCellsEachDimension(6,6);
-    double initialTemperature = 10; //in K
+    vec2 numberOfUnitCellsEachDimension(10,10);
+    double initialTemperature = 100.; //in K
     double currentTemperature;
-    double latticeConstant =10.256;  //in angstroms  //FOR 2D seems need larger latticeConstant to prevent blowup
+    double latticeConstant =3.82;  //in angstroms  //seems need to start it not too far apart-start close to equilibrium seperation for LJ--> 1.122*sigma
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;
@@ -43,7 +43,7 @@ int main()
     bool input_variance;
     double total_dt_time= 0.0;
 
-    double N_time_steps = 50000; //number of time steps
+    double N_time_steps = 2000000; //number of time steps
 
     //for NVT ensemble
     double N_steps = 100;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
@@ -51,7 +51,7 @@ int main()
     //input options interface
     cout<<"Do you want to input parameters, overiding default values?"<<endl;
     cin >> input_parameters;
-    cout <<"Select System: 1 Random positions or 2 fcc lattice" <<endl;
+    cout <<"Select System: 1 Random positions or 2 sc lattice" <<endl;
     cin >> system_select;
 
     //---------------------------------------------------------------------------------------------------------------------------------
@@ -106,7 +106,8 @@ int main()
      UnitConverter::initializeMDUnits(sigma, epsilon);
      initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
      latticeConstant = UnitConverter::lengthFromAngstroms(latticeConstant);
-     double dt = UnitConverter::timeFromSI(2e-14); //
+     double dt = UnitConverter::timeFromSI(2e-15); //
+     cout << "dt in LJ units" << dt <<endl;
 
     cout << "One unit of length is " << UnitConverter::lengthToSI(1.0) << " meters" << endl;
     cout << "One unit of velocity is " << UnitConverter::velocityToSI(1.0) << " meters/second" << endl;
@@ -116,7 +117,7 @@ int main()
     cout <<"Epsilon is " << epsilon <<" eV and sigma is " <<sigma <<" in Angstrom" << endl;
 
     System system;
-    if(system_select ==2) system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass);
+    if(system_select ==2) system.createSCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass); //system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass);
     else system.createRandomPositions(num_particles, side_length, initialTemperature, variance, input_variance, mass);
     system.potential().setEpsilon(1.0); //if don't set to 1.0, must modify LJ eqn.
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
@@ -188,7 +189,7 @@ int main()
         */
 
 
-         if( timestep % 1000 == 0 ) {
+         if( timestep % 100 == 0 ) {
             // Print the timestep and system properties every 1000 timesteps
             cout << setw(20) << system.steps() <<
                     setw(20) << system.time() <<
@@ -197,7 +198,7 @@ int main()
                     setw(20) << statisticsSampler.potentialEnergy() <<
                     setw(20) << statisticsSampler.totalEnergy() << endl;
         }
-        if(timestep % 10 ==0){
+        if(timestep % 100 ==0){
           //save atom coordinates only periodically to save CPU and file size
           movie.saveState(system, statisticsSampler);  //calls saveState fnc in io.cpp which saves the state to the movie.xyz file
         }
