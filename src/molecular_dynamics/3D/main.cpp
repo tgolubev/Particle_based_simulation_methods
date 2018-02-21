@@ -156,7 +156,7 @@ int main()
         system.step(dt);
         high_resolution_clock::time_point finishdt = high_resolution_clock::now();
         duration<double> time_dt = duration_cast<duration<double>>(finishdt-startdt);
-        cout << "dt time" << time_dt.count() <<endl;
+        //cout << "dt time" << time_dt.count() <<endl;
         total_dt_time += time_dt.count();
 
 

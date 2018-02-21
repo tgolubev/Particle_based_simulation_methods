@@ -80,18 +80,28 @@ void System::removeTotalMomentum() {
 
 void System::createSCLattice(vec2 systemSize, double latticeConstant, double temperature, double variance, bool input_variance, double mass) {
 
-    double x= 0.5*latticeConstant;
+    vec2 perturbation(1,1);
+
+   perturbation.randomGaussian(0, 0.5); //makes perturbation according to gussian
+    //double x= 0.5*latticeConstant + 0.5*latticeConstant*perturbation[0];
+
+    double x =  0.5*latticeConstant;
+
 
 
     //std::cout <<"x" <<x <<std::endl;  //works correctly
 
 
-    for(int i=1;i<systemSize[0];i++){  // i = 1 and < b/c can't have atoms on both boundaries--> will blow up!
+    for(int i=0;i<systemSize[0];i++){  // i = 1 and < b/c can't have atoms on both boundaries--> will blow up!
         //i.e. i = 0,1...N_x-1
+
+        perturbation.randomGaussian(0, 0.5); //makes perturbation according to gussian
+        //double y = 0.5*latticeConstant + 0.5*latticeConstant*perturbation[1];
 
         double y = 0.5*latticeConstant;
 
-        for(int j=1;j<systemSize[1];j++){
+
+        for(int j=0;j<systemSize[1];j++){
 
                 Atom *atom = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct //* atom means create a pointer --> atom is a pointer
                 //equivalent to: Atom *atom;  atom = new Atom(..);  //declare a pointer and have it point to new Atom object
@@ -149,6 +159,7 @@ void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double lattic
                 atom2->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom2);
 
+                /*
                 Atom *atom3 = new Atom(UnitConverter::massFromSI(mass));
                 x = LatticeVector[0];
                 y = halfLatticeConstant + LatticeVector[1];
@@ -166,15 +177,16 @@ void System::createFCCLattice(vec2 numberOfUnitCellsEachDimension, double lattic
                 m_atoms.push_back(atom4);
 
                 //std::cout << "atom mass = " <<atom1->mass() <<std::endl;
+                */
             }
         }
-
 
 
     setSystemSize(latticeConstant*numberOfUnitCellsEachDimension); //system size set by multiply vec2 # of unit cells by latticeConstant
     std::cout<<"system size = " << m_systemSize <<std::endl;
     std::cout<<"num_atoms = " << num_atoms() <<std::endl;
 }
+
 
 void System::createRandomPositions(int num_particles, double side_length, double temperature, double variance, bool input_variance, double mass){
 

@@ -57,7 +57,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
         //std::cout<<radius<<std::endl;
        // double radius = sqrt(radiusSqrd);
         //if(radius > 5.0*m_sigma) continue;
-        //if(radiusSqrd > 16.0*m_sigma_sqrd) continue;
+        if(radiusSqrd > 16.0*m_sigma_sqrd) continue;
 
         double radius = sqrt(radiusSqrd);
         double sigma_over_radius = m_sigma/radius;

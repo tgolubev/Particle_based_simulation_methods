@@ -31,11 +31,11 @@ int main()
     int system_select;
     int num_particles;
     bool input_parameters;
-    vec2 numberOfUnitCellsEachDimension(10,10);
-    double initialTemperature = 100.; //in K
+    vec2 numberOfUnitCellsEachDimension(30,30);
+    double initialTemperature = 600.; //in K
     double currentTemperature;
-    double latticeConstant =3.82;  //in angstroms  //seems need to start it not too far apart-start close to equilibrium seperation for LJ--> 1.122*sigma
-    double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
+    double latticeConstant =30.2;  //in angstroms  //need to start atoms far enough apart to not have blow up issues.
+    double sigma = 3.4;             //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;
     double variance;
@@ -46,7 +46,7 @@ int main()
     double N_time_steps = 2000000; //number of time steps
 
     //for NVT ensemble
-    double N_steps = 100;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
+    double N_steps = 10;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
 
     //input options interface
     cout<<"Do you want to input parameters, overiding default values?"<<endl;
@@ -117,7 +117,10 @@ int main()
     cout <<"Epsilon is " << epsilon <<" eV and sigma is " <<sigma <<" in Angstrom" << endl;
 
     System system;
-    if(system_select ==2) system.createSCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass); //system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass);
+    if(system_select ==2) {
+        system.createSCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass);
+        //system.createFCCLattice(numberOfUnitCellsEachDimension, latticeConstant, initialTemperature, variance, input_variance, mass);
+    }
     else system.createRandomPositions(num_particles, side_length, initialTemperature, variance, input_variance, mass);
     system.potential().setEpsilon(1.0); //if don't set to 1.0, must modify LJ eqn.
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
@@ -167,6 +170,7 @@ int main()
         system.increaseTemperature(statisticsSampler, UnitConverter::temperatureFromSI(0.0001));  //Increase T by this increment (in K)
         */
 
+
         //use sampler to calculate system parameters and save to statistics.txt file
         if(timestep % system.m_sample_freq ==0){
             //to save CPU, can choose to sample only periodically
@@ -174,19 +178,18 @@ int main()
         }
 
         //Uncoment the below block to use NVT ensemble.
-
-  /*
-
+        /*
         //periodically rescale Velocities to keep T constant (NVT ensemble)
-        //if(timestep % 100 == 0){
+        //if(timestep % 10 == 0){
             //rescale the velocities at every time step
            //sample temperature, so can rescale as often as we want
             statisticsSampler.sampleTemperature(system);
             currentTemperature = statisticsSampler.temperature();  //this gets the value of temperature member variable
            //Note: initial temperature is the desired temperature here
+
            system.rescaleVelocities(statisticsSampler, currentTemperature, initialTemperature, N_steps);
-        //}
-        */
+          }
+       */
 
 
          if( timestep % 100 == 0 ) {
