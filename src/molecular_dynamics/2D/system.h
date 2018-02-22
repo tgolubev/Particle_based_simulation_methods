@@ -55,5 +55,7 @@ public:
     int num_atoms() {return m_atoms.size();}
     //void setSampleFreq(int frequency){m_sample_freq = frequency;}
     int sample_freq(){return m_sample_freq;}
+
+    void addAtom(Atom *atom) {m_atoms.push_back(atom);}  //add Atom function
 };
 #endif

@@ -38,7 +38,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
     const double skin_cutoff = 3.*m_sigma;
     const double skin_cutoff_sqrd = skin_cutoff*skin_cutoff;
-    double too_close = 0.8*m_sigma;
+    double too_close = 0.7*m_sigma;
     double too_close_sqrd = too_close*too_close;
 
     vec2 sys_size = system.subsystemSize(); //returns size of LOCAL processors system box
@@ -64,11 +64,12 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     
     
    //First calculate interactions btw. all atoms in the system
-
+//std::cout << "system num atoms in LJ make sure updates" << system.num_atoms() <<std::endl;
 
 
     for(int current_index=0; current_index<system.num_atoms()-1; current_index++){  //-1 b/c don't need to calculate pairs when get to last atom
         Atom *current_atom = system.atoms(current_index);  //system.atoms(index) returns the pointer to the atom corresponding to index
+
 
         //if(system.steps() > 2200){
         //    std::cout << "current atom force" << current_atom->force[0] <<" "<<  current_atom->force[1] << "atom index" << current_index <<"num_atoms" << system.num_atoms() << "proc" <<rank << std::endl;
@@ -86,6 +87,10 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
              //NOTE: I need minimum image convention along y-direction!--> b/c no passing of atoms/ghosts etc there!
              if (displacement[1] >  system.halfsystemSize(1)) displacement[1] -= system.systemSize(1);   //systemSize(j) returns m_systemSize[j] from system class
              if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
+//FOR NOW DO MIRROR IMAGE IN X DIR ALSO--> BUT IT MUST BE DEPENDENT ON THE SUBSYSTEM SIZE....
+             //if (displacement[0] >  0.5*system.subsystemSize(0)) displacement[0] -= system.subsystemSize(0);   //systemSize(j) returns m_systemSize[j] from system class
+            // if (displacement[0] <= -0.5*system.subsystemSize(0)) displacement[0] += system.subsystemSize(0);
+
 
              //for case of 1 processor, need to implement x mirror image convention also
              if(nprocs ==1){
@@ -93,6 +98,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                  if (displacement[0] >  system.halfsystemSize(0)) displacement[0] -= system.systemSize(0);   //systemSize(j) returns m_systemSize[j] from system class
                  if (displacement[0] <= -system.halfsystemSize(0)) displacement[0] += system.systemSize(0);
              }
+
 
 
             // std::cout << displacement[0] <<"displacement x" <<displacement[1] <<"displacement y" <<std::endl;
@@ -105,7 +111,12 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
             if(radiusSqrd > skin_cutoff_sqrd ) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
 
-             //if(radiusSqrd < too_close_sqrd) radiusSqrd = too_close_sqrd;
+
+            if(radiusSqrd < too_close_sqrd) {
+                 //std::cout <<"tooclose being used " << std::endl;
+                 radiusSqrd = too_close_sqrd;
+             }
+
 
             double radius = sqrt(radiusSqrd);
             double sigma_over_radius = m_sigma/radius;
@@ -160,8 +171,10 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     }//end of outer loop
     
 
-
+//FOR NOW, DON'T CALCULATE GHOSTS--> INSTEAD USE MIRROR IMAGE CONVENTION...
     //send ghost atoms
+
+
      if (nprocs > 1) {
                 // Send ghost atoms to neighboring processor
                 MPI_Isend(&num_to_left, 1, MPI_INT, (rank - 1 + nprocs) % nprocs, 1, MPI_COMM_WORLD, req); //note: these formulas will pass i.e. from proc 0 to proc (max at right)...--> satisfy PBCs...
@@ -248,8 +261,14 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                 from_right.clear();
 
 
-
         }//end of if(nprocs>1)
+
+
+
+     //CHECK IF THERE ARE ANY FORCES WHICH ARE 0 --> there will be some b/c of gaseous system...
+    // for(int i = 0; i <system.num_atoms(); i++){
+       //  if(system.atoms(i)->force[0] == 0) std::cout <<"FORCE IS 0 IN LJ" << "position" << system.atoms(i)->position[0] <<" "<<  system.atoms(i)->position[1] << "rank" << rank << std::endl;
+    // }
 
 }
 

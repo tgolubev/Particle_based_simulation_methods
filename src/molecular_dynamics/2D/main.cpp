@@ -154,6 +154,22 @@ int main()
 
     for(int timestep=0; timestep< N_time_steps; timestep++) {
         high_resolution_clock::time_point startdt = high_resolution_clock::now();
+
+        /*
+        if(timestep == 2000){//add an atom for testing stability
+            Atom *atom = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg
+            //Choose random x,y,z positions
+            double x = Random::nextDouble(0, side_length); // random number in the interval [0,10]. nextDouble is defined in random.h
+            double y = Random::nextDouble(0, side_length);
+
+            atom->position.set(x,y);    //set atom to position x,y,z
+
+            atom->resetVelocityMaxwellian(initialTemperature, variance, input_variance);
+            system.addAtom(atom);     //add element to vector m_atoms 1 element (atom object)
+        }
+        */
+
+
         system.step(dt);
         high_resolution_clock::time_point finishdt = high_resolution_clock::now();
         duration<double> time_dt = duration_cast<duration<double>>(finishdt-startdt);
