@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 
     double initialTemperature = 600.;//in K
     double currentTemperature;
-     double latticeConstant =20.2;//changed from 30  //in angstroms  //need to start atoms far enough apart to not have blow up issues.
+     double latticeConstant =3.8;//changed from 30  //in angstroms  //need to start atoms far enough apart to not have blow up issues.
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;

@@ -32,9 +32,9 @@ int main()
     int num_particles;
     bool input_parameters;
     vec2 numberOfUnitCellsEachDimension(30,30);
-    double initialTemperature = 600.; //in K
+    double initialTemperature = 100.; //in K
     double currentTemperature;
-    double latticeConstant =30.2;  //in angstroms  //need to start atoms far enough apart to not have blow up issues.
+    double latticeConstant =4.1;  //in angstroms  //need to start atoms far enough apart to not have blow up issues.
     double sigma = 3.4;             //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;

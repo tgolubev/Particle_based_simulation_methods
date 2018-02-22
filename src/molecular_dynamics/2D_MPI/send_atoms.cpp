@@ -84,7 +84,7 @@ void send_atoms(System *system) {
                         to_left.push_back(system->atoms(i)->velocity[0]);
                         to_left.push_back(system->atoms(i)->velocity[1]);
 
-                        std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
+                        //std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
 
 
                         //to_left[array_index] = system->atoms(i)->position[0];
@@ -108,7 +108,7 @@ void send_atoms(System *system) {
                         to_right.push_back(system->atoms(i)->velocity[1]);
 
 
-                         std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
+                         //std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
 
 
 			to_delete.push_back(i);
@@ -159,41 +159,6 @@ void send_atoms(System *system) {
         */
 
         // add atoms to system
-
-
-
-        // add atoms to system
-
-        /*
-
-        if(num_to_right !=0){
-           std::cout <<"before sent to right" << to_right[0].position[0] <<" " << to_right[0].position[1] << "velocity" << to_right[0].velocity[0]
-                   <<" " << to_right[0].velocity[1] <<" proc" << rank << std::endl;
-        }
-
-        if(num_to_left !=0){
-            std::cout <<"before sent to left" << to_left[0].position[0] <<" " << to_left[0].position[1] << "velocity" << to_left[0].velocity[0]
-                    <<" " << to_left[0].velocity[1] <<" proc" << rank<< std::endl;
-        }
-
-        if(num_from_left !=0){
-            //std::cout <<"Send atoms: num_from left " <<num_from_left << "proc" << rank << std::endl;
-
-            std::cout <<"received from left" << from_left[0].position[0] <<" " <<from_left[0].position[1] << "velocity" << from_left[0].velocity[0]
-                    <<" " << from_left[0].velocity[1] <<" proc" << rank << std::endl;
-        }
-
-         if(num_from_right != 0){
-            //std::cout <<"num_from_right" <<num_from_right << "proc" << rank << std::endl;
-
-            std::cout <<"received from right" << from_right[0].position[0] <<" " << from_right[0].position[1]  << "velocity" << from_right[0].velocity[0]
-                    <<" " << from_right[0].velocity[1] << " proc" <<rank << std::endl;
-         }
-         */
-
-
-
-
         system->add_atoms(from_left, num_from_left);  //thes are just arrays of numbers...
         system->add_atoms(from_right, num_from_right);
 

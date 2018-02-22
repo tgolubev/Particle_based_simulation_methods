@@ -436,7 +436,7 @@ void System::add_atoms (std::vector <double> new_atoms, double num_recieved) { /
                //hard code resseting the mass to correct value
               //adding_atom->setMass(UnitConverter::massFromSI(6.63352088e-26));
 
-               std::cout <<"added atom position" << adding_atom->position[0] <<" " << adding_atom->position[1] << "added atom velocity" << adding_atom->velocity[0] << " " << adding_atom->velocity[1] << "proc " << rank <<std::endl;
+              // std::cout <<"added atom position" << adding_atom->position[0] <<" " << adding_atom->position[1] << "added atom velocity" << adding_atom->velocity[0] << " " << adding_atom->velocity[1] << "proc " << rank <<std::endl;
                //glob_to_loc_id_[adding_atom->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
                //std::cout <<"line 270 in addatoms" <<std::endl;
                //works through here
