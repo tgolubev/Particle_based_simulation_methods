@@ -31,11 +31,11 @@ int main()
     int system_select;
     int num_particles;
     bool input_parameters;
-    vec3 numberOfUnitCellsEachDimension(5,5,5);
-    double initialTemperature = 610; //in K
+    vec3 numberOfUnitCellsEachDimension(2,2,2);
+    double initialTemperature = 0.851; //CURRENTLY IN LENNARD JONES UNITS//in K
     double currentTemperature;
-    double latticeConstant =5.256;  //in angstroms
-    double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
+    double latticeConstant =  5.3;//4.35284;//5.256;  //in angstroms
+    double sigma = 1.; //3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;
     double variance;
@@ -106,9 +106,11 @@ int main()
     //-----------------------------------------------------------------------------------------------------------------------------------------------
     //Initialize MD units
      UnitConverter::initializeMDUnits(sigma, epsilon);
-     initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
+     //initialTemperature = UnitConverter::temperatureFromSI(initialTemperature);
      latticeConstant = UnitConverter::lengthFromAngstroms(latticeConstant);
-     double dt = UnitConverter::timeFromSI(2e-14); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
+     double dt = UnitConverter::timeFromSI(2e-15); // Measured in seconds (1fs is common). ANYTHING LARGER THAN 2E-14 HAS ISSUES: T at step 1 is already overshooted
+
+
 
     cout << "One unit of length is " << UnitConverter::lengthToSI(1.0) << " meters" << endl;
     cout << "One unit of velocity is " << UnitConverter::velocityToSI(1.0) << " meters/second" << endl;
@@ -123,7 +125,7 @@ int main()
     system.potential().setEpsilon(1.0); //we set epsilon =  1
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
 
-    system.m_sample_freq=10; //statistics sampler freq.
+    system.m_sample_freq=100; //statistics sampler freq.
 
 
     system.removeTotalMomentum();
@@ -151,7 +153,7 @@ int main()
 
    high_resolution_clock::time_point start2 = high_resolution_clock::now();  //start clock timer
 
-    for(int timestep=0; timestep<15000; timestep++) {  //chose # of timesteps here
+    for(int timestep=0; timestep<150000; timestep++) {  //chose # of timesteps here
         high_resolution_clock::time_point startdt = high_resolution_clock::now();
         system.step(dt);
         high_resolution_clock::time_point finishdt = high_resolution_clock::now();
@@ -176,7 +178,10 @@ int main()
 
         //Uncoment the below block to use NVT ensemble.
 
-        /*
+
+//rescale velocities for first 1000 timesteps, THEN TURN OFF THERMOSTAT:
+
+        if(timestep < 1000){
 
         //periodically rescale Velocities to keep T constant (NVT ensemble)
         //if(timestep % 100 == 0){
@@ -187,7 +192,8 @@ int main()
            //Note: initial temperature is the desired temperature here
            system.rescaleVelocities(statisticsSampler, currentTemperature, initialTemperature, N_steps);
         //}
-        */
+        }
+
 
          if( timestep % 1000 == 0 ) {
             // Print the timestep and system properties every 1000 timesteps

@@ -425,9 +425,9 @@ void System::add_atoms (std::vector <double> new_atoms, double num_recieved) { /
 
 
 
-               adding_atom->velocity[0] =new_atoms[index+2];
+               adding_atom->velocity[0] = new_atoms[index+2];
                adding_atom->velocity[1] = new_atoms[index+3];
-               adding_atom->force.set(0,0);  //intialize w/ 0 forces since calculated in LJ
+               //adding_atom->force.set(0,0);  //intialize w/ 0 forces since calculated in LJ
 
 
 
@@ -436,16 +436,27 @@ void System::add_atoms (std::vector <double> new_atoms, double num_recieved) { /
                //hard code resseting the mass to correct value
               //adding_atom->setMass(UnitConverter::massFromSI(6.63352088e-26));
 
-              // std::cout <<"added atom position" << adding_atom->position[0] <<" " << adding_atom->position[1] << "added atom velocity" << adding_atom->velocity[0] << " " << adding_atom->velocity[1] << "proc " << rank <<std::endl;
+               //std::cout <<"added atom position" << adding_atom->position[0] <<" " << adding_atom->position[1] << "added atom velocity" << adding_atom->velocity[0] << " " << adding_atom->velocity[1] << "proc " << rank <<std::endl;
                //glob_to_loc_id_[adding_atom->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
                //std::cout <<"line 270 in addatoms" <<std::endl;
                //works through here
               // update_proc[i] = i;  //Later can add atom indices to actually track how the atoms move around to different processors//adding_atom->atom_index; //note: if accessing member property through a pointer, must use -> instead of .
                //index++;
-\
+
         }
         m_num_atoms += num_recieved;
-       // return update_proc;
+
+
+
+   if(num_recieved > 0){
+    double kineticEnergy = 0.; // Remember to reset the value from the previous timestep
+    for(Atom *atom : atoms()) {
+        kineticEnergy += 0.5*mass*atom->velocity.lengthSquared();
+    }
+
+    //std::cout <<"KE" << kineticEnergy << std::endl;
+    }
+   // return update_proc;
 }
 
 

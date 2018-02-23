@@ -37,6 +37,12 @@ void vec3::print(string name)
     print();
 }
 
+double vec3::dot(vec3 aVector)
+{
+    return x()*aVector.x() + y()*aVector.y() + z()*aVector.z();
+}
+
+
 vec3 vec3::cross(vec3 aVector)
 {
     return vec3(y()*aVector.z()-z()*aVector.y(), z()*aVector.x()-x()*aVector.z(), x()*aVector.y()-y()*aVector.x());

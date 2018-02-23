@@ -15,6 +15,7 @@ public:
     void print();
     void print(string name);
     vec3 cross(vec3 aVector);
+    double dot(vec3 aVector);
     double lengthSquared();
     double length();
     double x() const { return components[0]; }

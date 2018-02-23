@@ -28,21 +28,28 @@ void StatisticsSampler::saveToFile(System &system)
 
     // Print out values here
     //Using SI units
-    m_file << std::setw(15) <<UnitConverter::timeToSI(system.time()) << //UnitConverter:: allows to access fncs in that class
+
+   /* m_file << std::setw(15) <<UnitConverter::timeToSI(system.time()) << //UnitConverter:: allows to access fncs in that class
               //std::setw(10) << m_totalMomentum <<
               std::setw(15) << UnitConverter::energyToSI(m_kineticEnergy)<<
               std::setw(15) << UnitConverter::energyToSI(m_potentialEnergy) <<
               std::setw(15) << UnitConverter::temperatureToSI(m_temperature)<<
-              std::setw(15) << UnitConverter::diffusionToSI(m_diffusion_coeff)<<endl;
-    /*
+              std::setw(15) << UnitConverter::diffusionToSI(m_diffusion_coeff)<<
+              std::setw(15) << UnitConverter::pressureToSI(m_pressure)<<endl;   //SI units are N/m^3 which is Pascal, 1atm = 1.01325*10^5 Pa
+              */
+
     //Using MD units
+
     m_file << std::setw(10) <<system.time() <<
               //std::setw(10) << m_totalMomentum <<
               std::setw(10) << m_kineticEnergy<<
               std::setw(10) << m_potentialEnergy <<
               std::setw(12) << m_temperature<<
-              std::setw(12) << m_diffusion_coeff<<endl;
-              */
+              std::setw(12) << m_diffusion_coeff<<
+              std::setw(12) << m_density<<
+              std::setw(12) << m_pressure<<endl;
+
+
 }
 
 
@@ -54,7 +61,8 @@ void StatisticsSampler::sample(System &system)
     samplePotentialEnergy(system);
     sampleTemperature(system);
     sampleDiffusionCoeff(system);
-    sampleDensity(system);
+    sampleDensity(system); //NOTE: is neccesary to be able to get pressure
+    samplePressure(system);
     saveToFile(system);
 }
 
@@ -97,6 +105,15 @@ void StatisticsSampler::sampleDensity(System &system)
         m_density = m_totalMass/system.volume();  //already have this function
     }
 
+}
+
+void StatisticsSampler::samplePressure(System &system){             //ideal gas pressure: P = (n/3N)sum(mv_i^2)
+    LennardJones m_potential;
+    //m_pressure_ideal = 2*m_kineticEnergy*m_density/(3*system.num_atoms()); //NOTE: density must be sampled 1st to be able to get pressure
+    m_pressure_ideal = m_density*m_temperature;  //NOTE: P_ideal = nT  , if rewrite the eqns
+    m_pressure = m_pressure_ideal + (1/(3*system.volume()))*m_potential.pressure_virial;  //pressure_virial is public variable so is accessible
+
+    //external pressure needs to be found in LJ since involves displacements
 }
 
 void StatisticsSampler::sampleDiffusionCoeff(System &system)

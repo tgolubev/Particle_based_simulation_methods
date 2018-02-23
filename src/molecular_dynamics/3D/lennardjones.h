@@ -13,6 +13,7 @@ private:
 
 
 public:
+    double pressure_virial = 0;  //this will be calculated in LJ loop and then picked up by statisticssampler to get total pressure
     LennardJones() { }
     void calculateForces(class System &system);
     double potentialEnergy() const;

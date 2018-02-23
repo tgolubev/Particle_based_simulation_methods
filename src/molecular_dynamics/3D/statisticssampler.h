@@ -16,6 +16,8 @@ private:
     double m_density = 0;
     double m_diffusion_coeff = 0;
     double m_totalMass = 0;
+    double m_pressure_ideal = 0;
+    double m_pressure = 0;
 public:
     StatisticsSampler();
     void saveToFile(System &system);
@@ -25,6 +27,7 @@ public:
     void sampleTemperature(System &system);
     void sampleDensity(System &system);
     void sampleDiffusionCoeff(System &system);
+    void samplePressure(System &system);
     void sampleMomentum(System &system);
     vec3 totalMomentum(){return m_totalMomentum;}
     double kineticEnergy() { return m_kineticEnergy; }

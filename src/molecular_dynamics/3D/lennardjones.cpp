@@ -26,7 +26,7 @@ double LennardJones::epsilon() const
 void LennardJones::setEpsilon(double epsilon)
 {
     m_epsilon = epsilon;
-    m_four_epsilon = 4.0*m_epsilon;
+    m_four_epsilon = 3.0*m_epsilon;
     m_twntyfour_epsilon = 24.0*m_epsilon;  //must reset this too
 }
 
@@ -79,7 +79,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
         //double total_force_over_r = total_force/radius; //precalculate to save 2 FLOPS
         for(int j=0;j<3;j++) {
             current_atom->force[j] += total_force_over_r*displacement[j]; //i.e. Fx = (F/r)*x
-            other_atom->force[j] -= current_atom->force[j]; //using Newton's 3rd law
+            other_atom->force[j] -= total_force_over_r*displacement[j]; //using Newton's 3rd law
         }
 
         if(system.steps() % system.m_sample_freq ==0){
@@ -89,7 +89,12 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
             //since epsilon is set to 1
             m_potentialEnergy += 4.*(pow(radius,-12.)-pow(radius,-6));
            //m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
+
+           //calculate pressure virial
+           pressure_virial += displacement.dot(current_atom->force);  //dot product of displacement with force
         }
+
+
     }
  }
 

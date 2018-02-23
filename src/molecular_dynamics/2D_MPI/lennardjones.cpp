@@ -38,10 +38,10 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
     const double skin_cutoff = 3.*m_sigma;
     const double skin_cutoff_sqrd = skin_cutoff*skin_cutoff;
-    double too_close = 0.7*m_sigma;
+    double too_close = 0.1*m_sigma;
     double too_close_sqrd = too_close*too_close;
 
-    vec2 sys_size = system.subsystemSize(); //returns size of LOCAL processors system box
+    vec2 sys_size = system.systemSize(); //returns size of GLOBAL system box
     int decomp_dim = 0;  // 0 or 1, x or y direction of decomposition
 
     int nprocs, rank;
@@ -109,7 +109,12 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
             double radiusSqrd = displacement.lengthSquared();
             //if(radiusSqrd > skin_cutoff_sqrd ) continue;
 
-            if(radiusSqrd > skin_cutoff_sqrd ) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
+           if(radiusSqrd > skin_cutoff_sqrd ) continue;  //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
+
+
+           if(system.steps() > 5000){
+  //std::cout <<"radius in LJ" << sqrt(radiusSqrd) <<std::endl;
+           }
 
 
             if(radiusSqrd < too_close_sqrd) {
@@ -119,6 +124,8 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
             double radius = sqrt(radiusSqrd);
             double sigma_over_radius = m_sigma/radius;
+
+
 
 
 
@@ -148,13 +155,17 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
         //remember if atom needs to be considered as ghost atom for neighboring processors
         // special case for nprocs==2; don't want to send same atom twise
         if (nprocs == 2) {
+            //std::cout << "check positions" << system.atoms(current_index)->position[0] << std::endl;
+
             if (system.atoms(current_index)->position[decomp_dim] < rank * sys_size[decomp_dim] / nprocs + skin_cutoff) {
+                //std::cout << "test if" << rank * sys_size[decomp_dim] / nprocs + skin_cutoff <<std::endl;
                 to_left.push_back(system.atoms(current_index)->position[0]);
                 to_left.push_back(system.atoms(current_index)->position[1]);
                 //note: don't need velocities for ghost atoms
                 num_to_left++;
             }
             else if  (system.atoms(current_index)->position[decomp_dim] > (rank + 1) * sys_size[decomp_dim] / nprocs - skin_cutoff) {
+                //std::cout << "test if" << (rank + 1) * sys_size[decomp_dim] / nprocs - skin_cutoff <<std::endl;
                 to_right.push_back(system.atoms(current_index)->position[0]);
                 to_right.push_back(system.atoms(current_index)->position[1]);
                 num_to_right++;
@@ -171,8 +182,22 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                 num_to_right++;
             }
         }
+
+        if(system.steps() % 100 ==0){
+//        std::cout <<"forces before add ghosts contribution" << current_atom->force[0] << " " << current_atom->force[1] <<std::endl;
+        }
             
     }//end of outer loop
+
+  // std::cout <<"ghost position BEFORE send to right" << to_right[0] <<" " << to_right[1] <<"proc" << rank <<std::endl;
+    // std::cout <<"ghost position BEFORE send to right" << to_right[2] <<" " <<to_right[3] <<std::endl;
+     //std::cout <<"ghost position BEFORE send to left" <<to_left[0] <<" " <<to_left[1]  <<"proc" << rank <<std::endl;
+     // std::cout <<"ghost position BEFORE send to left" <<to_left[2]<<" " <<to_left[3] <<std::endl;
+
+   // std::cout << "num to right" <<num_to_right <<"proc" << rank <<std::endl;
+   // std::cout << "num to left" <<num_to_left <<"proc" << rank <<std::endl;
+
+
     
 
     //send ghost atoms
@@ -211,6 +236,11 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                        // ghost_atom->position[1] = from_left[index+1];
                        //note: don't need velocities for ghost atoms
 
+                        if(ghost_index <2 && current_index ==0){
+                        //std::cout <<"ghost position AFTER send" << from_left[0] << " " << from_left[0+1] << "proc" << rank <<std::endl;
+                      // std::cout <<"ghost position AFTER send" << from_left[0] << " " << from_left[1+1] <<std::endl;
+                        }
+
 
                         vec2 displacement(0.,0.);
                         for(int j=0;j<2;j++){
@@ -223,7 +253,15 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
                         double radiusSqrd = displacement.lengthSquared();
                         // if(radiusSqrd > skin_cutoff_sqrd ) continue;
+
+
                         if(radiusSqrd > skin_cutoff_sqrd ) continue;
+
+                        if(system.steps() > 400){
+              // std::cout <<"radius in LJ GHOSTS" << sqrt(radiusSqrd) <<std::endl;
+                        }
+
+
 
                         if(radiusSqrd < too_close_sqrd) radiusSqrd = too_close_sqrd; //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
 
@@ -244,8 +282,14 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         int index = 2*ghost_index;  //for unpacking recieved data
                         //Atom *ghost_atom = new Atom(mass);   //create ghost atom based on recieved info from other proc
                         //ghost_atom->position[0] = from_right[index];
-                       // ghost_atom->position[1] = from_right[index+1];
+                        //ghost_atom->position[1] = from_right[index+1];
                        //note: don't need velocities for ghost atoms
+
+                if(ghost_index <2 && current_index ==0){
+                         //std::cout <<"ghost position AFTER send" << from_right[0] << " " << from_right[0+1] << "proc" << rank <<std::endl;
+                       // std::cout <<"ghost position AFTER send" << from_right[1] << " " << from_right[1+1] <<std::endl;
+                }
+
                         vec2 displacement(0.,0.);
                         for(int j=0;j<2;j++){
                             displacement[j] = current_atom->position[j] - from_right[index + j];  //use ghost atoms positions data directly
@@ -255,10 +299,13 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                         if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
 
                         double radiusSqrd = displacement.lengthSquared();
-                       //  if(radiusSqrd > skin_cutoff_sqrd ) continue;
-                        if(radiusSqrd > skin_cutoff_sqrd ) continue;
+                       if(radiusSqrd > skin_cutoff_sqrd ) continue;
 
-                        if(radiusSqrd < too_close_sqrd) radiusSqrd = too_close_sqrd; //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
+                       if(system.steps() > 5000){
+            //  std::cout <<"radius in LJ GHOSTS" << sqrt(radiusSqrd) <<std::endl;
+                       }
+
+                       if(radiusSqrd < too_close_sqrd) radiusSqrd = too_close_sqrd; //cutoff radius and if 2 particles are too close, don't compute the force to prevent blowup
 
                         double radius = sqrt(radiusSqrd);
                         double sigma_over_radius = m_sigma/radius;
@@ -270,6 +317,10 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                             //WE DO NOT want to update the force on other_atom here, b/c it is a ghost atom...--> outside of the system
                         }
                     }
+                    if(system.steps() % 100 ==0){
+                    //std::cout << "force after ghosts contribution" << current_atom->force[0] << " " <<current_atom->force[1] << std::endl;
+                    }
+
                 }
 
                 //clear the vectors

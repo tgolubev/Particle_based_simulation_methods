@@ -84,7 +84,7 @@ void send_atoms(System *system) {
                         to_left.push_back(system->atoms(i)->velocity[0]);
                         to_left.push_back(system->atoms(i)->velocity[1]);
 
-                        //std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
+                       //std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
 
 
                         //to_left[array_index] = system->atoms(i)->position[0];
@@ -108,7 +108,7 @@ void send_atoms(System *system) {
                         to_right.push_back(system->atoms(i)->velocity[1]);
 
 
-                         //std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
+                       // std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
 
 
 			to_delete.push_back(i);

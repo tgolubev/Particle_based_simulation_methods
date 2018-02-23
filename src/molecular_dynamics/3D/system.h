@@ -15,12 +15,13 @@ private:
     vec3 m_halfsystemSize;
     VelocityVerlet m_integrator;
     std::vector<Atom*> m_atoms;  //vector of atom pointers
-    LennardJones m_potential;
+
     double m_time = 0;
     int m_steps = 0;
     //int m_sample_freq;  //no need to make this private b/c actually want to be able to change it
 
 public:
+    LennardJones m_potential; //lennardJones object for forces...
     System();
     ~System();
     int m_sample_freq;

@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     //decompositione1D_system(system_length, my_id, nprocs, &subsystem_start, &subdomain_size);
     //cout << "length of each subsystem" << subsystem_length <<endl;
 
-    double initialTemperature = 600.;//in K
+    double initialTemperature = 60.;//in K
     double currentTemperature;
      double latticeConstant =3.8;//changed from 30  //in angstroms  //need to start atoms far enough apart to not have blow up issues.
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
 
     //all variables will be defined in EACH processor
-    vec2 Total_systemSize(90,30); //rectangle for symmetry for 2 procs, TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
+    vec2 Total_systemSize(40,20); //rectangle for symmetry for 2 procs, TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
     vec2 subsystemSize; //this will be defined in each processor seperately
     subsystemSize[0] = Total_systemSize[0]/nprocs;  //1D parallelization along x
     subsystemSize[1] = Total_systemSize[1]; //WILL CHANGE THIS TO /nprocs when do 2D parallelization

@@ -32,11 +32,14 @@ void VelocityVerlet::integrate(System &system, double dt) //passing by reference
         //std::cout << atom->position[0] <<"atomposition in VV" <<std::endl;  //these positions are blown up...
          //std::cout << atom->force[0] << "atom force" <<std::endl; //force is blown up
 
-       // if(atom->velocity[0] == 0){
+
+    /*    if(atom->velocity[0] == 0){
        //std::cout << "velocity in vv is ZERO" << atom->velocity[0] << "force is" << atom->force[0] << std::endl;
             //give it a velocity!
-          //  atom->resetVelocityMaxwellian(UnitConverter::temperatureFromSI(600.));
-        //}
+           
+           // atom->resetVelocityMaxwellian(UnitConverter::temperatureFromSI(0.0));
+        }
+*/
 
     }
 
