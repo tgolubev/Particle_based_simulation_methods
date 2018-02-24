@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     //decompositione1D_system(system_length, my_id, nprocs, &subsystem_start, &subdomain_size);
     //cout << "length of each subsystem" << subsystem_length <<endl;
 
-    double initialTemperature = 60.;//in K
+    double initialTemperature = 600.;//in K
     double currentTemperature;
      double latticeConstant =3.8;//changed from 30  //in angstroms  //need to start atoms far enough apart to not have blow up issues.
     double sigma = 3.4; //atom/particle diameter in Angstrom for LJ potential
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
 
     //all variables will be defined in EACH processor
-    vec2 Total_systemSize(40,20); //rectangle for symmetry for 2 procs, TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
+    vec2 Total_systemSize(90,30); //rectangle for symmetry for 2 procs, TOTAL system dimensions--> in units of unit cells--> since using SC lattice--> just gives # of atoms in each dimension
     vec2 subsystemSize; //this will be defined in each processor seperately
     subsystemSize[0] = Total_systemSize[0]/nprocs;  //1D parallelization along x
     subsystemSize[1] = Total_systemSize[1]; //WILL CHANGE THIS TO /nprocs when do 2D parallelization
@@ -74,7 +74,8 @@ int main(int argc, char **argv)
     int N_time_steps = 1000000; //number of time steps
 
     //for NVT ensemble
-    int N_steps = 5;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
+    int N_steps = 1;  //number of steps over which to gradually rescale velocities: has to be large enough to prevent instability
+    //using the more basic thermostat of sharp rescaling every 100 steps
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------
     //Initialize MD units
@@ -104,7 +105,7 @@ int main(int argc, char **argv)
     //system.createRandompositionitions(num_particles, side_length, initialTemperature, mass);
     system.potential().setEpsilon(1.0); //if don't set to 1.0, must modify LJ eqn.
     system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
-    system.m_sample_freq=10; //statistics sampler freq.
+    system.m_sample_freq=100; //statistics sampler freq.
     system.removeTotalMomentum();
 
     create_MPI_ATOM();
@@ -114,13 +115,14 @@ int main(int argc, char **argv)
     //record left half of system
 
     //IO movie("movie.xyz"); // To write the positionitions to file, create IO object called "movie"
-    IO movie2("movie_proc1.xyz");
+
     if( my_id == 0 ) {
        // movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
     }
     //record right half of system
+    IO movie2("movie_proc1.xyz");
 
-    if(my_id == 2) {
+    if(my_id == 1) {
         movie2.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
     }
     //all initial positions are correct...
@@ -173,18 +175,18 @@ int main(int argc, char **argv)
 
         //Uncoment the below block to use NVT ensemble.
 
-/*
+
 
             //periodically rescale Velocities to keep T constant (NVT ensemble)
-            //if(timestep % 100 == 0){
+            if(timestep % 100 == 0){
                 //rescale the velocities at every time step
             //sample temperature, so can rescale as often as we want
                 statisticsSampler.sampleTemperature(system);
                 currentTemperature = statisticsSampler.temperature();  //this gets the value of temperature member variable
             //Note: initial temperature is the desired temperature here
             system.rescaleVelocities(statisticsSampler, currentTemperature, initialTemperature, N_steps);
-            //}
-*/
+            }
+
 
 
 
@@ -202,7 +204,7 @@ int main(int argc, char **argv)
 
 
         if(timestep%10 == 0){
-            if( my_id == 2 ) {  //use proc1 to record
+            if( my_id == 1 ) {  //use proc1 to record
                 movie2.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
             }
         }

@@ -40,6 +40,8 @@ void System::applyPeriodicBoundaryConditions() {
                 atom->num_bndry_crossings[j] += 1;    //crossing right or top boundary is counted as +1 crossing
             }
         }
+        std::cout <<"syssize in pbc" << m_systemSize[0] <<" " <<m_systemSize[1] <<std::endl;
+
 
     }
 }
@@ -68,6 +70,31 @@ void System::applyMirrorBCs_inX(double dt){
 
 }
 
+void System::applyMirrorBCs(double dt){
+    for(Atom *atom : atoms()) {
+        for(int j = 0;j<2;j++){
+             if (atom->position[j] <  0. ) {
+                 //we go back to the previous x position, and keep the y position
+                 //also we reverse sign on X component of velocity
+                 // std::cout << "test mirror bc's BEFORE mirroring" << atom->position[0] <<"time step" << steps() << std::endl;
+                 atom->position[j] -=dt*atom->velocity[j];
+                 //atom->position[0] = 0.01;  //POOR MAN'S mirror BCs
+                // std::cout << "test mirror bc's" << atom->position[0] <<std::endl; // not working properly it seems--> after mirroring, stll have negative positoin...
+                 atom->velocity[j] = - atom->velocity[j];
+
+             }
+
+             if(atom->position[j] >  m_systemSize[j]){
+                // atom->position[j] = m_systemSize[j] -0.01;  //POOR MAN'S mirror BCs
+                  atom->position[j] -=dt*atom->velocity[j];
+                // std::cout << "test mirror bc's" << atom->position[0] <<std::endl; // not working properly it seems--> after mirroring, stll have negative positoin...
+                 atom->velocity[j] = - atom->velocity[j];
+             }
+        }
+
+}
+}
+
 
 // remove atoms that escape the SUB system (corresponding to current processor)
 /*
@@ -84,9 +111,9 @@ void System::removeEscapedAtoms() {
 
 void System::rescaleVelocities(StatisticsSampler &statisticsSampler, double currentTemperature, double desiredTemperature, int N_steps){
     //rescale velocities using equipartition theorem: v_desired = sqrt(T_desired/T_actual)*v_actual
-    //double rescaling_factor = sqrt(desiredTemperature/statisticsSampler.temperature()); //sqrt(T_desired/T_actual)
+    double rescaling_factor = sqrt(desiredTemperature/statisticsSampler.temperature()); //sqrt(T_desired/T_actual)
 
-    double rescaling_factor = sqrt(1+ (1/N_steps)*(desiredTemperature/currentTemperature-1)); //sqrt(1+(1/N_steps)(T_desired/T_current - 1))
+    //double rescaling_factor = sqrt(1+ (1/N_steps)*(desiredTemperature/currentTemperature-1)); //sqrt(1+(1/N_steps)(T_desired/T_current - 1))
     //Note: if N_steps is set to 1, then just gives the old scaling: sqrt(T_desired/T_actual)
     for(Atom *atom : atoms()) {
         atom->velocity *= rescaling_factor;  //a*=b means a = a*b
@@ -331,6 +358,22 @@ int System::delete_atoms (std::vector <int> indices) {
 
         return shift;
 }
+
+
+
+
+
+
+void System::delete_atom(std::vector <Atom*>::iterator iter){
+    m_atoms.erase(iter);  //NOTE: erase invalidates iterators!--> need to reinitialize an iter and go through list again I guess?
+}
+
+std::vector <Atom*>::iterator System::get_iterator(int i){
+    std::vector <Atom*>::iterator it = m_atoms.begin() + i;  //get iterator corresponding to current atom which are testing
+    return it;
+}
+
+
 /* I think this version is not needed --> is for 1 atom only it seems...
 /*
  Attempt to push ONE atom into the system.  This assigns the map automatically to link the atoms global index to the local storage location.
@@ -427,7 +470,7 @@ void System::add_atoms (std::vector <double> new_atoms, double num_recieved) { /
 
                adding_atom->velocity[0] = new_atoms[index+2];
                adding_atom->velocity[1] = new_atoms[index+3];
-               //adding_atom->force.set(0,0);  //intialize w/ 0 forces since calculated in LJ
+               adding_atom->force.set(0,0);  //intialize w/ 0 forces since calculated in LJ
 
 
 
@@ -436,7 +479,8 @@ void System::add_atoms (std::vector <double> new_atoms, double num_recieved) { /
                //hard code resseting the mass to correct value
               //adding_atom->setMass(UnitConverter::massFromSI(6.63352088e-26));
 
-               //std::cout <<"added atom position" << adding_atom->position[0] <<" " << adding_atom->position[1] << "added atom velocity" << adding_atom->velocity[0] << " " << adding_atom->velocity[1] << "proc " << rank <<std::endl;
+
+              // std::cout <<"added atom position" << adding_atom->position[0] <<" " << adding_atom->position[1] << "added atom velocity" << adding_atom->velocity[0] << " " << adding_atom->velocity[1] << "proc " << rank <<std::endl;
                //glob_to_loc_id_[adding_atom->atom_index] = index;  //BREAKS HERE!  //it has atom_index = 0...
                //std::cout <<"line 270 in addatoms" <<std::endl;
                //works through here

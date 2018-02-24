@@ -21,7 +21,7 @@ void send_atoms(System *system) {
 	
 	// store number of atoms to send to and receive from the processor on the left and on the right
 	int num_to_left = 0;
-	int num_to_right = 0;
+        int num_to_right = 0;
 	int num_from_left, num_from_right;
 	
         // store atoms to send and receive: vectors of atom objects (not pointers)
@@ -50,11 +50,12 @@ void send_atoms(System *system) {
 	MPI_Status stat[4], stat2[4];  //get status of the requests
 
 
+
+
 	int proc_to;
         for (int i=0; i!=system->num_atoms(); ++i) {   //-> are used b/c
 		// calculate the processor for each atom
                 proc_to = floor(system->atoms(i)->position[decomp_dim]/ sim_size[decomp_dim] * nprocs);
-                //
 
 
                // std::cout << "index  " << i<< "position  " << system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "proc  " <<rank <<std::endl;
@@ -84,7 +85,7 @@ void send_atoms(System *system) {
                         to_left.push_back(system->atoms(i)->velocity[0]);
                         to_left.push_back(system->atoms(i)->velocity[1]);
 
-                       //std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
+                      // std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
 
 
                         //to_left[array_index] = system->atoms(i)->position[0];
@@ -95,7 +96,15 @@ void send_atoms(System *system) {
                         //to_left.push_back(*(system->atoms(i)));  //* means pass the value that atoms (which is a pointer) points to
                         //std::cout<<"position to_left send line 53" << system->atoms(i)->position[0] <<endl;
 
-                        to_delete.push_back(i);  //never gets sent anywhere-< jus tfor cucrrent proc
+                        to_delete.push_back(i);  //using erase, requires an iterator //never gets sent anywhere-< jus tfor cucrrent proc
+
+                       //system->delete_atom(iter);
+
+
+                       // system->m_atoms.erase(iter);  //IT DOESN'T LIKE THIS B/C FOR THIS NEED m_atoms to be private
+                      // i--;                       //this is needed b/c if i..e 5th atom gets erased, then 6th atom becomes 5th atom, so need to recheck the 5th index in the for loop
+
+
 		}
 		else if (proc_to == (rank + 1) % nprocs) {
                         //to_right.push_back(*(system->atoms(i)));
@@ -107,15 +116,25 @@ void send_atoms(System *system) {
                         to_right.push_back(system->atoms(i)->velocity[0]);
                         to_right.push_back(system->atoms(i)->velocity[1]);
 
+                       // system->m_atoms.erase(iter);
 
-                       // std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
 
 
-			to_delete.push_back(i);
+                        //std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
+
+
+                        to_delete.push_back(i);
+
+
+                       // system->delete_atom(iter);
+                       // i--;
+
 		}
 		else if (proc_to != rank) {
                        // std::cout <<"Atom moved too many boxes" << proc_to << std::endl;
-		}			
+                }
+
+                //iter++;
 	}
          //gets through here fine
 
@@ -163,8 +182,77 @@ void send_atoms(System *system) {
         system->add_atoms(from_right, num_from_right);
 
 
+        //LOOP FOR DELETING ATOMS: this is inefficient but more foolproof--> delete all atoms whose positions don't belong to the current processor--> I already sent them over...
+
+        /*
+        for (int i=0; i!=system->num_atoms(); ++i) {   //-> are used b/c
+                // calculate the processor for each atom
+                proc_to = floor(system->atoms(i)->position[decomp_dim]/ sim_size[decomp_dim] * nprocs);
+
+                std::vector <Atom*>::iterator iter  = system->get_iterator(i);  //gets back iterator for m_atoms.begin() b/c m_atoms is private member fnc so need to do in system, auto is automatic type declaration
+                //std::vector <Atom*>::iterator iter = system->m_atoms.begin();
+                //put inside of loop b/c erase invalidates iterators...
+
+
+               // std::cout << "index  " << i<< "position  " << system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "proc  " <<rank <<std::endl;
+                // std::cout << "velocity  " << system->atoms(i)->velocity[0] << "   " <<system->atoms(i)->velocity[1] << "mass  " << system->atoms(i)->m_mass << "proc  " <<rank <<std::endl;
+
+                //print out if atom has wrong mass
+                 //if(system->atoms(i)->m_mass < 39.){
+
+                     //std::cout <<"wrong mass atom mass " <<system->atoms(i)->m_mass <<std::endl;
+                // }
+                //std::cout <<"velocityline 48" <<system->atoms(i)->velocity[0] <<std::endl;
+                  //std::cout <<"sim_size" <<sim_size[decomp_dim] <<std::endl;
+                 // std::cout <<"proc_to" << proc_to <<std::endl;
+                //proc_to works fine
+
+                if (proc_to == (rank - 1 + nprocs) % nprocs) {
+
+
+                       system->delete_atom(iter);
+
+
+                       // system->m_atoms.erase(iter);  //IT DOESN'T LIKE THIS B/C FOR THIS NEED m_atoms to be private
+                      i--;                       //this is needed b/c if i..e 5th atom gets erased, then 6th atom becomes 5th atom, so need to recheck the 5th index in the for loop
+
+
+                }
+                else if (proc_to == (rank + 1) % nprocs) {
+
+
+
+                       // std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
+
+
+                        //to_delete.push_back(i);
+
+
+                       system->delete_atom(iter);
+                       i--;
+
+                }
+                else if (proc_to != rank) {
+                       // std::cout <<"Atom moved too many boxes" << proc_to << std::endl;
+                }
+
+
+        }
+        */
+
+
+
+
+
+
+
+
+
         // delete atoms that we sent to another system
         system->delete_atoms(to_delete);
+
+        //not sure if this delete works properly--> I can make this way simpler--> but less efficicient by just deleting atoms from current system which have x position that doesn't
+        //correspond with the processor.AND I CAN DO THAT DURING THE TIME I AM FINDING THE ATOMS IN ABOVE STATEMENTS!--> when pushback toe to left and to right...
 
 
         //clear the vectors so can be used fresh again
@@ -176,5 +264,5 @@ void send_atoms(System *system) {
 
 
 	
-	MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
 }

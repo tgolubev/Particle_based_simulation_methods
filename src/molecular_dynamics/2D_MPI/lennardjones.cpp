@@ -87,6 +87,8 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
              //NOTE: I need minimum image convention along y-direction!--> b/c no passing of atoms/ghosts etc there!
              if (displacement[1] >  system.halfsystemSize(1)) displacement[1] -= system.systemSize(1);   //systemSize(j) returns m_systemSize[j] from system class
              if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
+
+
 //FOR NOW DO MIRROR IMAGE IN X DIR ALSO--> BUT IT MUST BE DEPENDENT ON THE SUBSYSTEM SIZE....
              //if (displacement[0] >  0.5*system.subsystemSize(0)) displacement[0] -= system.subsystemSize(0);   //systemSize(j) returns m_systemSize[j] from system class
             // if (displacement[0] <= -0.5*system.subsystemSize(0)) displacement[0] += system.subsystemSize(0);
@@ -165,7 +167,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                 num_to_left++;
             }
             else if  (system.atoms(current_index)->position[decomp_dim] > (rank + 1) * sys_size[decomp_dim] / nprocs - skin_cutoff) {
-                //std::cout << "test if" << (rank + 1) * sys_size[decomp_dim] / nprocs - skin_cutoff <<std::endl;
+               // std::cout << "test if" << (rank + 1) * sys_size[decomp_dim] / nprocs - skin_cutoff <<std::endl;
                 to_right.push_back(system.atoms(current_index)->position[0]);
                 to_right.push_back(system.atoms(current_index)->position[1]);
                 num_to_right++;
@@ -230,6 +232,8 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                     //forces with atoms which came from left
                     for (int ghost_index=0; ghost_index < num_from_left; ++ghost_index) {
                         int index = 2*ghost_index;  //for unpacking recieved data
+
+
                         //creating new atoms is VERY SLOW and not necessary--> we just need positions...so just use them directly in displacement
                         //Atom *ghost_atom = new Atom(mass);   //create ghost atom based on recieved info from other proc
                         //ghost_atom->position[0] = from_left[index];
@@ -247,12 +251,20 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                             //displacement[j] = current_atom->position[j] - ghost_atom->position[j];
                             displacement[j] = current_atom->position[j] - from_left[index + j];  //use ghost atoms positions data directly
                         }
+
+
+
                         //NOTE: I need minimum image convention along y-direction!--> b/c no passing of atoms/ghosts etc there!--> .i.e. think at the corners along skin
                         if (displacement[1] >  system.halfsystemSize(1)) displacement[1] -= system.systemSize(1);   //systemSize(j) returns m_systemSize[j] from system class
-                        if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
+                        if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1); //verified that halfsystemsize and systemsize is correct
+
+
 
                         double radiusSqrd = displacement.lengthSquared();
                         // if(radiusSqrd > skin_cutoff_sqrd ) continue;
+
+                        //if(radiusSqrd < 1.*m_sigma)  std::cout << "atom pos" <<current_atom->position[0] <<" " << current_atom->position[1] << "ghost pos" << from_left[index] << " " <<from_left[index+1] <<"timestep" << system.steps() << "proc " << rank <<std::endl;
+
 
 
                         if(radiusSqrd > skin_cutoff_sqrd ) continue;
@@ -275,6 +287,14 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                             //WE DO NOT want to update the force on other_atom here, b/c it is a ghost atom...--> outside of the system
                         }
 
+                        if(system.steps() % system.m_sample_freq ==0){
+                            //calculate potential energy every m_sample_freq steps
+                        //m_potentialEnergy += m_four_epsilon*(pow(sigma_over_radius,12.)-pow(sigma_over_radius,6));
+                            //below version is if make in unit converter L0 = sigma*1e-10;
+                            //since epsilon is set to 1
+                            m_potentialEnergy += 4.*(pow(radius,-12.)-pow(radius,-6));
+                        //m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
+                        }
 
                     }
                     //forces with atoms which came from right
@@ -316,10 +336,21 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                             current_atom->force[j] += total_force_over_r*displacement[j]; //i.e. Fx = (F/r)*x
                             //WE DO NOT want to update the force on other_atom here, b/c it is a ghost atom...--> outside of the system
                         }
+                        if(system.steps() % 100 ==0){
+                        //std::cout << "force after ghosts contribution" << current_atom->force[0] << " " <<current_atom->force[1] << std::endl;
+                        }
+                        if(system.steps() % system.m_sample_freq ==0){
+                            //calculate potential energy every m_sample_freq steps
+                        //m_potentialEnergy += m_four_epsilon*(pow(sigma_over_radius,12.)-pow(sigma_over_radius,6));
+                            //below version is if make in unit converter L0 = sigma*1e-10;
+                            //since epsilon is set to 1
+                            m_potentialEnergy += 4.*(pow(radius,-12.)-pow(radius,-6));
+                        //m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
+                        }
+
+
                     }
-                    if(system.steps() % 100 ==0){
-                    //std::cout << "force after ghosts contribution" << current_atom->force[0] << " " <<current_atom->force[1] << std::endl;
-                    }
+
 
                 }
 

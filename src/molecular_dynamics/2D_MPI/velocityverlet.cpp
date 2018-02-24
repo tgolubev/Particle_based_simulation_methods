@@ -30,7 +30,7 @@ void VelocityVerlet::integrate(System &system, double dt) //passing by reference
         atom->position += atom->velocity*dt;  //NOTE: since v is computed 1st, this is actually x(t+dt) = x(t) + vt+0.5at^2 since v = v+0.5at
         //std::cout<< atom->m_initial_position[0] << "atom INITIAL position" <<std::endl;  //initial positions seem fine...
         //std::cout << atom->position[0] <<"atomposition in VV" <<std::endl;  //these positions are blown up...
-         //std::cout << atom->force[0] << "atom force" <<std::endl; //force is blown up
+       //  std::cout << atom->velocity[0] << " " << atom->velocity[1] << "atom velocity" <<std::endl; //force is blown up
 
 
     /*    if(atom->velocity[0] == 0){
@@ -43,8 +43,10 @@ void VelocityVerlet::integrate(System &system, double dt) //passing by reference
 
     }
 
-    system.applyPeriodicBoundaryConditions();
-   // system.applyMirrorBCs_inX(dt);
+    //system.applyPeriodicBoundaryConditions();
+    //system.applyMirrorBCs_inX(dt);
+
+    system.applyMirrorBCs(dt);
 
 
     //send_atoms accepts a pointer, so declare a pointer(variable whose value = the memory address)
