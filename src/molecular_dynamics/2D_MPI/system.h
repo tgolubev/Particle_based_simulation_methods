@@ -43,15 +43,9 @@ public:
     void step(double dt);
     void applyMirrorBCs_inX(double dt);
 
-    //std::vector <int> add_atoms (const int natoms, Atom &new_atoms);		//!< Add atom(s) to the system with an array of atoms
-    void add_ghost_atoms (const int natoms,  std::vector <Atom> new_atoms);		//!< Add ghost atom(s) to the system (does not update the number of atoms the processor is responsible for
-    //std::vector <int> add_atoms (std::vector<Atom> new_atoms);				//!< Add atom(s) to the system with an vector of atoms
     void add_atoms(std::vector <double> new_atoms, double num_recieved);
-    void delete_atom(std::vector <Atom*>::iterator iter);
-    std::vector <Atom*>::iterator get_iterator(int i);
 
     int delete_atoms (std::vector <int> indices);				//!< Pop atoms with local indices from local storage
-    void clear_ghost_atoms ();								//!< Clear ghost atoms from system
 
     std::map <int, int> glob_to_loc_id_;  //!< Maps global sys_index to the local index of m_atoms an atom is stored at on each processor; the opposite conversion can be done with lookup of Atom::sys_index
 
