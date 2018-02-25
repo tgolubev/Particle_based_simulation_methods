@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     //all variables will be defined in EACH processor
     vec2 Total_systemSize(90,30); //since using SC lattice--> just gives # of atoms in each dimension
     vec2 subsystemSize;
-    subsystemSize[0] = Total_systemSize[0]/nprocs;  //1D parallelization along x
+    subsystemSize[0] = Total_systemSize[0]/(nprocs-1);  //1D parallelization along x
     subsystemSize[1] = Total_systemSize[1]; //MUST CHANGE THIS TO /nprocs when do 2D parallelization
 
     vec2 subsystemOrigin; //bottom left corner of each subsystem, this will be defined in each processor seperately
@@ -66,8 +66,8 @@ int main(int argc, char **argv)
 
     //-----------------------------------------------------------------------------------------------------------------------------------------------
     int *NumInBox_array;  //declare
-    int NumInBox;
-   // double * positions;  //stores positions of each domain
+    int NumInBox = 0;
+    double * positions;  //stores positions of each domain
     double * Allpositions;
     MPI_Datatype stype;
 
@@ -94,13 +94,13 @@ int main(int argc, char **argv)
     cout << "timestep in LJ units" <<dt <<endl;
 
     System system;
-   // if(my_id !=0){
+    if(my_id !=0){
         system.createSCLattice(Total_systemSize,subsystemSize, latticeConstant, initialTemperature, mass, subsystemOrigin);
         system.potential().setEpsilon(1.0); //if don't set to 1.0, must modify LJ eqn.
         system.potential().setSigma(UnitConverter::lengthFromAngstroms(sigma));      //i.e. LJ atom/particle diameter,
         system.m_sample_freq=100; //statistics sampler freq.
         system.removeTotalMomentum();
-   // }
+    }
 
     //create_MPI_ATOM();
 
@@ -109,6 +109,8 @@ int main(int argc, char **argv)
     //record left half of system
 
     //IO movie("movie.xyz"); // To write the positionitions to file, create IO object called "movie"
+
+    /*
 
     if( my_id == 0 ) {
         // movie.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
@@ -119,6 +121,7 @@ int main(int argc, char **argv)
     if(my_id == 2) {
         movie2.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
     }
+    */
 
     if(my_id != 0){
         cout << setw(20) << "Timestep" <<
@@ -133,11 +136,12 @@ int main(int argc, char **argv)
     high_resolution_clock::time_point start2 = high_resolution_clock::now();
 
     for(int timestep=0; timestep< N_time_steps; timestep++) {
-        //if(my_id != 0){
-
-            //gets here fine
+        if(my_id != 0){
+            //cout <<"line 140" <<endl;
 
             system.step(dt);  //only do timestepping for non-root procs
+
+            //cout <<"timestep" <<timestep <<endl;
 
             //doesn't get here...
 
@@ -164,19 +168,11 @@ int main(int argc, char **argv)
                         setw(20) << statisticsSampler.potentialEnergy() <<
                         setw(20) << statisticsSampler.totalEnergy() << endl;
             }
-
-            if(timestep%10 == 0){
-                if( my_id == 2 ) {  //use proc1 to record
-                    movie2.saveState(system, statisticsSampler);  //save the initial particle positionitions to file. pass statisticsSampler object too, so can use density function...
-                }
-           }
             NumInBox = system.num_atoms();
 
-        //positions = getPositions(system);
+           //positions = getPositions(system);
 
-
-
-            double positions[2*system.num_atoms()];
+            positions = new double[2*system.num_atoms()];
            //  cout <<"line 177" << system.atoms(0)->position[0] << endl;
             int i = 0, j=0;
             for(Atom *atom : system.atoms()) {
@@ -187,6 +183,8 @@ int main(int argc, char **argv)
             }
 
            // cout <<"posotins" << positions[0] <<endl;
+
+        }
 
 
 
@@ -202,7 +200,7 @@ int main(int argc, char **argv)
         int NumGlobal = 0;
 
         if(my_id == 0){
-            cout << "result of gather " << NumInBox_array[0] << " " << NumInBox_array[1] << " " << NumInBox_array[2] << endl;
+            //cout << "result of gather " << NumInBox_array[0] << " " << NumInBox_array[1] << " " << NumInBox_array[2] << endl;
 
             //make array of displacements for MPI_Gatherv
             for (int i=0;i<nprocs;i++){

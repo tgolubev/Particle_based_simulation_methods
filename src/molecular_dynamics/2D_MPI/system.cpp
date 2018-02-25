@@ -116,7 +116,7 @@ void System::createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double l
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);  //find # of processors
 
-    x =rank*subsystemSize[0]*latticeConstant + 0.5*latticeConstant;  //initializes x at the right position for the processor's domain
+    x =(rank-1)*subsystemSize[0]*latticeConstant + 0.5*latticeConstant;  //initializes x at the right position for the processor's domain
 
     for(int i=0;i<subsystemSize[0];i++){  // i = 1 and < b/c can't have atoms on both boundaries--> will blow up!
         //i.e. i = 0,1...N_x-1
@@ -189,6 +189,7 @@ void System::calculateForces() {
 
 void System::step(double dt) {
     m_integrator.integrate(*this, dt);  //this calls velocityverlet.cpp
+    //std::cout << "system line 192" <<std::endl;
     m_steps++;
     m_time += dt;
 
@@ -236,9 +237,9 @@ void System::add_atoms (std::vector <double> new_atoms, double num_recieved) { /
     //double mass;
     //std::vector <int> update_proc(natoms);
 
-    int nprocs, rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocs);  //find # of processors
+    //int nprocs, rank;
+    //MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
+    //MPI_Comm_size(MPI_COMM_WORLD, &nprocs);  //find # of processors
 
     //gets through here
 

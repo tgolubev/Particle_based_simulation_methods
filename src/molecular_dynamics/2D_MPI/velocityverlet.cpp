@@ -9,6 +9,8 @@
 
 void VelocityVerlet::integrate(System &system, double dt) //passing by reference &system
 {
+
+
     int nprocs, rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);  //find # of processors
@@ -18,6 +20,8 @@ void VelocityVerlet::integrate(System &system, double dt) //passing by reference
         system.calculateForces();
         m_firstStep = false;
     }
+
+    //std::cout <<"in VV" <<std::endl;
 
     for(Atom *atom : system.atoms()) {
         //this operates on the vectors directly using vec2 class
