@@ -78,7 +78,6 @@ void send_atoms(System *system) {
         MPI_Irecv(&num_from_right, 1, MPI_INT, (rank + 1) % nprocs, 1, MPI_COMM_WORLD, req+3);
         MPI_Waitall (4, req, stat);  //wait for all send and receive requests to be completed
 
-
         //SENDING ATOM INFORMATION AS SIMPLY 4 doubles FOR EACH ATOM!! rx, ry, vx, vy
 
         // resize vectors of atom data--> 4*# of atoms

@@ -60,7 +60,6 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     MPI_Request req[4], req2[4];
     MPI_Status stat[4], stat2[4];
     
-    
    //First calculate interactions btw. all atoms in the processor's domain
     for(int current_index=0; current_index<system.num_atoms()-1; current_index++){  //-1 b/c don't need to calculate pairs when get to last atom
         Atom *current_atom = system.atoms(current_index);  //system.atoms(index) returns the pointer to the atom corresponding to index

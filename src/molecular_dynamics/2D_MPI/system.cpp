@@ -41,8 +41,6 @@ void System::applyPeriodicBoundaryConditions() {
             }
         }
         std::cout <<"syssize in pbc" << m_systemSize[0] <<" " <<m_systemSize[1] <<std::endl;
-
-
     }
 }
 
@@ -67,7 +65,6 @@ void System::applyMirrorBCs(double dt){
                  atom->velocity[j] = - atom->velocity[j];
              }
         }
-
 }
 }
 

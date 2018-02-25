@@ -8,4 +8,4 @@ To run from terminal on Linux (must have OpenMPI installed)
 1. make
 2. mpirun -np [number of processors] MPI-md 
 
-Note: For stability, each processor's domain must be approximately square.
+Note: For stability, each processor's domain must be approximately square and larger than the cutoff radius.

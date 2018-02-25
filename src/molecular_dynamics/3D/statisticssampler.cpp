@@ -107,10 +107,12 @@ void StatisticsSampler::sampleDensity(System &system)
 
 }
 
+
+
 void StatisticsSampler::samplePressure(System &system){             //ideal gas pressure: P = (n/3N)sum(mv_i^2)
     LennardJones m_potential;
     //m_pressure_ideal = 2*m_kineticEnergy*m_density/(3*system.num_atoms()); //NOTE: density must be sampled 1st to be able to get pressure
-    m_pressure_ideal = m_density*m_temperature;  //NOTE: P_ideal = nT  , if rewrite the eqns
+    m_pressure_ideal = (system.num_atoms()/system.volume())*m_temperature;  //NOTE: P_ideal = nT  , if rewrite the eqns: use KE = (3/2)NT
     m_pressure = m_pressure_ideal + (1/(3*system.volume()))*m_potential.pressure_virial;  //pressure_virial is public variable so is accessible
 
     //external pressure needs to be found in LJ since involves displacements
