@@ -10,10 +10,11 @@ private:
     double m_potentialEnergy = 0;
     double m_four_epsilon = 4.0*m_epsilon;
     double m_twntyfour_epsilon = 24.0*m_epsilon;
+    double m_pressure_virial = 0;
 
 
 public:
-    double pressure_virial = 0;  //this will be calculated in LJ loop and then picked up by statisticssampler to get total pressure
+    double pressureVirial(){return m_pressure_virial;}  //this will be calculated in LJ loop and then picked up by statisticssampler to get total pressure
     LennardJones() { }
     void calculateForces(class System &system);
     double potentialEnergy() const;

@@ -33,6 +33,7 @@ void LennardJones::setEpsilon(double epsilon)
 void LennardJones::calculateForces(System &system)  //object system is passed by reference (allows changing)
 {
  m_potentialEnergy = 0;  //reset potential energy
+ m_pressure_virial = 0; //reset virial of pressure
 
  for(int current_index=0; current_index<system.num_atoms()-1; current_index++){  //-1 b/c don't need to calculate pairs when get to last atom
     Atom *current_atom = system.atoms(current_index);  //system.atoms(index) returns the pointer to the atom corresponding to index
@@ -91,13 +92,12 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
            //m_potentialEnergy += m_four_epsilon*(pow(radius,-12.)-pow(radius,-6));
 
            //calculate pressure virial
-           pressure_virial += displacement.dot(current_atom->force);  //dot product of displacement with force
+           m_pressure_virial += displacement.dot(total_force_over_r*displacement);  //NOTE: total_force_over_r*displacement is the Fij force btw the atom pair dot product of displacement with force
         }
 
 
     }
  }
-
 
 }
 

@@ -34,7 +34,7 @@ int main()
     vec3 numberOfUnitCellsEachDimension(5,5,5);
     double initialTemperature = 0.851; //CURRENTLY IN LENNARD JONES UNITS//in K
     double currentTemperature;
-    double latticeConstant =  1.587;//4.35284;//5.256;  //in angstroms
+    double latticeConstant =  1.69596;//4.35284;//5.256;  //in angstroms
     double sigma = 1.; //3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;
@@ -153,7 +153,7 @@ int main()
 
    high_resolution_clock::time_point start2 = high_resolution_clock::now();  //start clock timer
 
-    for(int timestep=0; timestep<150000; timestep++) {  //chose # of timesteps here
+    for(int timestep=0; timestep<20000; timestep++) {  //chose # of timesteps here
         high_resolution_clock::time_point startdt = high_resolution_clock::now();
         system.step(dt);
         high_resolution_clock::time_point finishdt = high_resolution_clock::now();
@@ -208,7 +208,18 @@ int main()
           //save atom coordinates only periodically to save CPU and file size
           movie.saveState(system, statisticsSampler);  //calls saveState fnc in io.cpp which saves the state to the movie.xyz file
         }
+
+        //below is for taking avg of pressures
+        if(timestep > 10000 && timestep % system.m_sample_freq ==0){  //if reached equil and are at timestep where statsampling is done, contribute the sampled pressure to the sum
+            statisticsSampler.sumPressures();
+        }
     }
+
+    //uncomment below block for pressure averages calculations
+    cout << "Average ideal gas pressure = " << statisticsSampler.pressure_ideal_sum/statisticsSampler.num_samples <<endl;
+    cout << "Average external pressure (from virial) = " << statisticsSampler.pressure_ext_sum/statisticsSampler.num_samples <<endl;
+    cout << "Average total pressure = " << statisticsSampler.pressure_sum/statisticsSampler.num_samples <<endl;
+
 
     //stop clock timer and output time duration
     high_resolution_clock::time_point finish2 = high_resolution_clock::now();

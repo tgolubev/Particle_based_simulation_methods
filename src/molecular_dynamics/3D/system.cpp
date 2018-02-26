@@ -111,10 +111,13 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
 
 
     vec3 LatticeVector;  //vector which points to the origin of each unit cell
+    vec3 perturbation(1,1,1);
     //Note: 1st unit cell starts at 0,0,0
 
     double x,y,z;
     double halfLatticeConstant=0.5*latticeConstant;
+
+
 
     for(int i=0;i<numberOfUnitCellsEachDimension[0];i++){
         //i.e. i = 0,1...N_x-1
@@ -122,13 +125,15 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
             for(int k=0;k<numberOfUnitCellsEachDimension[2];k++){
                 LatticeVector.set(latticeConstant*i,latticeConstant*j,latticeConstant*k);
 
+                perturbation.randomGaussian(0, 0.1); //fill perturbation with random #'s from gaussian
+
                 //Place the 4 atoms of each fcc cell into coordinates. Use setInitialPosition(): this will both set position and
                 //save the atom's initial position for use later.
                 //NOTE: The PBCs will prevent from adding atoms which are beyond the system dimensions when approach the boundaries.
                 Atom *atom1 = new Atom(UnitConverter::massFromSI(mass)); //uses mass in kg: mass is correct
-                x = LatticeVector[0];
-                y = LatticeVector[1];
-                z = LatticeVector[2];
+                x = LatticeVector[0] + perturbation[0] ;
+                y = LatticeVector[1] + perturbation[1];
+                z = LatticeVector[2] + perturbation[2];
                 atom1->setInitialPosition(x,y,z);
                 atom1->num_bndry_crossings.set(0.,0.,0.);   //make sure initial # of bndry crossings is 0
                 atom1->resetVelocityMaxwellian(temperature, variance, input_variance);

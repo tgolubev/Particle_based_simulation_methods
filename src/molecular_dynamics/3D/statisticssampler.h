@@ -18,7 +18,13 @@ private:
     double m_totalMass = 0;
     double m_pressure_ideal = 0;
     double m_pressure = 0;
+    double m_pressure_ext = 0;
+
 public:
+    int num_samples= 0; //number of samples which are taken, used for averaging pressures
+    double pressure_ideal_sum = 0;
+    double  pressure_ext_sum  =  0;
+    double pressure_sum = 0;
     StatisticsSampler();
     void saveToFile(System &system);
     void sample(System &system);
@@ -29,6 +35,7 @@ public:
     void sampleDiffusionCoeff(System &system);
     void samplePressure(System &system);
     void sampleMomentum(System &system);
+    void sumPressures(); //returns number of times pressures where summed --> # of samples taken
     vec3 totalMomentum(){return m_totalMomentum;}
     double kineticEnergy() { return m_kineticEnergy; }
     double potentialEnergy() { return m_potentialEnergy; }

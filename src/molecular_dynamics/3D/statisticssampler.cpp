@@ -47,9 +47,9 @@ void StatisticsSampler::saveToFile(System &system)
               std::setw(12) << m_temperature<<
               std::setw(12) << m_diffusion_coeff<<
               std::setw(12) << m_density<<
+              std::setw(12) << m_pressure_ideal <<
+              std::setw(12) << m_pressure_ext <<
               std::setw(12) << m_pressure<<endl;
-
-
 }
 
 
@@ -60,8 +60,8 @@ void StatisticsSampler::sample(System &system)
     sampleKineticEnergy(system);
     samplePotentialEnergy(system);
     sampleTemperature(system);
-    sampleDiffusionCoeff(system);
-    sampleDensity(system); //NOTE: is neccesary to be able to get pressure
+    //sampleDiffusionCoeff(system);
+    //sampleDensity(system);
     samplePressure(system);
     saveToFile(system);
 }
@@ -113,9 +113,21 @@ void StatisticsSampler::samplePressure(System &system){             //ideal gas 
     LennardJones m_potential;
     //m_pressure_ideal = 2*m_kineticEnergy*m_density/(3*system.num_atoms()); //NOTE: density must be sampled 1st to be able to get pressure
     m_pressure_ideal = (system.num_atoms()/system.volume())*m_temperature;  //NOTE: P_ideal = nT  , if rewrite the eqns: use KE = (3/2)NT
-    m_pressure = m_pressure_ideal + (1/(3*system.volume()))*m_potential.pressure_virial;  //pressure_virial is public variable so is accessible
+    //std::cout <<"pressure virial in statasamaple" <<system.m_potential.pressureVirial()<<std::endl;
+    m_pressure_ext = (1/(3*system.volume()))*system.m_potential.pressureVirial(); //NOTE: m_potential is a LJ object IN system class pressure_virial is public variable so is accessible
+    m_pressure = m_pressure_ideal + m_pressure_ext;
 
     //external pressure needs to be found in LJ since involves displacements
+}
+
+
+void StatisticsSampler::sumPressures(){
+    //this is for averaging
+    pressure_ideal_sum += m_pressure_ideal;
+    pressure_ext_sum += m_pressure_ext;
+    pressure_sum += m_pressure;
+    //std::cout <<"pressure sum" <<pressure_sum <<std::endl;
+    num_samples++;
 }
 
 void StatisticsSampler::sampleDiffusionCoeff(System &system)
