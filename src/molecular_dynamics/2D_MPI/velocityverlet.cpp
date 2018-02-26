@@ -29,7 +29,8 @@ void VelocityVerlet::integrate(System &system, double dt) //passing by reference
         atom->position += atom->velocity*dt;  //NOTE: since v is computed 1st, this is actually x(t+dt) = x(t) + vt+0.5at^2 since v = v+0.5at
     }
 
-    system.applyMirrorBCs(dt);
+    //system.applyMirrorBCs(dt);
+    system.applyPeriodicBoundaryConditions();
 
     if(nprocs >1){
        send_atoms(&system);  //send and recieve atoms which have left their processor's domain

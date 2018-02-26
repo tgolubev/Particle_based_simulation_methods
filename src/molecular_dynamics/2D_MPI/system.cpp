@@ -40,32 +40,30 @@ void System::applyPeriodicBoundaryConditions() {
                 atom->num_bndry_crossings[j] += 1;    //crossing right or top boundary is counted as +1 crossing
             }
         }
-        std::cout <<"syssize in pbc" << m_systemSize[0] <<" " <<m_systemSize[1] <<std::endl;
+        //std::cout <<"syssize in pbc" << m_systemSize[0] <<" " <<m_systemSize[1] <<std::endl;
     }
 }
 
 void System::applyMirrorBCs(double dt){
     for(Atom *atom : atoms()) {
         for(int j = 0;j<2;j++){
-             if (atom->position[j] <  0. ) {
-                 //we go back to the previous x position, and keep the y position
-                 //also we reverse sign on X component of velocity
-                 // std::cout << "test mirror bc's BEFORE mirroring" << atom->position[0] <<"time step" << steps() << std::endl;
-                 atom->position[j] -=dt*atom->velocity[j];
-                 //atom->position[0] = 0.01;  //POOR MAN'S mirror BCs
+            if (atom->position[j] <  0. ) {
+                //we go back to the previous x position, and keep the y position
+                //also we reverse sign on X component of velocity
+                // std::cout << "test mirror bc's BEFORE mirroring" << atom->position[0] <<"time step" << steps() << std::endl;
+                atom->position[j] -=dt*atom->velocity[j];
+                //atom->position[0] = 0.01;  //POOR MAN'S mirror BCs
                 // std::cout << "test mirror bc's" << atom->position[0] <<std::endl; // not working properly it seems--> after mirroring, stll have negative positoin...
-                 atom->velocity[j] = - atom->velocity[j];
-
-             }
-
-             if(atom->position[j] >  m_systemSize[j]){
+                atom->velocity[j] = - atom->velocity[j];
+            }
+            if(atom->position[j] >  m_systemSize[j]){
                 // atom->position[j] = m_systemSize[j] -0.01;  //POOR MAN'S mirror BCs
-                  atom->position[j] -=dt*atom->velocity[j];
+                atom->position[j] -=dt*atom->velocity[j];
                 // std::cout << "test mirror bc's" << atom->position[0] <<std::endl; // not working properly it seems--> after mirroring, stll have negative positoin...
-                 atom->velocity[j] = - atom->velocity[j];
-             }
+                atom->velocity[j] = - atom->velocity[j];
+            }
         }
-}
+    }
 }
 
 
@@ -241,11 +239,6 @@ void System::add_atoms (std::vector <double> new_atoms, double num_recieved) { /
     //MPI_Comm_rank(MPI_COMM_WORLD, &rank);   //find ID
     //MPI_Comm_size(MPI_COMM_WORLD, &nprocs);  //find # of processors
 
-    //gets through here
-
-    //std::cout <<"index at line 248"<< index <<std::endl;
-    //std::cout <<"natoms at line 248"<< natoms <<std::endl;  //finds that there are 100 new atoms --> ok.. make sense for 2 processors...
-    //issue is that it might try to add atoms that already are in the processor AGAIN
     for (int i = 0; i < num_recieved; ++i) {
 
         int index =4*i;

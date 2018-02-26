@@ -2,6 +2,7 @@
 #include "system.h"
 #include <cmath>
 #include <mpi.h>
+#include "atom.h"
 
 double LennardJones::potentialEnergy() const
 {
@@ -39,7 +40,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     const double skin_cutoff = 3.*m_sigma;
     const double skin_cutoff_sqrd = skin_cutoff*skin_cutoff;
 
-    vec2 sys_size = system.systemSize(); //returns size of GLOBAL system box
+    //vec2 system.systemSize() = system.systemSize(); //returns size of GLOBAL system box
     int decomp_dim = 0;  // 0 or 1, x or y direction of decomposition
 
     int nprocs, rank;
@@ -56,6 +57,10 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     std::vector<double> to_right;
     std::vector<double> from_left;
     std::vector<double> from_right;
+
+    //store atom pointers for use in current processor since only these atoms within skin region will interact with neighboring ghosts
+    std::vector<Atom*> Atomsto_left;
+    std::vector<Atom*> Atomsto_right;
 
     MPI_Request req[4], req2[4];
     MPI_Status stat[4], stat2[4];
@@ -108,38 +113,49 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
         
         //remember if atom needs to be considered as ghost atom for neighboring processors
         // special case for nprocs==2; don't want to send same atom twise
-        if (nprocs == 2) {
-            //std::cout << "check positions" << system.atoms(current_index)->position[0] << std::endl;
 
-            if (system.atoms(current_index)->position[decomp_dim] < (rank-1) * sys_size[decomp_dim] / (nprocs-1) + skin_cutoff) {
-                //std::cout << "test if" << rank * sys_size[decomp_dim] / nprocs + skin_cutoff <<std::endl;
-                to_left.push_back(system.atoms(current_index)->position[0]);
-                to_left.push_back(system.atoms(current_index)->position[1]);
-                //note: don't need velocities for ghost atoms
-                num_to_left++;
+
+        if (system.atoms(current_index)->position[decomp_dim] < (rank-1) * system.systemSize(decomp_dim)/ (nprocs-1) + skin_cutoff) {
+            //std::cout << "test if" << rank * system.systemSize()[decomp_dim] / nprocs + skin_cutoff <<std::endl;
+            //special case for ghosts from leftmost proc, come from right side--> must add systemsize from x positions
+            if(rank == 1){
+                to_left.push_back(system.atoms(current_index)->position[0] + system.systemSize(0));  //verified that this does give the correct numbers
+                //std::cout <<system.atoms(current_index)->position[0] + system.systemSize()[0] <<std::endl;
+            }else{
+            to_left.push_back(system.atoms(current_index)->position[0]);
             }
-            else if  (system.atoms(current_index)->position[decomp_dim] > (rank ) * sys_size[decomp_dim] / (nprocs-1) - skin_cutoff) {
-               // std::cout << "test if" << (rank + 1) * sys_size[decomp_dim] / nprocs - skin_cutoff <<std::endl;
-                to_right.push_back(system.atoms(current_index)->position[0]);
-                to_right.push_back(system.atoms(current_index)->position[1]);
-                num_to_right++;
+
+            to_left.push_back(system.atoms(current_index)->position[1]);
+            //note: don't need velocities for ghost atoms
+
+            //also save vectors of pointers to atom for using in current processor for more efficient ghost interaction calculation
+            Atomsto_left.push_back(system.atoms(current_index));  //this positions don't need to be changed b/c are for current proc
+            num_to_left++;
+
+        }
+        else if  (system.atoms(current_index)->position[decomp_dim] > (rank ) * system.systemSize(decomp_dim) / (nprocs-1) - skin_cutoff) {
+            //special case for ghosts from rightmost proc, must substract systemsize from x positions
+            if(rank == nprocs-1){//rightmost proc
+                to_right.push_back(system.atoms(current_index)->position[0] - system.systemSize(0));  //THIS DOESN'T GET TRIGGERED
+                //std::cout <<system.atoms(current_index)->position[0] - system.systemSize()[0] <<std::endl;
+            }else{
+                 to_right.push_back(system.atoms(current_index)->position[0]);
             }
-        } else {
-            if (system.atoms(current_index)->position[decomp_dim] < (rank-1) * sys_size[decomp_dim] / (nprocs-1) + skin_cutoff) {
-                to_left.push_back(system.atoms(current_index)->position[0]);
-                to_left.push_back(system.atoms(current_index)->position[1]);
-                num_to_left++;
-            }
-            if  (system.atoms(current_index)->position[decomp_dim] > (rank ) * sys_size[decomp_dim] / (nprocs-1) - skin_cutoff) {
-                to_right.push_back(system.atoms(current_index)->position[0]);
-                to_right.push_back(system.atoms(current_index)->position[1]);
-                num_to_right++;
-            }
+
+             //std::cout << "test if" << (rank + 1) * system.systemSize()[decomp_dim] / nprocs - skin_cutoff <<std::endl;
+           // std::cout <<system.atoms(current_index)->position[0]  <<std::endl;
+            to_right.push_back(system.atoms(current_index)->position[1]);
+            Atomsto_right.push_back(system.atoms(current_index));
+            num_to_right++;
+
         }
 
+
+        /*
         if(system.steps() % 100 ==0){
             //std::cout <<"forces before add ghosts contribution" << current_atom->force[0] << " " << current_atom->force[1] <<std::endl;
         }
+        */
             
     }//end of outer loop
 
@@ -150,14 +166,14 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
     //std::cout << "num to right" <<num_to_right <<"proc" << rank <<std::endl;
      //std::cout << "num to left" <<num_to_left <<"proc" << rank <<std::endl;
 
-
+   // std::cout <<"system size" <<system.systemSize()[0] <<std::endl;
 
 
     //send ghost atoms
      if (nprocs > 1) {
 
-         int ln =  (rank -1- 1 + nprocs-1) % (nprocs-1)+1;
-         int rn = (rank ) %( nprocs-1)+1;
+         int ln =  (rank -1- 1 + nprocs-1) % (nprocs-1)+1;  //left neighbor
+         int rn = (rank ) %( nprocs-1)+1;                   //right neighbor
 
          // Send ghost atoms to neighboring processor
          MPI_Isend(&num_to_left, 1, MPI_INT, ln, 10*rank + ln, MPI_COMM_WORLD, req); //note: these formulas will pass i.e. from proc 0 to proc (max at right)...--> satisfy PBCs...
@@ -182,13 +198,17 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
          //std::cout <<"fin send ghosts" <<std::endl;
 
-         // Calculate interactions between new (ghost) atoms and atoms on processor
-         for (int current_index=0; current_index!=system.num_atoms(); ++current_index) {
-             Atom *current_atom = system.atoms(current_index); //*curr... means pointer to current_atom = ... RHS is a pointer
+         // Calculate interactions between new (ghost) atoms and atoms on processor--> NOTE: need to only interact with atoms within the skin b/c of cutoff radius
+         //So i.e. atoms which were sent to left interact with atoms which came from left
 
-             //forces with atoms which came from left
-             for (int ghost_index=0; ghost_index < num_from_left; ++ghost_index) {
-                 int index = 2*ghost_index;  //for unpacking recieved data
+         //forces with atoms which came from left
+         for (int current_index=0; current_index<system.num_atoms(); current_index++){
+         //for (int current_index=0; current_index<num_to_left; current_index++) { //need real current_atom objects to be able to update their forces
+              Atom *current_atom = system.atoms(current_index);//Atomsto_left[current_index]; // //*curr... means pointer to current_atom = ... RHS is a pointer //these are addresses...
+
+              //std::cout << "line 202 lj" <<Atomsto_left[current_index] <<std::endl;
+
+             for (int ghost_index=0; ghost_index < 2*num_from_left; ghost_index+=2) {
                  //creating new atoms is VERY SLOW and not necessary--> we just need positions...so just use them directly in displacement
 
                  if(ghost_index <2 && current_index ==0){
@@ -196,12 +216,13 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                      // std::cout <<"ghost position AFTER send" << from_left[0] << " " << from_left[1+1] <<std::endl;
                  }
 
-
                  vec2 displacement(0.,0.);
                  for(int j=0;j<2;j++){
                      //displacement[j] = current_atom->position[j] - ghost_atom->position[j];
-                     displacement[j] = current_atom->position[j] - from_left[index + j];  //use ghost atoms positions data directly
-                 }
+                     displacement[j] = current_atom->position[j] - from_left[ghost_index + j];  //use ghost atoms positions data directly
+                 }//DISPLACEMENTS ARE NOW CORRECT!
+                // std::cout << "displacement" <<displacement[0] << " " <<displacement[1] <<std::endl;
+
 
                  //NOTE: I need minimum image convention along y-direction!--> b/c no passing of atoms/ghosts etc there!--> .i.e. think at the corners along skin
                  if (displacement[1] >  system.halfsystemSize(1)) displacement[1] -= system.systemSize(1);   //systemSize(j) returns m_systemSize[j] from system class
@@ -223,11 +244,13 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 
                  if(system.steps() % system.m_sample_freq ==0) m_potentialEnergy += 4.*(pow(radius,-12.)-pow(radius,-6));
              }
+         //}
 
+       //forces with atoms which came from right
+       //for (int current_index=0; current_index<num_to_right; current_index++) { //need real current_atom objects to be able to update their forces
+           //Atom *current_atom = Atomsto_right[current_index];
 
-             //forces with atoms which came from right
-             for (int ghost_index=0; ghost_index < num_from_right; ++ghost_index) {
-                 int index = 2*ghost_index;  //for unpacking recieved data
+             for (int ghost_index=0; ghost_index < 2*num_from_right; ghost_index+=2) {
 
                  if(ghost_index <2 && current_index ==0){
                      //std::cout <<"ghost position AFTER send" << from_right[0] << " " << from_right[0+1] << "proc" << rank <<std::endl;
@@ -235,11 +258,13 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                  }
                  vec2 displacement(0.,0.);
                  for(int j=0;j<2;j++){
-                     displacement[j] = current_atom->position[j] - from_right[index + j];  //use ghost atoms positions data directly
+                     displacement[j] = current_atom->position[j] - from_right[ghost_index + j];  //use ghost atoms positions data directly
                  }
                  //NOTE: I need minimum image convention along y-direction!--> b/c no passing of atoms/ghosts etc there!
                  if (displacement[1] >  system.halfsystemSize(1)) displacement[1] -= system.systemSize(1);   //systemSize(j) returns m_systemSize[j] from system class
                  if (displacement[1] <= -system.halfsystemSize(1)) displacement[1] += system.systemSize(1);
+
+                 //std::cout << "displacement" <<displacement[0] << " " <<displacement[1] <<std::endl;
 
                  double radiusSqrd = displacement.lengthSquared();
                  if(radiusSqrd > skin_cutoff_sqrd ) continue;
@@ -258,7 +283,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
                  }
                  if(system.steps() % system.m_sample_freq ==0) m_potentialEnergy += 4.*(pow(radius,-12.)-pow(radius,-6));
              }
-         }
+         }//end of outer loop
 
                 //clear the vectors
                 from_left.clear();
