@@ -106,6 +106,9 @@ int main(int argc, char **argv)
 
     StatisticsSampler statisticsSampler;
 
+    FILE *movie;
+    //IO movie("movie.xyz");
+
     //record left half of system
 
     //IO movie("movie.xyz"); // To write the positionitions to file, create IO object called "movie"
@@ -131,6 +134,8 @@ int main(int argc, char **argv)
 
                 setw(20) << "PotentialEnergy" <<
                 setw(20) << "TotalEnergy" << endl;
+    }else{
+        movie = fopen("movie.xyz","w+");
     }
 
     high_resolution_clock::time_point start2 = high_resolution_clock::now();
@@ -225,6 +230,23 @@ int main(int argc, char **argv)
 
         MPI_Gatherv(&positions[0], 1, stype, Allpositions, rcounts, displs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
+       if(timestep % 100 ==0){
+         if(my_id ==0){
+             fprintf(movie,"%d \n", NumGlobal);
+             fprintf(movie,"%11.3f \n",timestep);
+             for(int i =0;i<NumGlobal;i++){
+                 fprintf(movie, "H \t %11.3f \t %11.3f \n",Allpositions[2*i],Allpositions[2*i+1]);
+             }
+
+             delete [] Allpositions;
+         }
+       }
+
+
+
+
+
+
         //MPI_Gatherv(&positions[0], 2*NumInBox_array[my_id], MPI_INT, Allpositions, 2*NumInBox_array[my_id], displs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
          //cout << "positions" << positions <<endl;
@@ -251,6 +273,8 @@ int main(int argc, char **argv)
 
 
     }//end of for loop
+
+    if(my_id ==0) fclose(movie);
 
 
     //timing
