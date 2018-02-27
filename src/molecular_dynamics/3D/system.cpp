@@ -140,27 +140,27 @@ void System::createFCCLattice(vec3 numberOfUnitCellsEachDimension, double lattic
                 m_atoms.push_back(atom1);     //add element to vector m_atoms 1 element (atom object)
 
                 Atom *atom2 = new Atom(UnitConverter::massFromSI(mass));
-                x = halfLatticeConstant + LatticeVector[0];
-                y = halfLatticeConstant + LatticeVector[1];
-                z = LatticeVector[2];
+                x = halfLatticeConstant + LatticeVector[0]+ perturbation[0] ;
+                y = halfLatticeConstant + LatticeVector[1]+ perturbation[0] ;
+                z = LatticeVector[2]+ perturbation[0] ;
                 atom2->setInitialPosition(x,y,z);
                 atom2->num_bndry_crossings.set(0.,0.,0.);
                 atom2->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom2);
 
                 Atom *atom3 = new Atom(UnitConverter::massFromSI(mass));
-                x = LatticeVector[0];
-                y = halfLatticeConstant + LatticeVector[1];
-                z = halfLatticeConstant + LatticeVector[2];
+                x = LatticeVector[0]+ perturbation[0] ;;
+                y = halfLatticeConstant + LatticeVector[1]+ perturbation[0] ;
+                z = halfLatticeConstant + LatticeVector[2]+ perturbation[0] ;
                 atom3->setInitialPosition(x,y,z);
                 atom3->num_bndry_crossings.set(0.,0.,0.);
                 atom3->resetVelocityMaxwellian(temperature, variance, input_variance);
                 m_atoms.push_back(atom3);
 
                 Atom *atom4 = new Atom(UnitConverter::massFromSI(mass));
-                x = halfLatticeConstant + LatticeVector[0];
-                y = LatticeVector[1];
-                z = halfLatticeConstant + LatticeVector[2];
+                x = halfLatticeConstant + LatticeVector[0]+ perturbation[0] ;;
+                y = LatticeVector[1]+ perturbation[0] ;;
+                z = halfLatticeConstant + LatticeVector[2]+ perturbation[0] ;;
                 atom4->setInitialPosition(x,y,z);
                 atom4->num_bndry_crossings.set(0.,0.,0.);
                 atom4->resetVelocityMaxwellian(temperature, variance, input_variance);

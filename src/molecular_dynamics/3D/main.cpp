@@ -32,9 +32,9 @@ int main()
     int num_particles;
     bool input_parameters;
     vec3 numberOfUnitCellsEachDimension(5,5,5);
-    double initialTemperature = 0.851; //CURRENTLY IN LENNARD JONES UNITS//in K
+    double initialTemperature = 0.851; //CURRENTLY IN LENNARD JONES UNITS
     double currentTemperature;
-    double latticeConstant =  1.69596;//4.35284;//5.256;  //in angstroms
+    double latticeConstant =  1.6441; //in angstroms
     double sigma = 1.; //3.4; //atom/particle diameter in Angstrom for LJ potential
     double epsilon = 1.0318e-2; // epsilon from LJ in eV
     double side_length;

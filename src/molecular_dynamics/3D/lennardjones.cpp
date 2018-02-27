@@ -34,6 +34,8 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
 {
  m_potentialEnergy = 0;  //reset potential energy
  m_pressure_virial = 0; //reset virial of pressure
+ double cutoff = 3*m_sigma;
+ double cutoff_sqrd = cutoff*cutoff;
 
  for(int current_index=0; current_index<system.num_atoms()-1; current_index++){  //-1 b/c don't need to calculate pairs when get to last atom
     Atom *current_atom = system.atoms(current_index);  //system.atoms(index) returns the pointer to the atom corresponding to index
@@ -58,7 +60,7 @@ void LennardJones::calculateForces(System &system)  //object system is passed by
         //std::cout<<radius<<std::endl;
        // double radius = sqrt(radiusSqrd);
         //if(radius > 5.0*m_sigma) continue;
-        if(radiusSqrd > 16.0*m_sigma_sqrd) continue;
+        if(radiusSqrd > cutoff_sqrd) continue;
 
         double radius = sqrt(radiusSqrd);
         double sigma_over_radius = m_sigma/radius;
