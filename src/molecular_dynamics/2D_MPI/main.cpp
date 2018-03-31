@@ -194,10 +194,24 @@ int main(int argc, char **argv)
         if(timestep % 100 ==0){
             if(my_id ==0){
                 fprintf(movie,"%d \n", NumGlobal);
-                fprintf(movie,"%11.3f \n",timestep);
+                fprintf(movie,"%11.3f \n",timestep);  //comment line
+
+                int num=0;
+                for(int i=0;i<nprocs;i++){
+                    for(int j =0;j<NumInBox_array[i];j++){
+                        fprintf(movie, "H \t %11.3f \t %11.3f \t %d \n",Allpositions[num+2*j],Allpositions[num+2*j+1],i);  //this i will output the proc which each atom is a part of
+                    }
+                    num += 2*NumInBox_array[i];  //keeps track of start locations for elements belonging to next proc
+                }
+
+
+                /*
                 for(int i =0;i<NumGlobal;i++){
                     fprintf(movie, "H \t %11.3f \t %11.3f \n",Allpositions[2*i],Allpositions[2*i+1]);
                 }
+                */
+
+
                 delete [] Allpositions;
             }
         }
