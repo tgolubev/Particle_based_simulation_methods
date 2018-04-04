@@ -3,8 +3,11 @@ the plasma oscillation frequency. The algorithm flow is:
 
 1. Put particles into cells
 2. Calculate the charge in each cell and calculate a charge density.
+3. Solve Poisson's equation for the electric potential by solving the tridiagonal matrix equation which results from
 1D finite-difference discretization of the grid
 4. Use finite-differences to find electric field
+5. Calculate the forces F = q*E
 6. Use leap-frog integrator to move the particles under influence of the calculated forces.
 7. Update which particles are in which cells
 8. Repeat steps 2-7 for each time step
+
