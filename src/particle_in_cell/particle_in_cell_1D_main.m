@@ -69,46 +69,15 @@ for current_cell = 1:num_cells
     end
 end
 
-for i = 1:num_particles
-    %assign each particle to its cell
-    cell_index = floor(particle(i).pos_z/dz)+1;  %+1 b/c we can't index from 0
-    %cell_index
-    particle(i).cell = cell_index;  %keep track of which cell the particle is in
-    %this finds indices correctly
-    cell(cell_index).num_particles = cell(cell_index).num_particles +1;  
-    %cell(cell_index).num_particles;
-end
-
-%calculate charge density on each cell
-CV = -dz^2/epsilon_0;
-%sum over Wz's (the shape/weighting functions)
-%use Wz = 1 when in left half of cell, and 0 when in right half of cell
-% 1 when z<(delta z)/2
-% 0 when z>(delta z)/2
-for cell_index = 1:num_cells
-    Wz_sum = 0;
-    for i = 1:num_particles
-        if (particle(i).pos_z - (cell_index-1)*dz) < dz/2  %subtract off the start of each cell's position, to see if particle is located in left 1/2 or right 1/2 of the cell
-            Wz = 1;
-        else
-            Wz = 0;
-        end
-        Wz_sum = Wz_sum + Wz;
-    end
-    cell(cell_index).rho = rho_background*(1- (num_cells/num_particles)*Wz_sum);
-    
-    %setup rhs of Poisson matrix equation
-    rhs(cell_index) = CV*cell(cell_index).rho;  %NOTE:  check the constants CV!
-    
-    %setup Poisson matrix main diagonal
-    A(cell_index,cell_index) = -2;
-    
-end
-
 %setup Poisson matrix off-diagonals
 for cell_index = 2:num_cells -1
     A(cell_index,cell_index+1) = 1;
     A(cell_index,cell_index-1) = 1;
+end
+%setup Poisson matrix main diagonal
+for cell_index = 1:num_cells
+    
+    A(cell_index,cell_index) = -2;
 end
 %explicitely  define the elements which are missed in the loop
 A(1,2) = 1;
@@ -116,8 +85,7 @@ A(num_cells, num_cells-1)= 1;
 %define the 2 non-tridiag elements which impose the PBCs
 A(1,num_cells) = 1;
 A(num_cells,1) = 1;
-
-V = A\(rhs');
+CV = -dz^2/epsilon_0;
 
 %create file
 movie = fopen(fullfile('C:\Users\Tim\Documents\CMSE890\particle_in_cell_methods\results\movie.xyz'),'w'); % w: open file for writing
@@ -125,6 +93,46 @@ movie = fopen(fullfile('C:\Users\Tim\Documents\CMSE890\particle_in_cell_methods\
 %% Main loop
 step = 0;
 while step<= N_steps
+    added_cell = 0;
+    for i = 1:num_particles
+        %assign each particle to its cell
+        cell_index = floor(particle(i).pos_z/dz)+1;  %+1 b/c we can't index from 0
+        if cell_index > num_cells   %NOTE: once we update this, num_cells gets +1, so next time, if need another cell, will still enter this loop
+            cell(cell_index).num_particles = 0;
+            num_cells = num_cells + 1;
+        end
+
+        cell_index
+        particle(i).cell = cell_index;  %keep track of which cell the particle is in
+        %this finds indices correctly
+        cell(cell_index).num_particles = cell(cell_index).num_particles +1;  
+        %cell(cell_index).num_particles;
+    end
+%ISSUE IS THAT THE PARTICLES ARE FLYING APPART
+    
+    %calculate charge density on each cell
+
+    %sum over Wz's (the shape/weighting functions)
+    %use Wz = 1 when in left half of cell, and 0 when in right half of cell
+    % 1 when z<(delta z)/2
+    % 0 when z>(delta z)/2
+    for cell_index = 1:num_cells
+        Wz_sum = 0;
+        for i = 1:num_particles
+            if (particle(i).pos_z - (cell_index-1)*dz) < dz/2  %subtract off the start of each cell's position, to see if particle is located in left 1/2 or right 1/2 of the cell
+                Wz = 1;
+            else
+                Wz = 0;
+            end
+            Wz_sum = Wz_sum + Wz;
+        end
+        cell(cell_index).rho = rho_background*(1- (num_cells/num_particles)*Wz_sum);
+
+        %setup rhs of Poisson matrix equation
+        rhs(cell_index) = CV*cell(cell_index).rho;  %NOTE:  check the constants CV    
+    end
+
+    V = A\(rhs');
 
     %% Calculate Electric field in each cell
     for i = 2:num_cells-1
@@ -139,13 +147,9 @@ while step<= N_steps
     %F = -eE
     for i = 1:num_particles
         particle(i).force = particle_charge*E(particle(i).cell);  %based on E at the location fo electron
+
         %particle(i).force
     end
-    %ISSUE IS THAT THE ELECTRONS ARE FEELING NO FORCES IF I HAVE IONS, B/C THERE IS NO E
-    %field!--> b/c I have no net charge in each cell!!
-    %if i DON'T INITIALIZE FORCES, THEN ELECTRONS FEEL FORCES!
-    %but if I do electrons only, everything just blows appart!, all
-    %repulsive
     
     
    %save to file BEFORE proceed to next iter--> so can save the initial
@@ -180,10 +184,16 @@ while step<= N_steps
             
     end
     
- 
-    
     step = step +1;
+    
+    %for plotting
+    particle_1_z(step) = particle(1).pos_z;
+    steps(step) = step;
+    
 end
+
+figure;
+plot(steps, particle_1_z);
 
 fclose(movie);
 
