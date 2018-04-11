@@ -5,7 +5,7 @@ clear all;
 %Timofey Golubev
 %% Parameters
 
-num_cells = 10;  
+num_cells = 30;  
 num_particles_x = 5;  %number of particles in the x direction OF THE SHEET
 num_particles_y = 5;
 particles_per_cell = num_particles_x*num_particles_y;
@@ -14,7 +14,7 @@ num_particles = particles_per_cell*num_cells; %these are COMPUTATIONAL particles
 conversion = 10^-10;  %to convert to Ansgtroms for movie file--> OVITO uses Angstroms
 
 distance_unit = 10^-9;  %distance units in meters
-L = 10*distance_unit;  %length of the system  %NOTE: seems that this # must be very high for it to oscillate (BUT ONLY 1 PLANE OSCILLATES!)..--> 
+L = 10000000*distance_unit;  %length of the system  %NOTE: seems that this # must be very high for it to oscillate (BUT ONLY 1 PLANE OSCILLATES!)..--> 
 %NOTE: ALL THIS IS DOING IS SETTING THE SIZE OF THE COMPUTATIONAL
 %PARTICLES, NOT THE ACTUAL ELECTRON SPACINGS!!!-->  B/C THE ELECTRON
 %DENSITY IS SET BY THE "electron_density" below
@@ -38,7 +38,7 @@ particle_V = initial_spacing^2*dz;  %volume of each computational particle
 %NOTE: THE COMOPUTATIONAL PARTICLE DENSITY DOES NOT NEED TO CORRESPOND THE
 %THE REAL ELECTRON DENSITY--> CAN HAVE MORE electrons per 1 computational
 %particle.
-electron_density = 10^16     %density of typical plasma
+electron_density = 10^16    %changed from 10^16 %density of typical plasma
 rho_background = e*electron_density;       %this specifies the density of plasma we have, since neutralizing background + integral over rho_particles = 0 net charge.
 % so I'm assumign that the plasma has ON AVERAGE: 10^16 electron/m^3, which are
 % neutralized by the rho_background
@@ -67,11 +67,14 @@ end
 
 %Initialize computational particles evenly distributed in the cells
 i = 1;
+prev_random_num = 0;
 for current_cell = 1:num_cells
-    random_num = rand(1);
-    while(prev_random_num -ra
-    pos_z = (current_cell-1)*dz + rand(1)*dz; %use random # to get initial positions (rand(1) generates random number btw 0 and 1).
-    %pos_z = (current_cell-1)*dz + dz/4;     %make x position be same for all particles within each cell -> plane of charge%starting position of the slabs is 1 particle at the dz/4 position, inside each cell
+%     random_num = rand(1);
+%     while(abs(prev_random_num -random_num) < 0.25*dz)
+%         random_num = rand(1);          %make sure initialization is not too close
+%     end
+    %pos_z = (current_cell-1)*dz + rand(1)*dz; %use random # to get initial positions (rand(1) generates random number btw 0 and 1).
+    pos_z = (current_cell-1)*dz + dz/4;     %make x position be same for all particles within each cell -> plane of charge%starting position of the slabs is 1 particle at the dz/4 position, inside each cell
     for m = 1:num_particles_x     
         for n = 1:num_particles_y
             particle(i).name = 'name';
@@ -87,7 +90,7 @@ for current_cell = 1:num_cells
             i = i+1;
         end
     end
-    prev_random_num = random_num;
+%     prev_random_num = random_num;
 end
 
 %create file
@@ -198,7 +201,11 @@ while step<= N_steps
             EWz_sum = EWz_sum + EWz;
         end
         particle(i).force = sigma*EWz_sum;  %based on E at the location fo electron
-        particle(178).force
+        
+        
+        %for testing
+        %OUTPUT ALL FORCES in 1st step on
+        particle(100).force
     end
     
     

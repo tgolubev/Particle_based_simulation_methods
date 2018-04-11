@@ -6,15 +6,15 @@ clear all;
 %% Parameters
 
 num_cells = 30;  
-num_particles_x = 5;  %number of particles in the x direction OF THE SHEET
-num_particles_y = 5;
+num_particles_x = 1;  %number of particles in the x direction OF THE SHEET
+num_particles_y = 1;
 particles_per_cell = num_particles_x*num_particles_y;
 num_particles = particles_per_cell*num_cells; %these are COMPUTATIONAL particles 
 
 conversion = 10^-10;  %to convert to Ansgtroms for movie file--> OVITO uses Angstroms
 
 distance_unit = 10^-9;  %distance units in meters
-L = 1000000*distance_unit;  %length of the system  %NOTE: seems that this # must be very high for it to oscillate (BUT ONLY 1 PLANE OSCILLATES!)..--> 
+L = 10000000*distance_unit;  %length of the system  %NOTE: seems that this # must be very high for it to oscillate (BUT ONLY 1 PLANE OSCILLATES!)..--> 
 %NOTE: ALL THIS IS DOING IS SETTING THE SIZE OF THE COMPUTATIONAL
 %PARTICLES, NOT THE ACTUAL ELECTRON SPACINGS!!!-->  B/C THE ELECTRON
 %DENSITY IS SET BY THE "electron_density" below
@@ -38,7 +38,7 @@ particle_V = initial_spacing^2*dz;  %volume of each computational particle
 %NOTE: THE COMOPUTATIONAL PARTICLE DENSITY DOES NOT NEED TO CORRESPOND THE
 %THE REAL ELECTRON DENSITY--> CAN HAVE MORE electrons per 1 computational
 %particle.
-electron_density = 10^16     %density of typical plasma
+electron_density = 10^16    %changed from 10^16 %density of typical plasma
 rho_background = e*electron_density;       %this specifies the density of plasma we have, since neutralizing background + integral over rho_particles = 0 net charge.
 % so I'm assumign that the plasma has ON AVERAGE: 10^16 electron/m^3, which are
 % neutralized by the rho_background
@@ -70,7 +70,7 @@ i = 1;
 prev_random_num = 0;
 for current_cell = 1:num_cells
     random_num = rand(1);
-    while(abs(prev_random_num -random_num) < 0.25*dz)
+    while(abs(prev_random_num -random_num) < 0.5*dz)
         random_num = rand(1);          %make sure initialization is not too close
     end
     pos_z = (current_cell-1)*dz + rand(1)*dz; %use random # to get initial positions (rand(1) generates random number btw 0 and 1).
@@ -90,7 +90,7 @@ for current_cell = 1:num_cells
             i = i+1;
         end
     end
-    prev_random_num = random_num;
+%     prev_random_num = random_num;
 end
 
 %create file
@@ -193,7 +193,7 @@ while step<= N_steps
     for i = 1:num_particles
         EWz_sum = 0;
         for cell_index = 1:num_cells
-            if (particle(i).pos_z - (cell_index-1)*dz) < dz/2  %subtract off the start of each cell's position, to see if particle is located in left 1/2 or right 1/2 of the cell
+            if abs(particle(i).pos_z - (cell_index-1)*dz) < dz/2  %subtract off the start of each cell's position, to see if particle is located in left 1/2 or right 1/2 of the cell
                 EWz = E(cell_index)*1;
             else
                 EWz = 0;  %E*Wz = 0 b/c Wz= 0
@@ -201,7 +201,15 @@ while step<= N_steps
             EWz_sum = EWz_sum + EWz;
         end
         particle(i).force = sigma*EWz_sum;  %based on E at the location fo electron
-        particle(178).force
+        
+        
+        %for testing
+        %OUTPUT ALL FORCES in 1st step felt by each plane..--> do for case
+        %of 1 particle per plane
+        for i = 1:num_cells
+            particle(i).force
+        end
+        
     end
     
     
@@ -241,9 +249,9 @@ while step<= N_steps
     end
     
     %OUTPUT FOR TESTING
-    particle(100).velocity
-    particle(100).pos_z
-    particle(100).force
+%    particle(100).velocity
+   % particle(100).pos_z
+   % particle(100).force
     
     step = step +1;
     
@@ -257,7 +265,7 @@ while step<= N_steps
     
     %for plotting
     particle_1_z(step) = particle(1).pos_z;
-    particle_100_z(step) = particle(100).pos_z;
+%    particle_100_z(step) = particle(100).pos_z;
     %particle_250_z(step) = particle(250).pos_z;
     
     steps(step) = step;
