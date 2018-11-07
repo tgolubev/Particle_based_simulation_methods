@@ -14,7 +14,9 @@ num_particles = particles_per_cell*num_cells; %these are COMPUTATIONAL particles
 conversion = 10^-10;  %to convert to Ansgtroms for movie file--> OVITO uses Angstroms
 
 distance_unit = 10^-9;  %distance units in meters
-L = 10000000*distance_unit;  %length of the system  %NOTE: seems that this # must be very high for it to oscillate (BUT ONLY 1 PLANE OSCILLATES!)..--> 
+L = 10000000*distance_unit; 
+
+%length of the system  %NOTE: seems that this # must be very high for it to oscillate (BUT ONLY 1 PLANE OSCILLATES!)..--> 
 %NOTE: ALL THIS IS DOING IS SETTING THE SIZE OF THE COMPUTATIONAL
 %PARTICLES, NOT THE ACTUAL ELECTRON SPACINGS!!!-->  B/C THE ELECTRON
 %DENSITY IS SET BY THE "electron_density" below
@@ -31,8 +33,8 @@ m_e = 9.10938356*10^-31;  %electron mass (kg)
 
 system_volume = L*(particles_per_cell*initial_spacing^2)
 
-dt = 10^-16;  %10^-16 time step allows it to run with a lower 
-N_steps = 10000;
+dt = 10^-16; 
+N_steps = 200000;
 particle_V = initial_spacing^2*dz;  %volume of each computational particle
 
 %NOTE: THE COMOPUTATIONAL PARTICLE DENSITY DOES NOT NEED TO CORRESPOND THE
@@ -49,7 +51,8 @@ m_particle = electron_density*m_e*particle_V;
 
 initial_vel = 0;%10^6;  %initial velocity for electrons
 
-
+% figure; %makes a figure window--> for use with live plotting
+% hold on
 
 %% Initializations
 
@@ -70,8 +73,9 @@ i = 1;
 prev_random_num = 0;
 for current_cell = 1:num_cells
     random_num = rand(1);
-    while(abs(prev_random_num -random_num) < 0.5*dz)
-        random_num = rand(1);          %make sure initialization is not too close
+    while(abs((1+random_num)-prev_random_num)  < 0.5*dz)  %FIND that0.5*dz, is a good cutoff for "too close", if do only slight distortion, i.e. 0.9, then don't have enough to cause the uniform oscillations
+        %the 1+, is b/c the random_num is in the cell to the right..., MAKE ONLY SLIGHT DISPLACEMENT FROM PERFECT SPACING, BE ALLOWED
+        random_num = rand(1);          %make sure initialization is not too close: THIS IS ESSENTIAL TO AVOID BLOWING UP IN ELECTRIC POTENTIAL
     end
     pos_z = (current_cell-1)*dz + rand(1)*dz; %use random # to get initial positions (rand(1) generates random number btw 0 and 1).
     %pos_z = (current_cell-1)*dz + dz/4;     %make x position be same for all particles within each cell -> plane of charge%starting position of the slabs is 1 particle at the dz/4 position, inside each cell
@@ -85,18 +89,38 @@ for current_cell = 1:num_cells
             %particle(i).position
             %position is being calculated correctly
             particle(i).force = 0;  %initialize with 0 force felt
+            particle(i).num_bndry_cross = 0;
             particle(i).velocity = initial_vel;
             %particle(i).velocity = 10^-10*rand(1);         %TRY TO USE A RANDOM VELOCITY
             i = i+1;
         end
     end
-%     prev_random_num = random_num;
+    prev_random_num = random_num;
+end
+
+%make array of z position, for plotting
+for i =  1:num_cells
+    z(i) = dz*(i-1);
 end
 
 %create file
 movie = fopen(fullfile('C:\Users\Tim\Documents\CMSE890\particle_in_cell_methods\results\movie.xyz'),'w'); % w: open file for writing
+particle1_Zpos =  fopen(fullfile('C:\Users\Tim\Documents\CMSE890\particle_in_cell_methods\results\particle1_Zpos.txt'),'w');      %storing the plasma oscillations for 1 particle, for plots
 
 %% Main loop
+% 
+% writerObj = VideoWriter('C:\Users\Tim\Documents\CMSE890\particle_in_cell_methods\results\particle_positions.mp4', 'MPEG-4'); % New
+% %rom Matlab Help, VideoWriter(filename,profile) creates a VideoWriter object and applies a set of properties tailored to a specific file format (such as 'MPEG-4' or 'Uncompressed AVI').
+% writerObj.FrameRate = 60; % How many frames per second.
+% writerObj.Quality = 100;
+% open(writerObj); 
+
+%setup y-values-->  just make them all 0 --> since just want to plot the z
+%positions
+  for i = 1:num_particles
+        y_value(i) = 0;
+  end
+
 step = 0;
 while step<= N_steps
     added_cell = 0;
@@ -152,6 +176,7 @@ while step<= N_steps
         
         cell(cell_index).rho = rho_background*(1- (num_cells/num_particles)*Wz_sum); %this gives the total charge on the grid (in each cell)
 
+        rho_grid(cell_index) = cell(cell_index).rho;  %for plotting
         %setup rhs of Poisson matrix equation
         rhs(cell_index) = CV*cell(cell_index).rho;  %NOTE:  check the constants CV    
     end
@@ -174,8 +199,10 @@ while step<= N_steps
     %define the 2 non-tridiag elements which impose the PBCs
     A(1,num_cells) = 1;
     A(num_cells,1) = 1;
+    
 
     V = A\(rhs');
+    
 
     %% Calculate Electric field in each cell
     for i = 2:num_cells-1
@@ -186,7 +213,6 @@ while step<= N_steps
     %E(num_cells) = 0;
     E(1) = (V(2) - V(num_cells))/(2*dz);
     E(num_cells) = (V(1) - V(num_cells-1))/(2*dz);
-
 
     %% Calculate Forces felt by each electron
     %F = sigma* sum(E(grid pts)* Wz        %need to use the shape fnc's again
@@ -206,9 +232,9 @@ while step<= N_steps
         %for testing
         %OUTPUT ALL FORCES in 1st step felt by each plane..--> do for case
         %of 1 particle per plane
-        for i = 1:num_cells
-            particle(i).force
-        end
+%         for i = 1:num_cells
+%             particle(i).force
+%         end
         
     end
     
@@ -242,8 +268,10 @@ while step<= N_steps
         %Apply PBC'S
         if particle(i).pos_z > L 
             particle(i).pos_z = particle(i).pos_z -L;
+            particle(i).num_bndry_cross = particle(i).num_bndry_cross + 1;  %keep track of # of bndry crossings to get absolute position, no jumps in the particle curve
         elseif particle(i).pos_z < 0
            particle(i).pos_z = particle(i).pos_z + L;
+           particle(i).num_bndry_cross = particle(i).num_bndry_cross - 1;
         end
             
     end
@@ -264,25 +292,52 @@ while step<= N_steps
     end
     
     %for plotting
-    particle_1_z(step) = particle(1).pos_z;
-%    particle_100_z(step) = particle(100).pos_z;
+    particle_1_z(step) = particle(1).pos_z + L*particle(1).num_bndry_cross; % add the # of bndry crossings so can remove the spikes in plots when particle crosses a bndry
+    middle_particle_z(step) = particle(floor(num_particles/2)).pos_z + L*particle(floor(num_particles/2)).num_bndry_cross;
+    fprintf(particle1_Zpos, '%.4e %.4e %.4e \r\n ', step, particle_1_z(step), middle_particle_z(step));
+    E_of_t(step) = E(floor(num_cells/2));
+    %    particle_100_z(step) = particle(100).pos_z;
     %particle_250_z(step) = particle(250).pos_z;
     
-    steps(step) = step;
+    time(step) = step*dt;
+ 
+
+    %for 1D animation of particle positions
     
+%     for i = 1:num_particles
+%         plot(particle(i).pos_z,y_value(i));
+%     end
+%     frame = getframe;
+%     writeVideo(writerObj, frame);
+    
+    
+       
+    %for live plotting of z position
+%      plot(steps, middle_particle_z);
 end
 
-fclose(movie);
+ hold off
+% close(writerObj); % Saves the movie.
 
+fclose(particle1_Zpos);
+% 
 figure;
-plot(steps, particle_1_z);
+plot(time, particle_1_z);
 
-figure;
-plot(steps, particle_100_z);
+figure
+plot(time, middle_particle_z);
 
-figure;
-plot(steps, particle_250_z);
+%plot E of center grid point vs. time
+figure
+plot(time(1:20000),E_of_t(1:20000))
 
+% figure;
+% plot(steps, particle_100_z);
+% 
+% figure;
+% plot(steps, particle_250_z);
+
+% movie(frames.cdata);  %view the movie
 
 
 

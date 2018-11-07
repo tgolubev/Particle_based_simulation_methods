@@ -1,6 +1,6 @@
 # Commet lines
 # Here we define compiler option, libraries and the target
-FLAGS = -O2 -Wall
+FLAGS = -O3 -Wall 
 
 # Here we make the executable file
 SRCS =   main.cpp atom.cpp io.cpp lennardjones.cpp statisticssampler.cpp system.cpp unitconverter.cpp vec2.cpp velocityverlet.cpp send_atoms.cpp extpotential.cpp

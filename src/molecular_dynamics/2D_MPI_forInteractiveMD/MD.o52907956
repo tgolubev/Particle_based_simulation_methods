@@ -1,0 +1,1528 @@
+
+Inactive Modules:
+  1) R     2) TBB
+
+The following have been reloaded with a version change:
+  1) Boost/1.47.0 => Boost/1.63.0     3) OpenMPI/1.4.3 => OpenMPI/2.0.2
+  2) GNU/4.4.5 => GNU/6.2
+
+[csp-016:02534] mca_base_component_repository_open: unable to open mca_mtl_psm: libpsm_infinipath.so.1: cannot open shared object file: No such file or directory (ignored)
+[csp-016:02535] mca_base_component_repository_open: unable to open mca_mtl_psm: libpsm_infinipath.so.1: cannot open shared object file: No such file or directory (ignored)
+[css-012:49561] mca_base_component_repository_open: unable to open mca_mtl_psm: libpsm_infinipath.so.1: cannot open shared object file: No such file or directory (ignored)
+[csn-033:86796] mca_base_component_repository_open: unable to open mca_mtl_psm: libpsm_infinipath.so.1: cannot open shared object file: No such file or directory (ignored)
+[csn-033:86797] mca_base_component_repository_open: unable to open mca_mtl_psm: libpsm_infinipath.so.1: cannot open shared object file: No such file or directory (ignored)
+One unit of length is 3.4e-10 meters
+One unit of velocity is 997.765 meters/second
+One unit of time is 3.40761e-13 seconds
+One unit of mass is 1.66054e-27 kg
+One unit of temperature is 119.735 K
+Epsilon is 0.010318 eV and sigma is 3.4 in Angstrom
+mass in LJ units39.948
+timestep in LJ units0.00586921
+One unit of length is 3.4e-10 meters
+One unit of velocity is 997.765 meters/second
+One unit of time is 3.40761e-13 seconds
+One unit of mass is 1.66054e-27 kg
+One unit of temperature is 119.735 K
+Epsilon is 0.010318 eV and sigma is 3.4 in Angstrom
+mass in LJ units39.948
+timestep in LJ units0.00586921
+system size = [100.588, 33.5294]
+num_atoms = 690
+            Timestep                Time Temperature(not K!)       KineticEnergy     PotentialEnergy         TotalEnergy
+potential position5.1
+One unit of length is 3.4e-10 meters
+One unit of velocity is 997.765 meters/second
+One unit of time is 3.40761e-13 seconds
+One unit of mass is 1.66054e-27 kg
+One unit of temperature is 119.735 K
+Epsilon is 0.010318 eV and sigma is 3.4 in Angstrom
+mass in LJ units39.948
+timestep in LJ units0.00586921
+system size = [100.588, 33.5294]
+num_atoms = 690
+            Timestep                Time Temperature(not K!)       KineticEnergy     PotentialEnergy         TotalEnergy
+One unit of length is 3.4e-10 meters
+One unit of velocity is 997.765 meters/second
+One unit of time is 3.40761e-13 seconds
+One unit of mass is 1.66054e-27 kg
+One unit of temperature is 119.735 K
+Epsilon is 0.010318 eV and sigma is 3.4 in Angstrom
+mass in LJ units39.948
+timestep in LJ units0.00586921
+system size = [100.588, 33.5294]
+num_atoms = 690
+            Timestep                Time Temperature(not K!)       KineticEnergy     PotentialEnergy         TotalEnergy
+One unit of length is 3.4e-10 meters
+One unit of velocity is 997.765 meters/second
+One unit of time is 3.40761e-13 seconds
+One unit of mass is 1.66054e-27 kg
+One unit of temperature is 119.735 K
+Epsilon is 0.010318 eV and sigma is 3.4 in Angstrom
+mass in LJ units39.948
+timestep in LJ units0.00586921
+system size = [100.588, 33.5294]
+num_atoms = 690
+            Timestep                Time Temperature(not K!)       KineticEnergy     PotentialEnergy         TotalEnergy
+                   1          0.00586921             114.449             78969.9                proc1             45518.4              124488
+                   1          0.00586921             114.448             78969.2                proc4             45518.4              124488
+                   1          0.00586921             114.448             78969.2                proc2             45518.4              124488
+                   1          0.00586921             114.448             78969.2                proc3             45518.4              124488
+potential position5.2
+potential position5.3
+potential position5.4
+potential position5.5
+potential position5.6
+potential position5.7
+potential position5.8
+potential position5.9
+potential position6
+potential position6.1
+                 101             0.59279             31.7653               21918                proc1             8510.89             30428.9
+                 101             0.59279             31.7712             21922.1                proc4             8152.95             30075.1
+                 101             0.59279             31.7712             21922.1                proc2             8152.91               30075
+                 101             0.59279             31.7712             21922.1                proc3             8152.88               30075
+potential position6.2
+potential position6.3
+potential position6.4
+potential position6.5
+potential position6.6
+potential position6.7
+potential position6.8
+potential position6.9
+potential position7
+potential position7.1
+                 201             1.17971             10.3546             7144.67                proc1             2445.17             9589.85
+                 201             1.17971              9.4714             6535.27                proc3                1974             8509.27
+                 201             1.17971             9.47144             6535.29                proc4             1974.02             8509.31
+                 201             1.17971             9.47141             6535.27                proc2             1974.03              8509.3
+potential position7.2
+potential position7.3
+potential position7.4
+potential position7.5
+potential position7.6
+potential position7.7
+potential position7.8
+potential position7.9
+potential position8
+potential position8.1
+                 301             1.76663             7.23873             4994.72                proc1            -3.98246             4990.74
+                 301             1.76663             6.58451             4543.31                proc3            -199.243             4344.07
+                 301             1.76663              6.5845              4543.3                proc4             -199.38             4343.92
+                 301             1.76663             6.58453             4543.33                proc2            -199.104             4344.22
+potential position8.2
+potential position8.3
+potential position8.4
+potential position8.5
+potential position8.6
+potential position8.7
+potential position8.8
+potential position8.9
+potential position9
+potential position9.1
+                 401             2.35355             5.22831             3607.54                proc1             104.677             3712.21
+                 401             2.35355             5.12307             3534.92                proc4            -354.814              3180.1
+                 401             2.35355             5.12306             3534.91                proc3            -354.583             3180.33
+                 401             2.35355             5.12267             3534.64                proc2            -354.271             3180.37
+potential position9.2
+potential position9.3
+potential position9.4
+potential position9.5
+potential position9.6
+potential position9.7
+potential position9.8
+potential position9.9
+potential position10
+potential position10.1
+                 501             2.94047             5.49183             3789.37                proc1            -370.097             3419.27
+                 501             2.94047             5.37495             3708.71                proc3            -839.112              2869.6
+                 501             2.94047              5.3754             3709.02                proc2            -838.487             2870.54
+                 501             2.94047             5.46605             3771.57                proc4            -797.299             2974.28
+potential position10.2
+potential position10.3
+potential position10.4
+potential position10.5
+potential position10.6
+potential position10.7
+potential position10.8
+potential position10.9
+potential position11
+potential position11.1
+                 601             3.52739             5.61207             3855.49                proc1            -923.236             2932.25
+                 601             3.52739             5.21829             3600.62                proc3            -1117.06             2483.56
+                 601             3.52739             5.22766              3591.4                proc2            -1125.47             2465.94
+                 601             3.52739             5.27331             3670.22                proc4            -1033.08             2637.14
+potential position11.2
+potential position11.3
+potential position11.4
+potential position11.5
+potential position11.6
+potential position11.7
+potential position11.8
+potential position11.9
+potential position12
+potential position12.1
+                 701             4.11431             5.42304             3714.78                proc1            -1003.92             2710.86
+                 701             4.11431             4.97051             3424.68                proc3            -1047.32             2377.36
+                 701             4.11431             4.95937             3461.64                proc4             -952.32             2509.32
+                 701             4.11431             4.96611             3416.68                proc2            -1085.08              2331.6
+potential position12.2
+potential position12.3
+potential position12.4
+potential position12.5
+potential position12.6
+potential position12.7
+potential position12.8
+potential position12.9
+potential position13
+potential position13.1
+                 801             4.70124             5.08651             3484.26                proc1            -892.176             2592.09
+                 801             4.70124             4.66223             3216.94                proc3            -442.276             2774.67
+                 801             4.70124             4.71556             3277.31                proc4            -228.904             3048.41
+                 801             4.70124             4.68548             3232.98                proc2              -566.2             2666.78
+potential position13.2
+potential position13.3
+potential position13.4
+potential position13.5
+potential position13.6
+potential position13.7
+potential position13.8
+potential position13.9
+potential position14
+potential position14.1
+                 901             5.28816             5.10066             3478.65                proc1            -728.854             2749.79
+                 901             5.28816             5.12462             3535.99                proc3             1138.31              4674.3
+                 901             5.28816               5.005             3453.45                proc2            -19.3694             3434.08
+                 901             5.28816             5.26553             3675.34                proc4             1184.66                4860
+potential position14.2
+potential position14.3
+potential position14.4
+potential position14.5
+potential position14.6
+potential position14.7
+potential position14.8
+potential position14.9
+potential position15
+potential position15.1
+                1001             5.87508                -nan                -nan                proc1                 nan                -nan
+                1001             5.87508         9.34958e+33         4.79633e+36                proc3         2.28308e+19         4.79633e+36
+                1001             5.87508                -nan                -nan                proc2                 nan                -nan
+                1001             5.87508                -nan                -nan                proc4                 nan                -nan
+potential position15.2
+potential position15.3
+potential position15.4
+potential position15.5
+potential position15.6
+potential position15.7
+potential position15.8
+potential position15.9
+potential position16
+potential position16.1
+                1101               6.462                -nan                -nan                proc1                 nan                -nan
+                1101               6.462                -nan                -nan                proc4                 nan                -nan
+                1101               6.462                -nan                -nan                proc3                 nan                -nan
+                1101               6.462                -nan                -nan                proc2                 nan                -nan
+potential position16.2
+potential position16.3
+potential position16.4
+potential position16.5
+potential position16.6
+potential position16.7
+potential position16.8
+potential position16.9
+potential position17
+potential position17.1
+                1201             7.04892                -nan                -nan                proc1                 nan                -nan
+                1201             7.04892                -nan                -nan                proc4                 nan                -nan
+                1201             7.04892                -nan                -nan                proc3                 nan                -nan
+                1201             7.04892                -nan                -nan                proc2                 nan                -nan
+potential position17.2
+potential position17.3
+potential position17.4
+potential position17.5
+potential position17.6
+potential position17.7
+potential position17.8
+potential position17.9
+potential position18
+potential position18.1
+                1301             7.63584                -nan                -nan                proc1                 nan                -nan
+                1301             7.63584                -nan                -nan                proc3                 nan                -nan
+                1301             7.63584                -nan                -nan                proc2                 nan                -nan
+                1301             7.63584                -nan                -nan                proc4                 nan                -nan
+potential position18.2
+potential position18.3
+potential position18.4
+potential position18.5
+potential position18.6
+potential position18.7
+potential position18.8
+potential position18.9
+potential position19
+potential position19.1
+                1401             8.22276                -nan                -nan                proc1                 nan                -nan
+                1401             8.22276                -nan                -nan                proc4                 nan                -nan
+                1401             8.22276                -nan                -nan                proc3                 nan                -nan
+                1401             8.22276                -nan                -nan                proc2                 nan                -nan
+potential position19.2
+potential position19.3
+potential position19.4
+potential position19.5
+potential position19.6
+potential position19.7
+potential position19.8
+potential position19.9
+potential position20
+potential position20.1
+                1501             8.80968                -nan                -nan                proc1                 nan                -nan
+                1501             8.80968                -nan                -nan                proc2                 nan                -nan
+                1501             8.80968                -nan                -nan                proc4                 nan                -nan
+                1501             8.80968                -nan                -nan                proc3                 nan                -nan
+potential position20.2
+potential position20.3
+potential position20.4
+potential position20.5
+potential position20.6
+potential position20.7
+potential position20.8
+potential position20.9
+potential position21
+potential position21.1
+                1601              9.3966                -nan                -nan                proc1                 nan                -nan
+                1601              9.3966                -nan                -nan                proc2                 nan                -nan
+                1601              9.3966                -nan                -nan                proc3                 nan                -nan
+                1601              9.3966                -nan                -nan                proc4                 nan                -nan
+potential position21.2
+potential position21.3
+potential position21.4
+potential position21.5
+potential position21.6
+potential position21.7
+potential position21.8
+potential position21.9
+potential position22
+potential position22.1
+                1701             9.98352                -nan                -nan                proc1                 nan                -nan
+                1701             9.98352                -nan                -nan                proc4                 nan                -nan
+                1701             9.98352                -nan                -nan                proc2                 nan                -nan
+                1701             9.98352                -nan                -nan                proc3                 nan                -nan
+potential position22.2
+potential position22.3
+potential position22.4
+potential position22.5
+potential position22.6
+potential position22.7
+potential position22.8
+potential position22.9
+potential position23
+potential position23.1
+                1801             10.5704                -nan                -nan                proc1                 nan                -nan
+                1801             10.5704                -nan                -nan                proc2                 nan                -nan
+                1801             10.5704                -nan                -nan                proc3                 nan                -nan
+                1801             10.5704                -nan                -nan                proc4                 nan                -nan
+potential position23.2
+potential position23.3
+potential position23.4
+potential position23.5
+potential position23.6
+potential position23.7
+potential position23.8
+potential position23.9
+potential position24
+potential position24.1
+                1901             11.1574                -nan                -nan                proc1                 nan                -nan
+                1901             11.1574                -nan                -nan                proc3                 nan                -nan
+                1901             11.1574                -nan                -nan                proc4                 nan                -nan
+                1901             11.1574                -nan                -nan                proc2                 nan                -nan
+potential position24.2
+potential position24.3
+potential position24.4
+potential position24.5
+potential position24.6
+potential position24.7
+potential position24.8
+potential position24.9
+potential position25
+potential position25.1
+                2001             11.7443                -nan                -nan                proc1                 nan                -nan
+                2001             11.7443                -nan                -nan                proc3                 nan                -nan
+                2001             11.7443                -nan                -nan                proc4                 nan                -nan
+                2001             11.7443                -nan                -nan                proc2                 nan                -nan
+potential position25.2
+potential position25.3
+potential position25.4
+potential position25.5
+potential position25.6
+potential position25.7
+potential position25.8
+potential position25.9
+potential position26
+potential position26.1
+                2101             12.3312                -nan                -nan                proc1                 nan                -nan
+                2101             12.3312                -nan                -nan                proc3                 nan                -nan
+                2101             12.3312                -nan                -nan                proc2                 nan                -nan
+                2101             12.3312                -nan                -nan                proc4                 nan                -nan
+potential position26.2
+potential position26.3
+potential position26.4
+potential position26.5
+potential position26.6
+potential position26.7
+potential position26.8
+potential position26.9
+potential position27
+potential position27.1
+                2201             12.9181                -nan                -nan                proc1                 nan                -nan
+                2201             12.9181                -nan                -nan                proc3                 nan                -nan
+                2201             12.9181                -nan                -nan                proc2                 nan                -nan
+                2201             12.9181                -nan                -nan                proc4                 nan                -nan
+potential position27.2
+potential position27.3
+potential position27.4
+potential position27.5
+potential position27.6
+potential position27.7
+potential position27.8
+potential position27.9
+potential position28
+potential position28.1
+                2301              13.505                -nan                -nan                proc1                 nan                -nan
+                2301              13.505                -nan                -nan                proc3                 nan                -nan
+                2301              13.505                -nan                -nan                proc2                 nan                -nan
+                2301              13.505                -nan                -nan                proc4                 nan                -nan
+potential position28.2
+potential position28.3
+potential position28.4
+potential position28.5
+potential position28.6
+potential position28.7
+potential position28.8
+potential position28.9
+potential position29
+potential position29.1
+                2401              14.092                -nan                -nan                proc1                 nan                -nan
+                2401              14.092                -nan                -nan                proc3                 nan                -nan
+                2401              14.092                -nan                -nan                proc2                 nan                -nan
+                2401              14.092                -nan                -nan                proc4                 nan                -nan
+potential position29.2
+potential position29.3
+potential position29.4
+potential position29.5
+potential position29.6
+potential position29.7
+potential position29.8
+potential position29.9
+potential position30
+potential position30.1
+                2501             14.6789                -nan                -nan                proc1                 nan                -nan
+                2501             14.6789                -nan                -nan                proc4                 nan                -nan
+                2501             14.6789                -nan                -nan                proc3                 nan                -nan
+                2501             14.6789                -nan                -nan                proc2                 nan                -nan
+potential position30.2
+potential position30.3
+potential position30.4
+potential position30.5
+potential position30.6
+potential position30.7
+potential position30.8
+potential position30.9
+potential position31
+potential position31.1
+                2601             15.2658                -nan                -nan                proc1                 nan                -nan
+                2601             15.2658                -nan                -nan                proc3                 nan                -nan
+                2601             15.2658                -nan                -nan                proc2                 nan                -nan
+                2601             15.2658                -nan                -nan                proc4                 nan                -nan
+potential position31.2
+potential position31.3
+potential position31.4
+potential position31.5
+potential position31.6
+potential position31.7
+potential position31.8
+potential position31.9
+potential position32
+potential position32.1
+                2701             15.8527                -nan                -nan                proc1                 nan                -nan
+                2701             15.8527                -nan                -nan                proc3                 nan                -nan
+                2701             15.8527                -nan                -nan                proc2                 nan                -nan
+                2701             15.8527                -nan                -nan                proc4                 nan                -nan
+potential position32.2
+potential position32.3
+potential position32.4
+potential position32.5
+potential position32.6
+potential position32.7
+potential position32.8
+potential position32.9
+potential position33
+potential position33.1
+                2801             16.4397                -nan                -nan                proc1                 nan                -nan
+                2801             16.4397                -nan                -nan                proc4                 nan                -nan
+                2801             16.4397                -nan                -nan                proc3                 nan                -nan
+                2801             16.4397                -nan                -nan                proc2                 nan                -nan
+potential position33.2
+potential position33.3
+potential position33.4
+potential position33.5
+potential position33.6
+potential position33.7
+potential position33.8
+potential position33.9
+potential position34
+potential position34.1
+                2901             17.0266                -nan                -nan                proc1                 nan                -nan
+                2901             17.0266                -nan                -nan                proc4                 nan                -nan
+                2901             17.0266                -nan                -nan                proc3                 nan                -nan
+                2901             17.0266                -nan                -nan                proc2                 nan                -nan
+potential position34.2
+potential position34.3
+potential position34.4
+potential position34.5
+potential position34.6
+potential position34.7
+potential position34.8
+potential position34.9
+potential position35
+potential position35.1
+                3001             17.6135                -nan                -nan                proc1                 nan                -nan
+                3001             17.6135                -nan                -nan                proc3                 nan                -nan
+                3001             17.6135                -nan                -nan                proc2                 nan                -nan
+                3001             17.6135                -nan                -nan                proc4                 nan                -nan
+potential position35.2
+potential position35.3
+potential position35.4
+potential position35.5
+potential position35.6
+potential position35.7
+potential position35.8
+potential position35.9
+potential position36
+potential position36.1
+                3101             18.2004                -nan                -nan                proc1                 nan                -nan
+                3101             18.2004                -nan                -nan                proc2                 nan                -nan
+                3101             18.2004                -nan                -nan                proc4                 nan                -nan
+                3101             18.2004                -nan                -nan                proc3                 nan                -nan
+potential position36.2
+potential position36.3
+potential position36.4
+potential position36.5
+potential position36.6
+potential position36.7
+potential position36.8
+potential position36.9
+potential position37
+potential position37.1
+                3201             18.7873                -nan                -nan                proc1                 nan                -nan
+                3201             18.7873                -nan                -nan                proc4                 nan                -nan
+                3201             18.7873                -nan                -nan                proc3                 nan                -nan
+                3201             18.7873                -nan                -nan                proc2                 nan                -nan
+potential position37.2
+potential position37.3
+potential position37.4
+potential position37.5
+potential position37.6
+potential position37.7
+potential position37.8
+potential position37.9
+potential position38
+potential position38.1
+                3301             19.3743                -nan                -nan                proc1                 nan                -nan
+                3301             19.3743                -nan                -nan                proc3                 nan                -nan
+                3301             19.3743                -nan                -nan                proc2                 nan                -nan
+                3301             19.3743                -nan                -nan                proc4                 nan                -nan
+potential position38.2
+potential position38.3
+potential position38.4
+potential position38.5
+potential position38.6
+potential position38.7
+potential position38.8
+potential position38.9
+potential position39
+potential position39.1
+                3401             19.9612                -nan                -nan                proc1                 nan                -nan
+                3401             19.9612                -nan                -nan                proc4                 nan                -nan
+                3401             19.9612                -nan                -nan                proc3                 nan                -nan
+                3401             19.9612                -nan                -nan                proc2                 nan                -nan
+potential position39.2
+potential position39.3
+potential position39.4
+potential position39.5
+potential position39.6
+potential position39.7
+potential position39.8
+potential position39.9
+potential position40
+potential position40.1
+                3501             20.5481                -nan                -nan                proc1                 nan                -nan
+                3501             20.5481                -nan                -nan                proc4                 nan                -nan
+                3501             20.5481                -nan                -nan                proc3                 nan                -nan
+                3501             20.5481                -nan                -nan                proc2                 nan                -nan
+potential position40.2
+potential position40.3
+potential position40.4
+potential position40.5
+potential position40.6
+potential position40.7
+potential position40.8
+potential position40.9
+potential position41
+potential position41.1
+                3601              21.135                -nan                -nan                proc1                 nan                -nan
+                3601              21.135                -nan                -nan                proc3                 nan                -nan
+                3601              21.135                -nan                -nan                proc4                 nan                -nan
+                3601              21.135                -nan                -nan                proc2                 nan                -nan
+potential position41.2
+potential position41.3
+potential position41.4
+potential position41.5
+potential position41.6
+potential position41.7
+potential position41.8
+potential position41.9
+potential position42
+potential position42.1
+                3701             21.7219                -nan                -nan                proc1                 nan                -nan
+                3701             21.7219                -nan                -nan                proc3                 nan                -nan
+                3701             21.7219                -nan                -nan                proc2                 nan                -nan
+                3701             21.7219                -nan                -nan                proc4                 nan                -nan
+potential position42.2
+potential position42.3
+potential position42.4
+potential position42.5
+potential position42.6
+potential position42.7
+potential position42.8
+potential position42.9
+potential position43
+potential position43.1
+                3801             22.3089                -nan                -nan                proc1                 nan                -nan
+                3801             22.3089                -nan                -nan                proc4                 nan                -nan
+                3801             22.3089                -nan                -nan                proc3                 nan                -nan
+                3801             22.3089                -nan                -nan                proc2                 nan                -nan
+potential position43.2
+potential position43.3
+potential position43.4
+potential position43.5
+potential position43.6
+potential position43.7
+potential position43.8
+potential position43.9
+potential position44
+potential position44.1
+                3901             22.8958                -nan                -nan                proc1                 nan                -nan
+                3901             22.8958                -nan                -nan                proc3                 nan                -nan
+                3901             22.8958                -nan                -nan                proc2                 nan                -nan
+                3901             22.8958                -nan                -nan                proc4                 nan                -nan
+potential position44.2
+potential position44.3
+potential position44.4
+potential position44.5
+potential position44.6
+potential position44.7
+potential position44.8
+potential position44.9
+potential position45
+potential position45.1
+                4001             23.4827                -nan                -nan                proc1                 nan                -nan
+                4001             23.4827                -nan                -nan                proc3                 nan                -nan
+                4001             23.4827                -nan                -nan                proc2                 nan                -nan
+                4001             23.4827                -nan                -nan                proc4                 nan                -nan
+potential position45.2
+potential position45.3
+potential position45.4
+potential position45.5
+potential position45.6
+potential position45.7
+potential position45.8
+potential position45.9
+potential position46
+potential position46.1
+                4101             24.0696                -nan                -nan                proc1                 nan                -nan
+                4101             24.0696                -nan                -nan                proc4                 nan                -nan
+                4101             24.0696                -nan                -nan                proc3                 nan                -nan
+                4101             24.0696                -nan                -nan                proc2                 nan                -nan
+potential position46.2
+potential position46.3
+potential position46.4
+potential position46.5
+potential position46.6
+potential position46.7
+potential position46.8
+potential position46.9
+potential position47
+potential position47.1
+                4201             24.6565                -nan                -nan                proc1                 nan                -nan
+                4201             24.6565                -nan                -nan                proc3                 nan                -nan
+                4201             24.6565                -nan                -nan                proc4                 nan                -nan
+                4201             24.6565                -nan                -nan                proc2                 nan                -nan
+potential position47.2
+potential position47.3
+potential position47.4
+potential position47.5
+potential position47.6
+potential position47.7
+potential position47.8
+potential position47.9
+potential position48
+potential position48.1
+                4301             25.2435                -nan                -nan                proc1                 nan                -nan
+                4301             25.2435                -nan                -nan                proc3                 nan                -nan
+                4301             25.2435                -nan                -nan                proc4                 nan                -nan
+                4301             25.2435                -nan                -nan                proc2                 nan                -nan
+potential position48.2
+potential position48.3
+potential position48.4
+potential position48.5
+potential position48.6
+potential position48.7
+potential position48.8
+potential position48.9
+potential position49
+potential position49.1
+                4401             25.8304                -nan                -nan                proc1                 nan                -nan
+                4401             25.8304                -nan                -nan                proc3                 nan                -nan
+                4401             25.8304                -nan                -nan                proc2                 nan                -nan
+                4401             25.8304                -nan                -nan                proc4                 nan                -nan
+potential position49.2
+potential position49.3
+potential position49.4
+potential position49.5
+potential position49.6
+potential position49.7
+potential position49.8
+potential position49.9
+potential position50
+potential position50.1
+                4501             26.4173                -nan                -nan                proc1                 nan                -nan
+                4501             26.4173                -nan                -nan                proc3                 nan                -nan
+                4501             26.4173                -nan                -nan                proc2                 nan                -nan
+                4501             26.4173                -nan                -nan                proc4                 nan                -nan
+potential position50.2
+potential position50.3
+potential position50.4
+potential position50.5
+potential position50.6
+potential position50.7
+potential position50.8
+potential position50.9
+potential position51
+potential position51.1
+                4601             27.0042                -nan                -nan                proc1                 nan                -nan
+                4601             27.0042                -nan                -nan                proc3                 nan                -nan
+                4601             27.0042                -nan                -nan                proc2                 nan                -nan
+                4601             27.0042                -nan                -nan                proc4                 nan                -nan
+potential position51.2
+potential position51.3
+potential position51.4
+potential position51.5
+potential position51.6
+potential position51.7
+potential position51.8
+potential position51.9
+potential position52
+potential position52.1
+                4701             27.5911                -nan                -nan                proc1                 nan                -nan
+                4701             27.5911                -nan                -nan                proc3                 nan                -nan
+                4701             27.5911                -nan                -nan                proc2                 nan                -nan
+                4701             27.5911                -nan                -nan                proc4                 nan                -nan
+potential position52.2
+potential position52.3
+potential position52.4
+potential position52.5
+potential position52.6
+potential position52.7
+potential position52.8
+potential position52.9
+potential position53
+potential position53.1
+                4801             28.1781                -nan                -nan                proc1                 nan                -nan
+                4801             28.1781                -nan                -nan                proc3                 nan                -nan
+                4801             28.1781                -nan                -nan                proc2                 nan                -nan
+                4801             28.1781                -nan                -nan                proc4                 nan                -nan
+potential position53.2
+potential position53.3
+potential position53.4
+potential position53.5
+potential position53.6
+potential position53.7
+potential position53.8
+potential position53.9
+potential position54
+potential position54.1
+                4901              28.765                -nan                -nan                proc1                 nan                -nan
+                4901              28.765                -nan                -nan                proc4                 nan                -nan
+                4901              28.765                -nan                -nan                proc3                 nan                -nan
+                4901              28.765                -nan                -nan                proc2                 nan                -nan
+potential position54.2
+potential position54.3
+potential position54.4
+potential position54.5
+potential position54.6
+potential position54.7
+potential position54.8
+potential position54.9
+potential position55
+potential position55.1
+                5001             29.3519                -nan                -nan                proc1                 nan                -nan
+                5001             29.3519                -nan                -nan                proc3                 nan                -nan
+                5001             29.3519                -nan                -nan                proc2                 nan                -nan
+                5001             29.3519                -nan                -nan                proc4                 nan                -nan
+potential position55.2
+potential position55.3
+potential position55.4
+potential position55.5
+potential position55.6
+potential position55.7
+potential position55.8
+potential position55.9
+potential position56
+potential position56.1
+                5101             29.9388                -nan                -nan                proc1                 nan                -nan
+                5101             29.9388                -nan                -nan                proc2                 nan                -nan
+                5101             29.9388                -nan                -nan                proc3                 nan                -nan
+                5101             29.9388                -nan                -nan                proc4                 nan                -nan
+potential position56.2
+potential position56.3
+potential position56.4
+potential position56.5
+potential position56.6
+potential position56.7
+potential position56.8
+potential position56.9
+potential position57
+potential position57.1
+                5201             30.5258                -nan                -nan                proc1                 nan                -nan
+                5201             30.5258                -nan                -nan                proc4                 nan                -nan
+                5201             30.5258                -nan                -nan                proc2                 nan                -nan
+                5201             30.5258                -nan                -nan                proc3                 nan                -nan
+potential position57.2
+potential position57.3
+potential position57.4
+potential position57.5
+potential position57.6
+potential position57.7
+potential position57.8
+potential position57.9
+potential position58
+potential position58.1
+                5301             31.1127                -nan                -nan                proc1                 nan                -nan
+                5301             31.1127                -nan                -nan                proc2                 nan                -nan
+                5301             31.1127                -nan                -nan                proc3                 nan                -nan
+                5301             31.1127                -nan                -nan                proc4                 nan                -nan
+potential position58.2
+potential position58.3
+potential position58.4
+potential position58.5
+potential position58.6
+potential position58.7
+potential position58.8
+potential position58.9
+potential position59
+potential position59.1
+                5401             31.6996                -nan                -nan                proc1                 nan                -nan
+                5401             31.6996                -nan                -nan                proc3                 nan                -nan
+                5401             31.6996                -nan                -nan                proc4                 nan                -nan
+                5401             31.6996                -nan                -nan                proc2                 nan                -nan
+potential position59.2
+potential position59.3
+potential position59.4
+potential position59.5
+potential position59.6
+potential position59.7
+potential position59.8
+potential position59.9
+potential position60
+potential position60.1
+                5501             32.2865                -nan                -nan                proc1                 nan                -nan
+                5501             32.2865                -nan                -nan                proc2                 nan                -nan
+                5501             32.2865                -nan                -nan                proc3                 nan                -nan
+                5501             32.2865                -nan                -nan                proc4                 nan                -nan
+potential position60.2
+potential position60.3
+potential position60.4
+potential position60.5
+potential position60.6
+potential position60.7
+potential position60.8
+potential position60.9
+potential position61
+potential position61.1
+                5601             32.8734                -nan                -nan                proc1                 nan                -nan
+                5601             32.8734                -nan                -nan                proc4                 nan                -nan
+                5601             32.8734                -nan                -nan                proc2                 nan                -nan
+                5601             32.8734                -nan                -nan                proc3                 nan                -nan
+potential position61.2
+potential position61.3
+potential position61.4
+potential position61.5
+potential position61.6
+potential position61.7
+potential position61.8
+potential position61.9
+potential position62
+potential position62.1
+                5701             33.4604                -nan                -nan                proc1                 nan                -nan
+                5701             33.4604                -nan                -nan                proc2                 nan                -nan
+                5701             33.4604                -nan                -nan                proc3                 nan                -nan
+                5701             33.4604                -nan                -nan                proc4                 nan                -nan
+potential position62.2
+potential position62.3
+potential position62.4
+potential position62.5
+potential position62.6
+potential position62.7
+potential position62.8
+potential position62.9
+potential position63
+potential position63.1
+                5801             34.0473                -nan                -nan                proc1                 nan                -nan
+                5801             34.0473                -nan                -nan                proc2                 nan                -nan
+                5801             34.0473                -nan                -nan                proc3                 nan                -nan
+                5801             34.0473                -nan                -nan                proc4                 nan                -nan
+potential position63.2
+potential position63.3
+potential position63.4
+potential position63.5
+potential position63.6
+potential position63.7
+potential position63.8
+potential position63.9
+potential position64
+potential position64.1
+                5901             34.6342                -nan                -nan                proc1                 nan                -nan
+                5901             34.6342                -nan                -nan                proc2                 nan                -nan
+                5901             34.6342                -nan                -nan                proc3                 nan                -nan
+                5901             34.6342                -nan                -nan                proc4                 nan                -nan
+potential position64.2
+potential position64.3
+potential position64.4
+potential position64.5
+potential position64.6
+potential position64.7
+potential position64.8
+potential position64.9
+potential position65
+potential position65.1
+                6001             35.2211                -nan                -nan                proc1                 nan                -nan
+                6001             35.2211                -nan                -nan                proc2                 nan                -nan
+                6001             35.2211                -nan                -nan                proc4                 nan                -nan
+                6001             35.2211                -nan                -nan                proc3                 nan                -nan
+potential position65.2
+potential position65.3
+potential position65.4
+potential position65.5
+potential position65.6
+potential position65.7
+potential position65.8
+potential position65.9
+potential position66
+potential position66.1
+                6101              35.808                -nan                -nan                proc1                 nan                -nan
+                6101              35.808                -nan                -nan                proc4                 nan                -nan
+                6101              35.808                -nan                -nan                proc2                 nan                -nan
+                6101              35.808                -nan                -nan                proc3                 nan                -nan
+potential position66.2
+potential position66.3
+potential position66.4
+potential position66.5
+potential position66.6
+potential position66.7
+potential position66.8
+potential position66.9
+potential position67
+potential position67.1
+                6201              36.395                -nan                -nan                proc1                 nan                -nan
+                6201              36.395                -nan                -nan                proc4                 nan                -nan
+                6201              36.395                -nan                -nan                proc2                 nan                -nan
+                6201              36.395                -nan                -nan                proc3                 nan                -nan
+potential position67.2
+potential position67.3
+potential position67.4
+potential position67.5
+potential position67.6
+potential position67.7
+potential position67.8
+potential position67.9
+potential position68
+potential position68.1
+                6301             36.9819                -nan                -nan                proc1                 nan                -nan
+                6301             36.9819                -nan                -nan                proc3                 nan                -nan
+                6301             36.9819                -nan                -nan                proc4                 nan                -nan
+                6301             36.9819                -nan                -nan                proc2                 nan                -nan
+potential position68.2
+potential position68.3
+potential position68.4
+potential position68.5
+potential position68.6
+potential position68.7
+potential position68.8
+potential position68.9
+potential position69
+potential position69.1
+                6401             37.5688                -nan                -nan                proc1                 nan                -nan
+                6401             37.5688                -nan                -nan                proc4                 nan                -nan
+                6401             37.5688                -nan                -nan                proc3                 nan                -nan
+                6401             37.5688                -nan                -nan                proc2                 nan                -nan
+potential position69.2
+potential position69.3
+potential position69.4
+potential position69.5
+potential position69.6
+potential position69.7
+potential position69.8
+potential position69.9
+potential position70
+potential position70.1
+                6501             38.1557                -nan                -nan                proc1                 nan                -nan
+                6501             38.1557                -nan                -nan                proc3                 nan                -nan
+                6501             38.1557                -nan                -nan                proc4                 nan                -nan
+                6501             38.1557                -nan                -nan                proc2                 nan                -nan
+potential position70.2
+potential position70.3
+potential position70.4
+potential position70.5
+potential position70.6
+potential position70.7
+potential position70.8
+potential position70.9
+potential position71
+potential position71.1
+                6601             38.7426                -nan                -nan                proc1                 nan                -nan
+                6601             38.7426                -nan                -nan                proc3                 nan                -nan
+                6601             38.7426                -nan                -nan                proc2                 nan                -nan
+                6601             38.7426                -nan                -nan                proc4                 nan                -nan
+potential position71.2
+potential position71.3
+potential position71.4
+potential position71.5
+potential position71.6
+potential position71.7
+potential position71.8
+potential position71.9
+potential position72
+potential position72.1
+                6701             39.3296                -nan                -nan                proc1                 nan                -nan
+                6701             39.3296                -nan                -nan                proc3                 nan                -nan
+                6701             39.3296                -nan                -nan                proc4                 nan                -nan
+                6701             39.3296                -nan                -nan                proc2                 nan                -nan
+potential position72.2
+potential position72.3
+potential position72.4
+potential position72.5
+potential position72.6
+potential position72.7
+potential position72.8
+potential position72.9
+potential position73
+potential position73.1
+                6801             39.9165                -nan                -nan                proc1                 nan                -nan
+                6801             39.9165                -nan                -nan                proc3                 nan                -nan
+                6801             39.9165                -nan                -nan                proc2                 nan                -nan
+                6801             39.9165                -nan                -nan                proc4                 nan                -nan
+potential position73.2
+potential position73.3
+potential position73.4
+potential position73.5
+potential position73.6
+potential position73.7
+potential position73.8
+potential position73.9
+potential position74
+potential position74.1
+                6901             40.5034                -nan                -nan                proc1                 nan                -nan
+                6901             40.5034                -nan                -nan                proc2                 nan                -nan
+                6901             40.5034                -nan                -nan                proc3                 nan                -nan
+                6901             40.5034                -nan                -nan                proc4                 nan                -nan
+potential position74.2
+potential position74.3
+potential position74.4
+potential position74.5
+potential position74.6
+potential position74.7
+potential position74.8
+potential position74.9
+potential position75
+potential position75.1
+                7001             41.0903                -nan                -nan                proc1                 nan                -nan
+                7001             41.0903                -nan                -nan                proc2                 nan                -nan
+                7001             41.0903                -nan                -nan                proc3                 nan                -nan
+                7001             41.0903                -nan                -nan                proc4                 nan                -nan
+potential position75.2
+potential position75.3
+potential position75.4
+potential position75.5
+potential position75.6
+potential position75.7
+potential position75.8
+potential position75.9
+potential position76
+potential position76.1
+                7101             41.6772                -nan                -nan                proc1                 nan                -nan
+                7101             41.6772                -nan                -nan                proc2                 nan                -nan
+                7101             41.6772                -nan                -nan                proc3                 nan                -nan
+                7101             41.6772                -nan                -nan                proc4                 nan                -nan
+potential position76.2
+potential position76.3
+potential position76.4
+potential position76.5
+potential position76.6
+potential position76.7
+potential position76.8
+potential position76.9
+potential position77
+potential position77.1
+                7201             42.2642                -nan                -nan                proc1                 nan                -nan
+                7201             42.2642                -nan                -nan                proc2                 nan                -nan
+                7201             42.2642                -nan                -nan                proc3                 nan                -nan
+                7201             42.2642                -nan                -nan                proc4                 nan                -nan
+potential position77.2
+potential position77.3
+potential position77.4
+potential position77.5
+potential position77.6
+potential position77.7
+potential position77.8
+potential position77.9
+potential position78
+potential position78.1
+                7301             42.8511                -nan                -nan                proc1                 nan                -nan
+                7301             42.8511                -nan                -nan                proc2                 nan                -nan
+                7301             42.8511                -nan                -nan                proc3                 nan                -nan
+                7301             42.8511                -nan                -nan                proc4                 nan                -nan
+potential position78.2
+potential position78.3
+potential position78.4
+potential position78.5
+potential position78.6
+potential position78.7
+potential position78.8
+potential position78.9
+potential position79
+potential position79.1
+                7401              43.438                -nan                -nan                proc1                 nan                -nan
+                7401              43.438                -nan                -nan                proc2                 nan                -nan
+                7401              43.438                -nan                -nan                proc4                 nan                -nan
+                7401              43.438                -nan                -nan                proc3                 nan                -nan
+potential position79.2
+potential position79.3
+potential position79.4
+potential position79.5
+potential position79.6
+potential position79.7
+potential position79.8
+potential position79.9
+potential position80
+potential position80.1
+                7501             44.0249                -nan                -nan                proc1                 nan                -nan
+                7501             44.0249                -nan                -nan                proc2                 nan                -nan
+                7501             44.0249                -nan                -nan                proc3                 nan                -nan
+                7501             44.0249                -nan                -nan                proc4                 nan                -nan
+potential position80.2
+potential position80.3
+potential position80.4
+potential position80.5
+potential position80.6
+potential position80.7
+potential position80.8
+potential position80.9
+potential position81
+potential position81.1
+                7601             44.6118                -nan                -nan                proc1                 nan                -nan
+                7601             44.6118                -nan                -nan                proc2                 nan                -nan
+                7601             44.6118                -nan                -nan                proc3                 nan                -nan
+                7601             44.6118                -nan                -nan                proc4                 nan                -nan
+potential position81.2
+potential position81.3
+potential position81.4
+potential position81.5
+potential position81.6
+potential position81.7
+potential position81.8
+potential position81.9
+potential position82
+potential position82.1
+                7701             45.1988                -nan                -nan                proc1                 nan                -nan
+                7701             45.1988                -nan                -nan                proc2                 nan                -nan
+                7701             45.1988                -nan                -nan                proc4                 nan                -nan
+                7701             45.1988                -nan                -nan                proc3                 nan                -nan
+potential position82.2
+potential position82.3
+potential position82.4
+potential position82.5
+potential position82.6
+potential position82.7
+potential position82.8
+potential position82.9
+potential position83
+potential position83.1
+                7801             45.7857                -nan                -nan                proc1                 nan                -nan
+                7801             45.7857                -nan                -nan                proc4                 nan                -nan
+                7801             45.7857                -nan                -nan                proc2                 nan                -nan
+                7801             45.7857                -nan                -nan                proc3                 nan                -nan
+potential position83.2
+potential position83.3
+potential position83.4
+potential position83.5
+potential position83.6
+potential position83.7
+potential position83.8
+potential position83.9
+potential position84
+potential position84.1
+                7901             46.3726                -nan                -nan                proc1                 nan                -nan
+                7901             46.3726                -nan                -nan                proc2                 nan                -nan
+                7901             46.3726                -nan                -nan                proc3                 nan                -nan
+                7901             46.3726                -nan                -nan                proc4                 nan                -nan
+potential position84.2
+potential position84.3
+potential position84.4
+potential position84.5
+potential position84.6
+potential position84.7
+potential position84.8
+potential position84.9
+potential position85
+potential position85.1
+                8001             46.9595                -nan                -nan                proc1                 nan                -nan
+                8001             46.9595                -nan                -nan                proc2                 nan                -nan
+                8001             46.9595                -nan                -nan                proc3                 nan                -nan
+                8001             46.9595                -nan                -nan                proc4                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8101             47.5465                -nan                -nan                proc1                 nan                -nan
+                8101             47.5465                -nan                -nan                proc2                 nan                -nan
+                8101             47.5465                -nan                -nan                proc3                 nan                -nan
+                8101             47.5465                -nan                -nan                proc4                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8201             48.1334                -nan                -nan                proc1                 nan                -nan
+                8201             48.1334                -nan                -nan                proc2                 nan                -nan
+                8201             48.1334                -nan                -nan                proc4                 nan                -nan
+                8201             48.1334                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8301             48.7203                -nan                -nan                proc1                 nan                -nan
+                8301             48.7203                -nan                -nan                proc2                 nan                -nan
+                8301             48.7203                -nan                -nan                proc4                 nan                -nan
+                8301             48.7203                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8401             49.3072                -nan                -nan                proc1                 nan                -nan
+                8401             49.3072                -nan                -nan                proc2                 nan                -nan
+                8401             49.3072                -nan                -nan                proc4                 nan                -nan
+                8401             49.3072                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8501             49.8941                -nan                -nan                proc1                 nan                -nan
+                8501             49.8941                -nan                -nan                proc2                 nan                -nan
+                8501             49.8941                -nan                -nan                proc3                 nan                -nan
+                8501             49.8941                -nan                -nan                proc4                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8601             50.4811                -nan                -nan                proc1                 nan                -nan
+                8601             50.4811                -nan                -nan                proc2                 nan                -nan
+                8601             50.4811                -nan                -nan                proc4                 nan                -nan
+                8601             50.4811                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8701              51.068                -nan                -nan                proc1                 nan                -nan
+                8701              51.068                -nan                -nan                proc4                 nan                -nan
+                8701              51.068                -nan                -nan                proc2                 nan                -nan
+                8701              51.068                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8801             51.6549                -nan                -nan                proc1                 nan                -nan
+                8801             51.6549                -nan                -nan                proc4                 nan                -nan
+                8801             51.6549                -nan                -nan                proc2                 nan                -nan
+                8801             51.6549                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                8901             52.2418                -nan                -nan                proc1                 nan                -nan
+                8901             52.2418                -nan                -nan                proc2                 nan                -nan
+                8901             52.2418                -nan                -nan                proc4                 nan                -nan
+                8901             52.2418                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9001             52.8287                -nan                -nan                proc1                 nan                -nan
+                9001             52.8287                -nan                -nan                proc2                 nan                -nan
+                9001             52.8287                -nan                -nan                proc4                 nan                -nan
+                9001             52.8287                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9101             53.4157                -nan                -nan                proc1                 nan                -nan
+                9101             53.4157                -nan                -nan                proc2                 nan                -nan
+                9101             53.4157                -nan                -nan                proc3                 nan                -nan
+                9101             53.4157                -nan                -nan                proc4                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9201             54.0026                -nan                -nan                proc1                 nan                -nan
+                9201             54.0026                -nan                -nan                proc3                 nan                -nan
+                9201             54.0026                -nan                -nan                proc2                 nan                -nan
+                9201             54.0026                -nan                -nan                proc4                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9301             54.5895                -nan                -nan                proc1                 nan                -nan
+                9301             54.5895                -nan                -nan                proc4                 nan                -nan
+                9301             54.5895                -nan                -nan                proc3                 nan                -nan
+                9301             54.5895                -nan                -nan                proc2                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9401             55.1764                -nan                -nan                proc1                 nan                -nan
+                9401             55.1764                -nan                -nan                proc4                 nan                -nan
+                9401             55.1764                -nan                -nan                proc3                 nan                -nan
+                9401             55.1764                -nan                -nan                proc2                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9501             55.7633                -nan                -nan                proc1                 nan                -nan
+                9501             55.7633                -nan                -nan                proc2                 nan                -nan
+                9501             55.7633                -nan                -nan                proc4                 nan                -nan
+                9501             55.7633                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9601             56.3503                -nan                -nan                proc1                 nan                -nan
+                9601             56.3503                -nan                -nan                proc2                 nan                -nan
+                9601             56.3503                -nan                -nan                proc3                 nan                -nan
+                9601             56.3503                -nan                -nan                proc4                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9701             56.9372                -nan                -nan                proc1                 nan                -nan
+                9701             56.9372                -nan                -nan                proc4                 nan                -nan
+                9701             56.9372                -nan                -nan                proc2                 nan                -nan
+                9701             56.9372                -nan                -nan                proc3                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9801             57.5241                -nan                -nan                proc1                 nan                -nan
+                9801             57.5241                -nan                -nan                proc2                 nan                -nan
+                9801             57.5241                -nan                -nan                proc3                 nan                -nan
+                9801             57.5241                -nan                -nan                proc4                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+                9901              58.111                -nan                -nan                proc1                 nan                -nan
+                9901              58.111                -nan                -nan                proc2                 nan                -nan
+                9901              58.111                -nan                -nan                proc3                 nan                -nan
+                9901              58.111                -nan                -nan                proc4                 nan                -nan
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+potential position85.1
+Total CPU time for proc 1 is 311.919
+Total CPU time for proc 2 is 311.919
+Total CPU time for proc 0 is 311.919
+Total CPU time for proc 4 is 311.919
+Total CPU time for proc 3 is 311.919
+Job Id: 52907956.mgr-04.i
+    Job_Name = MD
+    Job_Owner = golubevt@dev-intel16-k80.i
+    resources_used.cput = 00:19:11
+    resources_used.energy_used = 0
+    resources_used.mem = 881804kb
+    resources_used.vmem = 4401268kb
+    resources_used.walltime = 00:04:05
+    job_state = R
+    queue = main
+    server = mgr-04.i
+    Checkpoint = u
+    ctime = Wed Feb 28 23:24:08 2018
+    Error_Path = dev-intel16-k80.i:/mnt/home/golubevt/Documents/molecular_dyna
+	mics/2D_MPI_forInteractiveMD/MD.e52907956
+    exec_host = csn-033/1,8+csp-016/11,17+css-012/0,2+css-016/3,16+css-026/4,7
+    Hold_Types = n
+    Join_Path = oe
+    Keep_Files = n
+    Mail_Points = a
+    mtime = Wed Feb 28 23:25:09 2018
+    Output_Path = dev-intel16-k80.i:/mnt/home/golubevt/Documents/molecular_dyn
+	amics/2D_MPI_forInteractiveMD/MD.o52907956
+    Priority = 0
+    qtime = Wed Feb 28 23:24:08 2018
+    Rerunable = False
+    Resource_List.nodes = 5:ppn=2
+    Resource_List.walltime = 00:10:00
+    Resource_List.nodect = 5
+    Resource_List.mem = 2048mb
+    session_id = 86484
+    Variable_List = PBS_O_QUEUE=main,PBS_O_HOME=/mnt/home/golubevt,
+	PBS_O_LOGNAME=golubevt,
+	PBS_O_PATH=/opt/software/OpenMPI/2.0.2--GCC-6.2/bin:/opt/software/GCC
+	/6.2/bin:/opt/software/powertools/bin:/opt/software/Stata/15.0/SE:/opt
+	/software/MATLAB/R2014a/bin:/opt/software/Python/2.7.2--GCC-4.4.5/bin:
+	/opt/software/cmake/2.8.5--GCC-4.4.5/bin:/usr/lib64/qt-3.3/bin:/opt/so
+	ftware/lmod/bin:/opt/moab/bin:/usr/local/bin:/bin:/usr/bin:/mnt/home/g
+	olubevt/p4vasp/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/hpcc/bin
+	:/opt/ibutils/bin,PBS_O_MAIL=/var/spool/mail/golubevt,
+	PBS_O_SHELL=/bin/bash,PBS_O_LANG=en_US.UTF-8,
+	PBS_O_WORKDIR=/mnt/home/golubevt/Documents/molecular_dynamics/2D_MPI_
+	forInteractiveMD,PBS_O_HOST=dev-intel16-k80.i,PBS_O_SERVER=mgr-04
+    euser = golubevt
+    egroup = pa
+    queue_type = E
+    etime = Wed Feb 28 23:24:08 2018
+    submit_args = Sub_cuda.qsub
+    start_time = Wed Feb 28 23:25:09 2018
+    Walltime.Remaining = 284
+    start_count = 1
+    fault_tolerant = False
+    job_radix = 0
+    submit_host = dev-intel16-k80.i
+    init_work_dir = /mnt/home/golubevt/Documents/molecular_dynamics/2D_MPI_for
+	InteractiveMD
+    request_version = 1
+

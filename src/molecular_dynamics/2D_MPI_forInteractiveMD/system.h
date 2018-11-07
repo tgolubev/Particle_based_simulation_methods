@@ -24,12 +24,13 @@ private:
     int m_steps = 0;
     int m_num_atoms;
 
+
 public:
 
     System();
     ~System();
     int m_sample_freq;
-    ExtPotential extPotential;  // create the external potential object
+    ExtPotential extPotential;
     void createFCCLattice(vec2 Total_systemSize, double latticeConstant, double temperature,  double mass);
     void createSCLattice(vec2 Total_systemSize, vec2 subsystemSize, double latticeConstant, double temperature,  double mass, vec2 subsystemOrigin);
     void createRandomPositions(int num_particles, double side_length, double temperature,  double mass);
