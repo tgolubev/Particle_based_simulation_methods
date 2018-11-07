@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     double side_length;
     double total_dt_time= 0.0;
 
-    vec2 Total_systemSize(120, 30); // since using SC lattice--> just gives # of atoms in each dimension
+    vec2 Total_systemSize(90, 30); // since using SC lattice--> just gives # of atoms in each dimension
     vec2 subsystemSize;
     subsystemSize[0] = Total_systemSize[0]/(nprocs-1);  //1D domain decomposition along x
     subsystemSize[1] = Total_systemSize[1];
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
     }
 
     //setup external potential--> object extPotential is declare as public member of system
-    system.extPotential.position.set(5.,system.systemSize(1)/2);
+    system.extPotential.position.set(5.,system.systemSize(1)/2.);
     system.extPotential.setMax(200.);  //200 is stable when use 1sigma for stdev
     system.extPotential.setStdev(UnitConverter::lengthFromAngstroms(1*sigma));
 
@@ -142,8 +142,10 @@ int main(int argc, char **argv)
         //move around the ext Potential to show example
         // in the full project, the positions are recieved from the X-box controller
         if(timestep % 10 == 0){
-               if(system.extPotential.position[0] < 85) system.extPotential.position[0] += 0.1;
-               //if(my_id == 0) cout << "potential position" << system.extPotential.position[0] <<std::endl;
+               if(system.extPotential.position[0] < 85) {
+                   system.extPotential.position[0] += 0.1;
+               }
+               //if(my_id == 0) cout << "potential position" << system.extPotential.position[1] <<std::endl;
         }
 
         if (my_id != 0) {
@@ -215,7 +217,7 @@ int main(int argc, char **argv)
 
         if (timestep % 100 == 0) {
             if (my_id == 0) {
-                fprintf(movie,"%d \n", NumGlobal);
+                fprintf(movie,"%d \n", NumGlobal + 1); // +1 b/c we want to visualize the external potential is represented as a particle
                 fprintf(movie,"%11.3f \n",timestep);  //comment line
 
                 int num=0;
@@ -232,7 +234,7 @@ int main(int argc, char **argv)
                 double x_pos = system.extPotential.position[0];
                 double y_pos = system.extPotential.position[1];
                 //std::cout << system.extPotential.position[0] << system.extPotential.position[1];
-                fprintf(movie, "Ar \t %11.3f \t %11.3f \n", x_pos, y_pos);
+                fprintf(movie, "Ar \t %11.3f \t %11.3f 0 \n", x_pos, y_pos);  //use 0 for the particle type, to distinguish the potential
             }
         }
     }
