@@ -12,8 +12,9 @@
 class System
 {
 private:
+    //m_ stands for member
     vec2 m_systemSize;
-    vec2 m_sim_size;      // simulation size
+    vec2 m_sim_size;  //will be just slightly larger than systemSize for purpose to make sure to include outer boundary atoms in the last processor
     vec2 m_subsystemSize;
     vec2 m_halfsystemSize;
     VelocityVerlet m_integrator;
@@ -44,7 +45,10 @@ public:
     void applyMirrorBCs_inX(double dt);
 
     void add_atoms(std::vector <double> new_atoms, double num_recieved);
-    int delete_atoms (std::vector <int> indices);
+
+    int delete_atoms (std::vector <int> indices);				//!< Pop atoms with local indices from local storage
+
+    //std::map <int, int> glob_to_loc_id_;  //!< Maps global sys_index to the local index of m_atoms an atom is stored at on each processor; the opposite conversion can be done with lookup of Atom::sys_index
 
     // Setters and getters
     std::vector<Atom *> &atoms() { return m_atoms; } // Calling atoms(): Returns a reference to the std::vector of atom pointers
@@ -56,16 +60,13 @@ public:
     double systemSize(int j) { return m_systemSize[j]; }
     double subsystemSize(int j) { return m_subsystemSize[j]; }
     double halfsystemSize(int j){return m_halfsystemSize[j];}
-
     void setSystemSize(vec2 systemSize) {
             m_systemSize = systemSize;
             m_halfsystemSize = 0.5*systemSize;
-    }
-
+        }
     void setSubSystemSize(vec2 subsystemSize) {
           m_subsystemSize = subsystemSize;
-    }
-
+        }
     void setSimSize(vec2 simSize){m_sim_size = simSize;}
 
 

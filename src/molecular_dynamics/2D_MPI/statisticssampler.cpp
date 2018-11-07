@@ -1,11 +1,3 @@
-//------------------------------------------------------------------------------------------------------
-// Implementation of StatisticsSampler class which contains all functions for calculating physical
-// quantities about the system such as temperature, pressure, etc.
-//
-//
-// Small modifications by Timofey Golubev
-//------------------------------------------------------------------------------------------------------
-
 #include "system.h"
 #include "statisticssampler.h"
 #include "lennardjones.h"
