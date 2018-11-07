@@ -1,3 +1,8 @@
+//------------------------------------------------------------------------------------------------------
+// Random class borrowed with permission from:
+// https://github.com/andeplane/molecular-dynamics-fys3150v
+//
+//------------------------------------------------------------------------------------------------------
 
 #ifndef RANDOM_H
 #define RANDOM_H

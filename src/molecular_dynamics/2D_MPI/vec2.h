@@ -1,3 +1,9 @@
+//------------------------------------------------------------------------------------------------------
+// Definition of 2D vector class which contains overloaded operators for
+// vector operations
+//
+//------------------------------------------------------------------------------------------------------
+
 #ifndef VEC2_H
 #define VEC2_H
 #include <string>

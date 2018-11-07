@@ -1,11 +1,19 @@
+//------------------------------------------------------------------------------------------------------
+// The IO class contains utility functions that can be used for I/O.
+
+// By: Timofey Golubev
+
+//------------------------------------------------------------------------------------------------------
+
 #include "io.h"
 #include "system.h"
 #include "atom.h"
 #include "unitconverter.h"
 #include "statisticssampler.h"
 #include <cstdlib>
-using std::endl; using std::cout;
 
+using std::endl;
+using std::cout;
 
 IO::IO(const char *filename)
 {
@@ -31,11 +39,10 @@ void IO::close() {
     }
 }
 
-// This saves the current state to a file following the xyz-standard (see http://en.wikipedia.org/wiki/XYZ_file_format )
-// It can easily be opened in Ovito. Note that you can also output more properties than just the position. You can print the
-// velocities per particle (or kinetic energy etc), and color the atoms in Ovito based on these properties.
-
-void IO::saveState(System &system, StatisticsSampler &statisticsSampler) //statisticsSampler object of the class StatisticsSampler is passed by reference
+//! This saves the current state to a file following the xyz-standard (see http://en.wikipedia.org/wiki/XYZ_file_format )
+//! It can easily be opened in Ovito. Note that you can also output more properties than just the position. You can print the
+//! velocities per particle (or kinetic energy etc), and color the atoms in Ovito based on these properties.
+void IO::saveState(System &system, StatisticsSampler &statisticsSampler)
 {
     if(file.is_open()) {
         file << system.atoms().size() << endl;
@@ -48,7 +55,6 @@ void IO::saveState(System &system, StatisticsSampler &statisticsSampler) //stati
                     //statisticsSampler.density() << "\n"; //density  is just a function that accesses the member of the class m_density and returns it
                     //UnitConverter::velocityToSI(atom->velocity.x()) <<" "<<
                     //UnitConverter::velocityToSI(atom->velocity.y()) <<" "<<
-
         }
     }
 }
@@ -66,7 +72,6 @@ double * getPositions(System &system){
      }
 
      return positions;
-
 }
 
 

@@ -6,21 +6,25 @@
 
 
 
-void ExtPotential::setPosition(double x, double y){
+void ExtPotential::setPosition(double x, double y)
+{
    position.set(x,y);
 }
 
-void ExtPotential::setStdev(double input_stdev){
+void ExtPotential::setStdev(double input_stdev)
+{
     stdev = input_stdev;
     twostdevSqrd = 2*stdev*stdev;
 }
 
-void ExtPotential::setMax(double inputmax){
+void ExtPotential::setMax(double inputmax)
+{
     max = inputmax;
 }
 
 
-vec2 ExtPotential::getForcefromPotential(vec2 atomPosition, double skin_cutoff_sqrd){
+vec2 ExtPotential::getForcefromPotential(vec2 atomPosition, double skin_cutoff_sqrd)
+{
     vec2 displacement = position - atomPosition;
     vec2 force;
 

@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------------------------------
+// Definitions of the LennardJones class. Defines the Lennard Jones Interatomic potential
+// and contains functions to calculate the pairwise forces.
+
+// By: Timofey Golubev
+
+//------------------------------------------------------------------------------------------------------
+
 #ifndef LENNARDJONES_H
 #define LENNARDJONES_H
 
@@ -18,7 +26,6 @@ public:
     double sigma() const;
     void setSigma(double sigma);
     double epsilon() const;
-    //double twntyfour_epsilon() const;
     void setEpsilon(double epsilon);
 };
 #endif

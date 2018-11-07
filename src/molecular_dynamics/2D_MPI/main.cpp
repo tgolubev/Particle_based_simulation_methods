@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     double side_length;
     double total_dt_time= 0.0;
 
-    vec2 Total_systemSize(90, 30); // since using SC lattice--> just gives # of atoms in each dimension
+    vec2 Total_systemSize(120, 30); // since using SC lattice--> just gives # of atoms in each dimension
     vec2 subsystemSize;
     subsystemSize[0] = Total_systemSize[0]/(nprocs-1);  //1D domain decomposition along x
     subsystemSize[1] = Total_systemSize[1];
