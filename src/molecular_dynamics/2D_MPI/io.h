@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------------------------------
+// The IO class contains utility functions that can be used for I/O.
+
+// By: Timofey Golubev
+
+//------------------------------------------------------------------------------------------------------
+
+
 #ifndef IO_H
 #define IO_H
 #include <fstream>
@@ -19,8 +27,6 @@ public:
 
 };
 
-
 double * getPositions(System &system);
-
 
 #endif

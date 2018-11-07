@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------------------------------
+// Definitions of the Atom class. Simple class to describe particles and be able to reset
+// their velocities
+
+// By: Timofey Golubev
+
+//------------------------------------------------------------------------------------------------------
+
 #ifndef ATOM_H
 #define ATOM_H
 #include "vec2.h"

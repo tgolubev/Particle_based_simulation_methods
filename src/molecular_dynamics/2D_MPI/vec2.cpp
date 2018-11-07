@@ -1,3 +1,9 @@
+//------------------------------------------------------------------------------------------------------
+// Definition of 2D vector class which contains overloaded operators for
+// vector operations
+//
+//------------------------------------------------------------------------------------------------------
+
 #include "vec2.h"
 #include "random.h"
 //#include <cmath>

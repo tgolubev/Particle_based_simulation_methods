@@ -1,3 +1,12 @@
+//------------------------------------------------------------------------------------------------------
+// Implementation of theUnitConverter class which contains functions for converting
+// from molecular dynamics units (units convenient for computation) to SI units.
+//
+// Borrowed with permission from: https://github.com/andeplane/molecular-dynamics-fys3150v
+//
+// Small modifications by Timofey Golubev
+//------------------------------------------------------------------------------------------------------
+
 #ifndef UNITCONVERTER_H
 #define UNITCONVERTER_H
 

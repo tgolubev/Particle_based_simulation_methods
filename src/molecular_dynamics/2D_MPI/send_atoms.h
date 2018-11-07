@@ -1,3 +1,9 @@
+//------------------------------------------------------------------------------------------------------
+// Declare the send_atoms function so that it can be used in velocityverlet.cpp
+//
+// By Timofey Golubev
+//------------------------------------------------------------------------------------------------------
+
 #ifndef SEND_ATOMS_H
 #define SEND_ATOMS_H
 

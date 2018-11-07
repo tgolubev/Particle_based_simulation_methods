@@ -1,18 +1,14 @@
 #include "send_atoms.h"
 #include <mpi.h>
-#include <math.h>  //<> for include for files in other directories, i.e. STL
+#include <math.h>
 #include "global.h" //tells it that MPI_ATOM is extern variable--> defined elsewhere
-
 
 using namespace std;
 
-/*
- This function sends the atoms that have left the domain of the processor to the relevant neighboring processor.
-*/
+//!This function sends the atoms that have left the domain of the processor to the relevant neighboring processor.
+//!It is called in velocityverlet.cpp
 void send_atoms(System *system) {
 
-        //vec2 sim_size = system->simSize(); //returns total simulation size, needed for finding which proc atoms belong to.
-        //NOTE: sim_size is just slightly larger than systemSize in order to include the atoms on the system edges
         int decomp_dim = 0;  // 0 or 1, x or y direction of decomposition
 
 	int nprocs, rank;
@@ -40,18 +36,16 @@ void send_atoms(System *system) {
 	MPI_Status stat[4], stat2[4];  //get status of the requests
 
 	int proc_to;
-        for (int i=0; i!=system->num_atoms(); ++i) {   //-> are used b/c
+        for (int i = 0; i != system->num_atoms(); ++i) {   //-> are used b/c
 		// calculate the processor for each atom
                 proc_to = floor(system->atoms(i)->position[decomp_dim]/ system->systemSize(decomp_dim) * (nprocs-1));
 
-                if (proc_to == (rank -1- 1 + nprocs-1) % (nprocs-1)) {
+                if (proc_to == (rank - 2 + nprocs-1) % (nprocs-1)) {
                         num_to_left++;
                         to_left.push_back(system->atoms(i)->position[0]);
                         to_left.push_back(system->atoms(i)->position[1]);
                         to_left.push_back(system->atoms(i)->velocity[0]);
                         to_left.push_back(system->atoms(i)->velocity[1]);
-
-                      // std::cout <<"BEFORE SEND position" <<system->atoms(i)->position[0] << " " <<system->atoms(i)->position[1] << "vel" <<system->atoms(i)->velocity[0] << " " <<system->atoms(i)->velocity[1] <<std::endl;
 
                         to_delete.push_back(i);  //using erase, requires an iterator //never gets sent anywhere-< just for cucrrent proc
 		}
@@ -70,8 +64,8 @@ void send_atoms(System *system) {
 
 
 	// send number of atoms
-        int ln =  (rank -1- 1 + nprocs-1) % (nprocs-1)+1;
-        int rn = (rank ) %( nprocs-1)+1;
+        int ln = (rank - 2 + nprocs-1) % (nprocs-1)+1;
+        int rn = (rank ) % (nprocs-1)+1;
 
         //synthax: MPI_Isend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag,  MPI_Comm comm, MPI_Request *request)
         //(starting address of data that sending (called buffer), # of elements in buffer, MPI data type, destination processor, message tag, communicator, pointer to the request)
@@ -82,7 +76,7 @@ void send_atoms(System *system) {
         MPI_Irecv(&num_from_right, 1, MPI_INT, rn, 10*rn +rank, MPI_COMM_WORLD, req+3);
         MPI_Waitall (4, req, stat);
 
-        //SENDING ATOM INFORMATION AS SIMPLY 4 doubles FOR EACH ATOM!! rx, ry, vx, vy
+        //sending atom info is simply 4 doubles for each atom: rx, ry, vx, vy
 
         // resize vectors of atom data--> 4*# of atoms
         from_left.resize(4*num_from_left);
@@ -107,6 +101,4 @@ void send_atoms(System *system) {
         from_right.clear();
         from_left.clear();
         to_delete.clear();
-
-        //MPI_Barrier(MPI_COMM_WORLD);
 }

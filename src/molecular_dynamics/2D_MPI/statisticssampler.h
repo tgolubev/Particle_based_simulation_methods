@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------------------------------
+// Definition of StatisticsSampler class which contains all functions for calculating physical
+// quantities about the system such as temperature, pressure, etc.
+//
+//
+// Small modifications by Timofey Golubev
+//------------------------------------------------------------------------------------------------------
+
 #ifndef STATISTICSSAMPLER_H
 #define STATISTICSSAMPLER_H
 #include <fstream>

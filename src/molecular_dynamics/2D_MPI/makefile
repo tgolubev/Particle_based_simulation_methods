@@ -8,7 +8,7 @@ OBJS = $(subst .cpp,.o,$(SRCS))
 all: MPI-md
 
 # Whereas here we create the object file
-MPI-md: $(OBJS) mpiatom.h  global.h #need to put this explicitely b/ doesn't have an associated .cpp
+MPI-md: $(OBJS) global.h #need to put this explicitely b/ doesn't have an associated .cpp
 	mpic++ ${FLAGS} -o MPI-md $(OBJS) # note: must use mpic++ compiler for MPI with cpp files (mpicc for .c)
 #	export OMP_NUM_THREADS=20
 #	./md
